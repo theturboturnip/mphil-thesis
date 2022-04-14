@@ -1,4 +1,4 @@
-\ProvidesPackage{turnipstyle}[2020/12/01]
+\ProvidesPackage{turnipstyle}[2022/04/14]
 
 % ----
 % ARGS
@@ -10,6 +10,10 @@
   \@libertinemathtrue
 }
 
+\newif\if@linkcolors\@linkcolorsfalse
+\DeclareOption{linkcolors}{
+  \@linkcolorstrue
+}
 
 % Done taking options
 \ProcessOptions*\relax
@@ -48,3 +52,15 @@
 \DeclareMathOperator{\forall}{\oldforall}
 \RequirePackage{breqn} % For long equation breaking
 \RequirePackage{bm}
+
+\if@linkcolors
+\RequirePackage[usenames,dvipsnames]{xcolor} 
+\RequirePackage[colorlinks,unicode]{hyperref}
+% hyperref setup
+\hypersetup{
+    colorlinks,
+    linkcolor={Periwinkle!50!blue},
+    citecolor={MidnightBlue},
+    urlcolor={MidnightBlue}
+}
+\fi
