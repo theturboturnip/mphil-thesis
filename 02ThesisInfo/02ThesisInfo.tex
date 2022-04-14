@@ -3,7 +3,7 @@
 %%
 
 %% The title of the thesis:
-\title{An Investigation of Scalable Vector Support on Capability-Based Systems}
+\title{Investigating scalable vector models on capability-based hardware}
 
 %% The full name of the author (e.g.: James Smith):
 \author{Samuel Stark}
@@ -22,6 +22,15 @@
 
 %% Declaration date:
 \date{June 2022}
+
+%% Word count
+\begin{luacode*}
+    local pip=io.popen("texcount -1 -sum -merge -q thesis.tex")
+    wordcount=pip:read()
+    pip:close()
+\end{luacode*}
+\wordcount{\luadirect{tex.print(wordcount)}}
+\wordcountmethod{\texttt{texcount -1 -sum -merge -q thesis.tex}\\(Does not include the title page or this declaration)}
 
 %% PDF meta-info:
 \subjectline{Computer Science}

@@ -1,7 +1,10 @@
 alias b := build-thesis
 build-thesis:
     @# Run latexmk on just this thesis
-    latexmk -lualatex ./thesis.tex -outdir=./output/
+    latexmk -shell-escape -lualatex ./thesis.tex -outdir=./output/
+
+clean:
+    latexmk -lualatex ./thesis.tex -outdir=./output/ -c
 
 open: build-thesis
     xdg-open ./output/thesis.pdf
