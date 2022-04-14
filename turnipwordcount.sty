@@ -1,0 +1,34 @@
+\ProvidesPackage{turnipwordcount}[2021/10/17]
+
+% ----
+% ARGS
+% ----
+
+% Done taking options
+\ProcessOptions*\relax
+
+% ----
+% MAIN
+% ____
+
+\newcommand{\detailtexcount}[1]{%
+  \immediate\write18{texcount -merge -sum #1.tex > detail.wcdetail }%
+  \verbatiminput{#1.wcdetail}%
+}
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge -q #1.tex > words.sum }%
+  \input{words.sum}words%
+}
+
+\newcommand{\quickcharcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge -char -q #1.tex > chars.sum }%
+  \input{chars.sum} characters (not including spaces)%
+}
+
+\newcommand{\essayinput}[1]{%
+    \textbf{\quickwordcount{#1}}%
+    \firstpar%
+    \vspace{1em}\\
+    \input{#1}%
+}

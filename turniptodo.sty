@@ -1,0 +1,163 @@
+\ProvidesPackage{turniptodo}[2022/01/16]
+
+% For macro help
+\RequirePackage{etoolbox}
+\RequirePackage{xpatch}
+% For TODO highlighting
+\RequirePackage{xcolor}
+% For writing out to files
+\RequirePackage{newfile}
+% For finding the current file
+\RequirePackage{currfile}
+
+% ----
+% ARGS
+% ----
+
+%% Hide TODOs option
+\newif\if@hidetodo\@hidetodofalse
+\DeclareOption{hide}{
+  \@hidetodotrue
+}
+
+%% Warn-on-TODO for all TODOs
+\newif\if@warnontodo\@warnontodofalse
+\DeclareOption{warn}{
+  \@warnontodotrue
+}
+\DeclareOption{nowarn}{
+  \@warnontodofalse
+}
+
+% Error-on-TODO for all TODOs but pending
+\newif\if@errorontodo\@errorontodofalse
+\DeclareOption{error}{
+  \@errorontodotrue
+}
+\DeclareOption{noerror}{
+  \@errorontodofalse
+}
+
+%% Disabling writing
+\newif\if@enablewrite\@enablewritetrue
+\DeclareOption{disablewrite}{
+  \@enablewritefalse
+}
+
+%% Release mode - Error-on-TODO + Hide TODOs
+\DeclareOption{release}{
+    \@hidetodotrue
+    \@errorontodotrue
+    \@warnontodotrue
+}
+
+%% Use Footnotes
+\newif\if@footnotes\@footnotestrue
+\DeclareOption{nofootnotes}{
+  \@footnotesfalse
+}
+
+% Done taking options
+\ProcessOptions*\relax
+
+% ----
+% MAIN
+% ----
+\definecolor{hotpink}{rgb}{1,0,1} 
+
+% Hide TODOs if requested
+\if@hidetodo
+    \newcommand{\todofmt}[2][red]{}
+\else 
+    \newcommand{\todofmt}[2][red]{\textcolor{#1}{\textbf{#2}}}
+\fi
+
+% Counters
+\newcounter{todopendingi}
+\newcounter{todomarki}
+\newcounter{todocitei}
+\newcounter{todorefi}
+
+% Basic definitions
+\newcommand{\todopending}[1]{%
+    \refstepcounter{todopendingi}%
+    \todofmt[hotpink]{TODO? #1}%
+}
+\newcommand{\todomark}[1]{%
+    \refstepcounter{todomarki}%
+    \todofmt{[%
+        TODO\arabic{todomarki} #1%
+    ]}%
+}
+\newcommand{\todocite}[2][]{%
+    \refstepcounter{todocitei}%
+    \todofmt{[%
+        TC\arabic{todocitei}%
+        \ifstrempty{#1}{}{, \unexpanded{#1}}%
+        \if@footnotes%
+            \footnote{\todofmt{#2}}%
+        \fi%
+    ]}%
+}
+\newcommand{\todoref}[1]{%
+    \refstepcounter{todorefi}%
+    \todofmt{Section ??\arabic{todorefi}}%
+}
+
+% Add write hooks if necessary
+\if@enablewrite
+    \newcommand{\@maketodostream}[2]{%
+        \newoutputstream{@#1}
+        \openoutputfile{\jobname.#1.txt}{@#1}
+        \addtostream{@#1}{#2}
+    }
+    
+    \@maketodostream{todopending}{Future TODOs}
+    \apptocmd{\todopending}{%
+        \addtostream{@todopending}{\arabic{todopendingi} - \currfilepath - \unexpanded{#1}}%
+    }{}{}
+    
+    \@maketodostream{todomark}{TODOs}
+    \apptocmd{\todomark}{%
+        \addtostream{@todomark}{\arabic{todomarki} - \currfilepath - \unexpanded{#1}}%
+    }{}{}
+    
+    \@maketodostream{todocite}{TODO Citations}
+    \xapptocmd{\todocite}{%
+        \addtostream{@todocite}{\arabic{todocitei} - \currfilepath - \unexpanded{#2}%
+        \ifstrempty{#1}{}{, \unexpanded{#1}}%
+        }%
+    }{}{}
+    
+    \@maketodostream{todoref}{TODO Refs}
+    \apptocmd{\todoref}{%
+        \addtostream{@todoref}{\arabic{todorefi} - \currfilepath - \unexpanded{#1}}%
+    }{}{}
+\fi
+
+% Add errors/warnings if necessary
+\if@errorontodo
+    \newcommand{\@todoerror}[1]{%
+        \PackageError{turniptodo}{#1}{%
+        The 'error' argument forces todomarks, todocites, and todorefs to become errors. Eliminate the TODOs to compile the document%
+        }%
+    }
+
+    % Errors ignore pending TODOs
+    % \appto{\todopending}{\@todoerror{TODO pending \unexpanded{#1}}}
+    \apptocmd{\todomark}{\@todoerror{TODO mark \unexpanded{#1}}}{}{}
+    \xapptocmd{\todocite}{\@todoerror{TODO cite \unexpanded{#1}}}{}{}
+    \apptocmd{\todoref}{\@todoerror{TODO ref \unexpanded{#1}}}{}{}
+\fi
+
+\if@warnontodo
+    \newcommand{\@todowarning}[1]{\PackageWarning{turniptodo}{#1}}
+    
+    \apptocmd{\todopending}{\@todowarning{TODO pending \unexpanded{#1}}}{}{}
+    \if@errorontodo
+    \else    
+        \apptocmd{\todomark}{\@todowarning{TODO mark \unexpanded{#1}}}{}{}
+        \xapptocmd{\todocite}{\@todowarning{TODO cite \unexpanded{#1}}}{}{}
+        \apptocmd{\todoref}{\@todowarning{TODO ref \unexpanded{#1}}}{}{}
+    \fi
+\fi
