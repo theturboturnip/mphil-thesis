@@ -1,0 +1,3 @@
+[submodule "thesis"]
+	path = thesis-class
+	url = https://github.com/cambridge/thesis
