@@ -1,4 +1,18 @@
 *~
 *#
-output
+
+# Ignore misc LaTeX files, except for the thesis.pdf
+output/*
 !output/thesis.pdf
+
+# thesis-class is cloned as a git repository
+# We only want to include important files - these will be pulled in to Overleaf
+# Ignore all files initially
+thesis-class/*
+# Pull in the actual class
+!thesis-class/cam-thesis.cls
+# Pull in the college shields
+!thesis-class/CollegeShields
+!thesis-class/CollegeShields/*
+# Pull in the license, as required by the license :)
+!thesis-class/License
