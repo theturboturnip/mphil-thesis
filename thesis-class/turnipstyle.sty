@@ -1,0 +1,66 @@
+\ProvidesPackage{turnipstyle}[2022/04/14]
+
+% ----
+% ARGS
+% ----
+
+%% Hide TODOs option
+\newif\if@libertinemath\@libertinemathfalse
+\DeclareOption{libertinemath}{
+  \@libertinemathtrue
+}
+
+\newif\if@linkcolors\@linkcolorsfalse
+\DeclareOption{linkcolors}{
+  \@linkcolorstrue
+}
+
+% Done taking options
+\ProcessOptions*\relax
+
+% ----
+% MAIN
+% ____
+
+% (1) choose a font that is available as T1
+% for example:
+\RequirePackage{lmodern}
+% (2) specify encoding
+% Blatantly stolen from ACM style
+\RequirePackage[T1]{fontenc}
+% Note that the order in which packages are loaded matters,
+% and the correct order depends on the LaTeX engine used.
+% See https://github.com/borisveytsman/acmart/issues/402
+% and https://github.com/borisveytsman/acmart/issues/410
+\RequirePackage{bera}% optional: just to have a nice mono-spaced font
+\if@libertinemath
+    \usepackage[libertine]{newtxmath}
+\fi
+\RequirePackage[tt=false]{libertine}
+%\setmonofont[StylisticSet=3]{inconsolata}
+% (3) load symbol definitions
+\RequirePackage{textcomp}
+% The underscore package breaks labels with underscores in them
+% \RequirePackage{underscore}
+
+
+\RequirePackage{amsmath} %For both in-line and equation mode
+\numberwithin{equation}{section} %Numbering of our equations per section
+% % Better forall spacing
+\let\oldforall\forall
+\let\forall\undefined
+\DeclareMathOperator{\forall}{\oldforall}
+\RequirePackage{breqn} % For long equation breaking
+\RequirePackage{bm}
+
+\if@linkcolors
+\RequirePackage[usenames,dvipsnames]{xcolor} 
+\RequirePackage[colorlinks,unicode]{hyperref}
+% hyperref setup
+\hypersetup{
+    colorlinks,
+    linkcolor={Periwinkle!50!blue},
+    citecolor={MidnightBlue},
+    urlcolor={MidnightBlue}
+}
+\fi

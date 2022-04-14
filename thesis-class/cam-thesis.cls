@@ -135,16 +135,22 @@
     \RequirePackage[
         pdfpagelabels=false,
         pdfborder={0 0 0},
-        pdfusetitle=true
+        pdfusetitle=true,
+        unicode
     ]{hyperref}
 \else
     \RequirePackage[
         pdffitwindow=true,
         pdfpagelabels=true,
-        colorlinks=false,
+        colorlinks,
         pdfborder={0 0 0},
-        pdfusetitle=true
+        pdfusetitle=true,
+        unicode
     ]{hyperref}
+
+    % Setup nice fonts and link colors
+    % PhD formatting is more lenient than TRs, so only use this on theses
+    \RequirePackage[linkcolors]{turnipstyle}
 \fi
 \RequirePackage[all]{hypcap}        % Fixes links to floats (must be included after hyperref).
 
@@ -300,6 +306,14 @@
 \newif\ifcam@submissiondate\cam@submissiondatefalse
 \newcommand{\@submissiondate}{}
 \newcommand{\submissiondate}[1]{\renewcommand{\@submissiondate}{#1}\cam@submissiondatetrue}
+
+% DOCVAR: wordcount (This will appear in the declaration for MPhil theses)
+\newcommand{\@wordcount}{Unknown}
+\newcommand{\wordcount}[1]{\renewcommand{\@wordcount}{#1}}
+
+% DOCVAR: wordcountmethod (This will appear in the declaration for MPhil theses)
+\newcommand{\@wordcountmethod}{Unspecified}
+\newcommand{\wordcountmethod}[1]{\renewcommand{\@wordcountmethod}{#1}}
 
 % DOCVAR: submissionnotice (The submission notice is shown on the bottom of the
 % title page.)
@@ -480,7 +494,27 @@ for the degree of Doctor of Philosophy%
 % (see http://www.cl.cam.ac.uk/techreports/submission.html).
 \else
 {\ifcam@mphil
-%
+\chapter*{Declaration}
+\thispagestyle{empty}
+I \@author{} of \@college{}, being a candidate for the M.Phil in
+Advanced Computer Science, hereby declare that this report and the
+work described in it are my own work, unaided except as may be
+specified below, and that the report does not contain material that
+has already been used to any substantial extent for a comparable
+purpose.
+\\\vspace{15mm}
+Total Word Count: \@wordcount{}
+\\
+Word Count Method: \@wordcountmethod{}
+
+% Leaving some space for the signature:
+\vspace{15mm}
+
+\begin{flushright}
+\@author{}\\
+\@date{}\\
+\end{flushright}
+\vfill
 \else
 \ifcam@firstyr
 % First and second yr report don't need the declaration

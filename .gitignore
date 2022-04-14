@@ -11,6 +11,8 @@ output/*
 thesis-class/*
 # Pull in the actual class
 !thesis-class/cam-thesis.cls
+# Pull in turnipstyle
+!thesis-class/turnipstyle.sty
 # Pull in the college shields
 !thesis-class/CollegeShields
 !thesis-class/CollegeShields/*
