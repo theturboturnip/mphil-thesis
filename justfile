@@ -14,5 +14,5 @@ upgrade-thesis-class:
     else
         # if it is not a git repo, then delete and re-clone 
         rm -r ./thesis-class/
-        git clone https://github.com/cambridge/thesis ./thesis-class/
+        git clone https://github.com/theturboturnip/thesis ./thesis-class/
     fi

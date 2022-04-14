@@ -78,6 +78,11 @@
 \newif\ifcam@index\cam@indexfalse
 \DeclareOption{withindex}{\cam@indextrue}
 
+% MPhil dissertation - omits declaration
+%
+\newif\ifcam@mphil\cam@mphilfalse
+\DeclareOption{mphil}{\cam@mphiltrue}
+
 % 1st year report - omits abstract/declaration
 %
 \newif\ifcam@firstyr\cam@firstyrfalse
@@ -317,7 +322,11 @@ in partial fulfilment of the requirements
 \ifcam@secondyr
 in partial fulfilment of the requirements
 \fi
+\ifcam@mphil
+for the degree of Master of Philosophy%
+\else
 for the degree of Doctor of Philosophy%
+\fi
 }
 \newcommand{\submissionnotice}[1]{\renewcommand{\@submissionnotice}{#1}}
 
@@ -470,7 +479,10 @@ for the degree of Doctor of Philosophy%
 % Technical report doesn't need the declaration
 % (see http://www.cl.cam.ac.uk/techreports/submission.html).
 \else
-{\ifcam@firstyr
+{\ifcam@mphil
+%
+\else
+\ifcam@firstyr
 % First and second yr report don't need the declaration
 \else 
 \ifcam@secondyr
@@ -497,6 +509,7 @@ This dissertation does not exceed the prescribed limit of 60\,000 words.
 \@date{}\\
 \end{flushright}
 \vfill
+\fi
 \fi
 \fi}
 \fi
