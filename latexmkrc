@@ -1,6 +1,10 @@
 # Settings
 $xdvipdfmx = "xdvipdfmx -z 6 -o %D %O %S";
 
+# TURBOTURNIP SPECIFIC - Add thesis-class to path so it picks up the class
+# https://tex.stackexchange.com/a/474915
+ensure_path( 'TEXINPUTS', './thesis-class//' );
+
 ###############################
 # Post processing of pdf file #
 ###############################
@@ -29,10 +33,21 @@ END {
 ##############
 # Glossaries #
 ##############
-add_cus_dep( 'glo', 'gls', 0, 'glo2gls' );
-add_cus_dep( 'acn', 'acr', 0, 'glo2gls');  # from Overleaf v1
-sub glo2gls {
-    system("makeglossaries $_[0]");
+# TURBOTURNIP SPECIFIC - Replaced this with latexmk example_rcfiles glossaries version
+# add_cus_dep( 'glo', 'gls', 0, 'glo2gls' );
+# add_cus_dep( 'acn', 'acr', 0, 'glo2gls');  # from Overleaf v1
+# sub glo2gls {
+#     system("makeglossaries $_[0]");
+# }
+add_cus_dep( 'acn', 'acr', 0, 'makeglossaries' );
+add_cus_dep( 'glo', 'gls', 0, 'makeglossaries' );
+$clean_ext .= " acr acn alg glo gls glg";
+
+sub makeglossaries {
+    my ($base_name, $path) = fileparse( $_[0] );
+    my @args = ( "-q", "-d", $path, $base_name );
+    if ($silent) { unshift @args, "-q"; }
+    return system "makeglossaries", "-d", $path, $base_name; 
 }
 
 #############
