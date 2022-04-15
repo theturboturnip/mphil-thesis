@@ -3,9 +3,11 @@
 ## Build System
 
 This is the LuaTeX source code for my MPhil thesis.
+It compiles on TeX Live 2021 and 2022, and has not been tested on other versions.
+The word count feature requires compiling with `--shell-escape`.
 
-It's based on the "Clean Sample" from [https://github.com/cambridge/thesis].
-This folder is not included as a submodule (Overleaf doesn't like them), but the pertinent files are copied into the `./thesis-class/` directory.
+It's based on the "Clean Sample" from [my fork of https://github.com/cambridge/thesis](https://github.com/theturboturnip/thesis).
+This repository is not included as a submodule (Overleaf doesn't like them), but the pertinent files are copied into the `./thesis-class/` directory.
 If you clone this repository, `./thesis-class/` will be a regular directory.
 If you want to upgrade the thesis class to a newer version, running `just upgrade-thesis-class` will clone the full Git repository under `./thesis-class/`, fetch, and pull.
 
