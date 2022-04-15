@@ -1,0 +1,29 @@
+\chapter{Software considerations}
+PLAN: 3-4k words
+
+Largest impact of adding vectors to scalar languages = how to generate vector code.
+Is it automatic?
+Are there intrinsics?
+Is assembly feasible?
+How does ARM handle this vs. RVV?
+
+Largest impact of adding CHERI to previously insecure languages = memory safety :D.
+How must the vector instructions change to support capabilities? i.e. go into clang and use GPCRC.
+Can you store vectors on the stack?
+
+Unique intersection between CHERI + vectors: capabilities-in-vectors
+Do we need new instructions for performing capability operations on caps-in-vectors?
+
+\section{Compiling Vector Code}
+\subsection{Automatic Vectorization}
+\subsection{Vector Intrinsics}
+\subsection{Inline Assembly}
+\subsection{Comparing ARM SVE with RVV} 
+
+\section{Complications with CHERI-Clang}
+\subsection{Adapting Intrinsics for CHERI}
+\subsection{Storing Scalable Vectors on-stack}
+
+\section{Capability-in-Vector Operations}
+
+\section{The \texttt{vector\_memcpy} testbench}

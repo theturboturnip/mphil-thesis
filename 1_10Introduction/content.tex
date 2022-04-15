@@ -1,5 +1,5 @@
 \chapter{Introduction}
-
+PLAN: 1k words
 % 2-3 pages
 
 \todomark{para on what vectors are}
@@ -19,10 +19,20 @@
 
 \todomark{memcpy is a very common operation, vectorized on many platforms (cite)}
 \todomark{thus memory accesses themselves should be optimized}
+\todomark{also raises the question of storing capabilities within vectors, which could be useful for revocation strategies as proposed in XYZ}
 
 \todomark{scalable vector support useful for future Arm support}
 \todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
 
 \section{Aims}
 
-\todomark{What does this project actually do}
+Investigate the reprecussions of adding scalable vector support to CHERI systems.
+\todomark{Identify where potential roadblocks could be, and where they couldn't be.}
+% What are potential performance/compatibility roadblocks?
+
+\todomark{Investigate from both hardware and software perspectives}
+
+\todomark{Investigate from both (adding CHERI to vector) and (adding vectors to CHERI) perspectives}
+
+% How does CHERI impact vector implementations (i.e. storing capabilities inside vectors for generic memcpy)
+% How do vectors impact CHERI implementations (particularly scalable vectors?)

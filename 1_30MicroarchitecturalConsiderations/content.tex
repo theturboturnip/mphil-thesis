@@ -1,2 +1,43 @@
-\chapter{Microarchitectural considerations}
+\chapter{Hardware considerations}
+PLAN: 4-5k words
 
+
+Largest u-arch impact of adding vectors to any scalar processor = exceptions
+How do scalar exceptions impact vector pipeline?
+How do vector exceptions impact scalar pipeline?
+How are the vector and scalar pipelines combined? are they separate? what is the impact of a separate vector unit?
+- e.g. register coloring etc.
+How does ARM handle this vs. RVV?
+
+Largest impact of adding CHERI to vector processor = capability checks.
+When do they happen?
+What happens when they fail?
+    In fast-paths, when we fail, do we need to perform accesses up to the point of failure?
+
+Thought: If, for a given vector memory access, a scalarized version wouldn't trigger any capability bounds errors, should that vector memory access *never* trigger a bounds error?
+Could be simpler
+
+Unique interaction between theoretical models for capabilities and vectors = capabilities-in-vectors.
+How do vectors need to change in order to hold capabilities?
+Does this fundamentally change how vectors work?
+Alignment, atomicity, vector size impact?
+Does this require u128 element size?
+
+\section{Hardware Emulator}
+
+\section{Pipeline Impacts}
+\subsection{Combined vs. Separate Vector Pipeline}
+\subsection{Handling Scalar Exceptions}
+\subsection{Handling Vector Exceptions}
+
+\section{Vector Capability Checks}
+\subsection{Fast-Path Checks}
+\subsubsection{Handling Failure}
+\subsection{Slow-Path Checks}
+\subsubsection{Handling Failure}
+
+\section{Capabilities-In-Vectors}
+\subsection{Vector Register Changes}
+\subsection{Memory Access Guarantees}
+
+\section{Case Study: XYZ}

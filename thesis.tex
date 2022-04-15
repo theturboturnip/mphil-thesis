@@ -50,9 +50,15 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Main Chapter
+%%
+\input{1_35_SoftwareConsiderations/content}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Other Chapter
 %%
-\input{1_40TestingThroughEmulation/content}
+% \input{1_40TestingThroughEmulation/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,12 +74,14 @@
 % If you include some work not referenced in the main text (e.g. using \nocite{}), consider changing "References" to "Bibliography".
 %
 
-% \renewcommand to change default "Bibliography" to "References"
-% \renewcommand{\bibname}{References}
 \cleardoublepage
 \phantomsection
-% \addcontentsline{toc}{chapter}{References}
-\turnipbib{}
+\begingroup
+% Allow references to not fill the whole line
+\raggedright
+\printbibheading[heading=bibnumbered,title=References]
+\printbibliography[heading=none]
+\endgroup%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Appendix
