@@ -1,38 +1,92 @@
 \chapter{Introduction}
-PLAN: 1k words
+% PLAN: 1k words
 % 2-3 pages
 
-\todomark{para on what vectors are}
+% \todomark{para on what capabilities are}
+Since 2010, the Cambridge Computer Lab (in association with SRI) has been developing the  CHERI\footnote{Capability Hardware Enhanced RISC Instructions} architecture extension, which improves the security of any given architecture by checking all memory accesses in hardware.
+The core impact of CHERI, on a hardware level, is that memory can no longer be accessed directly through raw addresses, but must pass through a \emph{capability}\todocite{TR-951?}.
+Capabilities are unforgeable tokens that grant fine-grained access to ranges of memory.
+Instead of generating them from scratch, capabilities must be \emph{derived} from another capability with greater permissions.
+For example, a capability giving read-write access to an array of structures can be used to create a sub-capability granting read-only access to a single element.
+This vastly reduces the scope of memory-related security issues, such as buffer overflows\todocite{something something heartbleed?}, and creates interesting opportunities for software compartmentalization\todocite{CHERI: A Hybrid Capability-System Architecture for
+Scalable Software Compartmentalization}.
 
-\todomark{para on what capabilities are}
+Industry leaders have recognized the value CHERI provides.
+Arm Inc have manufactured the Morello System-on-Chip, based on their Neoverse N1 CPU, which incorporates CHERI capabilities into the Armv8.2 ISA.
+While this represents a great step forward, there are still elements on the SoC that haven't fully embraced CHERI (e.g. the GPU), and architecture extensions that haven't been investigated in the context of CHERI.
+One such example is Arm's Scalable Vector Extension (introduced in Armv8.2 but not included in Neoverse N1), which is designed to remain in use well into the future\todocite{stephensARMScalableVector2017}.
+Supporting this and other scalable vector ISAs in CHERI is essential to CHERI's long-term relevance.
 
-\todomark{above paras should explain why the interactions between the two are interesting}
+% \todomark{para on what vectors are}
+In the context of modern computer architecture, vector processing is the practice of dividing a large hardware register into a \emph{vector} of multiple \emph{elements} and executing the same operation on each element in a single instruction\footnote{This is a SIMD (Single Instruction Multiple Data) paradigm.}.
+This data-level parallelism can drastically increase throughput, particularly for arithmetic-heavy programs.
+However, before computing arithmetic, the vectors must be populated with data.
+% This is typically done using specialized vector memory accesses, which access a whole vector's worth of memory in a single instruction.
+
+% This was the initial motivation for investigating the interactions between CHERI and vector processing.
+
+% \todomark{above paras should explain why the interactions between the two are interesting}
 
 \section{Motivation}
-\todomark{rvv introduces vectors for RVV}
-\todomark{rvv is scalable vector}
-\todomark{CHERI has a RISC-V ISA + various implementations, wants to support vectors}
+% \todomark{vectorized memory accesses required for vectorized arithmetic}
+Modern vector implementations all provide vector load/store instructions to access a whole vector's worth of memory.
+These range from simple contiguous accesses (where all elements are next to each other), to complex indexed accesses (where each element loads from a different location based on another vector).
+They can also have per-element semantics, e.g. ``elements must be loaded in order, so if one element fails the preceding elements are still valid''\todocite{RISC-V V fault-only-first}.
+% \todomark{Necessary for CHERI support in order for CHERI performance to be competitive}
+If CHERI CPUs want to benefit from vector processing's increased performance and throughput, they must support those instructions at some level.
+But adding CHERI's bounds-checking to the mix may affect these semantics, and could impact performance (e.g. checking each element's access in turn may be slow).
 
-\todomark{vectorized memory accesses required for vectorized arithmetic}
-\todomark{Necessary for CHERI support in order for CHERI performance to be competitive}
-\todomark{if this were the only priority, vectorized memory access doesn't need to be that fast relative to arithmetic?}
+% \todomark{if this were the only priority, vectorized memory access doesn't need to be that fast relative to arithmetic?}
+Vector memory access performance is more critical than one may initially assume, because vectors are used for more than just computation.
+% \todomark{memcpy is a very common operation, vectorized on many platforms (cite)}
+A prime example is \code{memcpy}: for \code{x86\_64}, \code{glibc} includes multiple versions of the function\footnote{It appears memcpy is implemented as a copy of memmove.} taking advantage of vector platforms, then selects one to use at runtime\todocite{https://github.com/bminor/glibc/blob/master/sysdeps/x86_64/multiarch/ifunc-memmove.h}
+% \todomark{thus memory accesses themselves should be optimized}
+These implementations are written in assembly and heavily optimized.
+If the memory accesses are hitting the cache, a few extra cycles of bounds-checking for each access could actually make a noticeable difference.
 
-\todomark{memcpy is a very common operation, vectorized on many platforms (cite)}
-\todomark{thus memory accesses themselves should be optimized}
-\todomark{also raises the question of storing capabilities within vectors, which could be useful for revocation strategies as proposed in XYZ}
+% \todomark{also raises the question of storing capabilities within vectors, which could be useful for revocation strategies as proposed in XYZ}
+\code{memcpy} also raises the important question of how the vector model interacts with capabilities.
+In non-CHERI processors, \code{memcpy} will copy pointers around in memory without fuss.
+For a CHERI-enabled vector processor to support this, it would need to be able to load/store capabilities from vectors without violating any security guarantees.
+This may require more guarantees than otherwise necessary - for example, each vector register likely needs to be as large or larger than a single capability.
 
-\todomark{scalable vector support useful for future Arm support}
-\todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
+% \todomark{rvv introduces vectors for RVV}
+% \todomark{rvv is scalable vector}
+% \todomark{why rvv and not just arm}
+% \todomark{CHERI has a RISC-V ISA + various implementations, wants to support vectors}
+% \todomark{scalable vector support useful for future Arm support}
+% \todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
+To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \todocite{risc-v v spec}).
+As of November 2021 this has been ratified by RISC-V International\todocite{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}, and will be RISC-V's standard vector instruction set moving forward.
+Choosing it has two key benefits.
+Firstly, the CHERI project maintains three open-source cores (Piccolo, Flute, and Tooba\todocite{cheri risc-v page?}) implementing CHERI-RISC-V, none of which support vector processing.
+Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for these cores.
+Secondly, RVV is a \emph{scalable} vector model.
+This has more potential roadblocks than a fixed-length vector model, and investigating them here will make life easier if Arm wish to integrate their Scalable Vector Extension with CHERI later down the road.
 
 \section{Aims}
+The aim of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI's memory protection system.
+In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
 
-Investigate the reprecussions of adding scalable vector support to CHERI systems.
-\todomark{Identify where potential roadblocks could be, and where they couldn't be.}
+% Investigate the reprecussions of adding scalable vector support to CHERI systems.
+% \todomark{Identify where potential roadblocks could be, and where they couldn't be.}
 % What are potential performance/compatibility roadblocks?
+This project does not try to implement CHERI-RVV in a hardware description language.
+Instead, it uses an emulator written in Rust to experiment with potential integration methods.
+A higher-level approach allows us to evaluate what's plausible for hardware without getting stuck in the weeds of implementing it in full.
 
-\todomark{Investigate from both hardware and software perspectives}
+% \todomark{Investigate from both hardware and software perspectives}
+Software and the user story for writing CHERI-RVV programs is also considered. 
+Where possible, vector code is generated from C source code using the CHERI-Clang compiler, rather than hand-writing assembly.
+This reveals many problems CHERI-Clang has with vector intrinsics, which we later propose solutions to.
 
-\todomark{Investigate from both (adding CHERI to vector) and (adding vectors to CHERI) perspectives}
+% \todomark{Investigate from both (adding CHERI to vector) and (adding vectors to CHERI) perspectives}
+As scalar CHERI processors and vector non-CHERI processors both already exist, we consider integration from both sides: how does vector processing change when adding CHERI, and how does CHERI change when adding vectors?
+Examples of these perspectives include the following:
+\begin{itemize}
+    \item When adding CHERI to vectors, do vectors need to be able to hold capabilities? If so, what changes are necessary?
+    \item When adding vectors to scalar CHERI, what are the benefits/drawbacks of using a separate hardware vector unit vs. an integrated scalar+vector pipeline?
+\end{itemize}
 
 % How does CHERI impact vector implementations (i.e. storing capabilities inside vectors for generic memcpy)
 % How do vectors impact CHERI implementations (particularly scalable vectors?)
