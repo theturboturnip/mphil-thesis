@@ -1,0 +1,74 @@
+\section{RVV}\label{chap:bg:sec:rvv}
+% RISC-V has extensions
+RISC-V is an open family of ISAs which defines ``base integer ISAs'' (e.g. all 64-bit RISC-V cores implement the RV64I Base Integer Instruction Set) and extensions (e.g. the ``M'' extension for integer multiplication).
+A base instruction set combined with a set of extensions is known as a RISC-V ISA.
+Because RISC-V is open, anyone can design, manufacture, and sell chips implementing any RISC-V ISA.
+% RVV is the vector one
+RVV is the officially ratified vector extension for RISC-V, and going forward all RISC-V chips with vector processing capabilities should implement it instead of designing their own custom vector extensions.
+
+% RVV adds registers, vtype, vlen, vstart
+RVV defines thirty-two new vector registers, each of implementation-defined length VLEN.
+% registers are scalable
+VLEN can be different for different chips, so programs have to adapt to the VLEN provided by the processor it's running on.
+% \begin{itemize}
+%     \item vtype (SEW + LMUL)
+%     \item vlen
+%     \item vstart
+% \end{itemize}
+% vsetvl family for getting `vector length' based on `vtype'
+This is achieved using the \code{vsetvl} family of instructions.
+
+\subsection{\code{vsetvl} and \code{vtype}}
+\code{vsetvl} instructions take in the total number of elements that need processing and a \code{vtype} describing those elements, and returns the number of elements that can be processed per instruction.
+A colloquial description is shown in \cref{fig:vsetvl}.
+
+\begin{figure}
+    \centering
+    \begin{displayquote}
+    I have $N$ elements to process overall.
+    These elements are $SEW$-bits wide, and I'd like to use $LMUL$ vector register's worth of elements per instruction.
+    How many elements will I process in a single instruction?
+    \end{displayquote}
+    \caption{Summary of \code{vsetvl} behaviour}
+    \label{fig:vsetvl}
+\end{figure}
+
+
+% vtype, LMUL
+The \code{vtype} passed to a \code{vsetvl} operation is stored by the processor, and has two key components\footnote{The tail and mask-agnostic bits are ignored here for the purposes of simplification}:
+\begin{itemize}
+    \item Selected Element Width \code{SEW}
+    \item Vector Register Group Multiplier \code{LMUL}
+\end{itemize}
+
+\todomark{talk about SEW? it's pretty obvious how it works}
+
+The utility of \code{LMUL} is not immediately obvious.
+It defines the length of the Vector Register Group, which all instructions operate on.
+For example, if $LMUL = 8$ then vectorized operations will run on each element over 8 vector registers.
+Applications which benefit from using longer logical vectors, e.g. for higher throughput, can request a large LMUL and leave it at that.
+However the intent behind LMUL is to make widening/narrowing calaulations easier.
+For example, if a vector multiplication multiplies 8-bit input elements producing 16-bit results, storing those 16-bit results requires twice as many vector registers as for the input elements.
+\todomark{diagram explaining that lol}
+
+\subsection{\code{vlen}, \code{vstart}, and masking}
+% Every vector instruction operates on at most vlen elements of SEW width
+% `at most' => elements can be excluded based on vstart and masking
+
+% If vector instructions are interrupted after completing X elements, e.g. crossing a page boundary and faulting during a memory access, the implementation may set `vstart=X' and resume the instruction from that element later
+% Explored further in \cref{??}
+% Thus each instruction operates on elements between vstart and vlen
+
+% masking is common to other fixed-length architectures
+% set bits in register v0 - 1 = masked \emph{out}, 0 = performs as normal
+
+\subsection{Memory accesses}
+% unit/strided,
+% indexed,
+% fof,
+% bytemask,
+% wholeregister.
+
+\subsection{Interaction with exceptions}
+
+\subsection{Implementations}

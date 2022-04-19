@@ -20,6 +20,7 @@ Supporting this and other scalable vector ISAs in CHERI is essential to CHERI's 
 % \todomark{para on what vectors are}
 In the context of modern computer architecture, vector processing is the practice of dividing a large hardware register into a \emph{vector} of multiple \emph{elements} and executing the same operation on each element in a single instruction\footnote{This is a SIMD (Single Instruction Multiple Data) paradigm.}.
 This data-level parallelism can drastically increase throughput, particularly for arithmetic-heavy programs.
+\todomark{explain Scalable vectors}
 However, before computing arithmetic, the vectors must be populated with data.
 % This is typically done using specialized vector memory accesses, which access a whole vector's worth of memory in a single instruction.
 

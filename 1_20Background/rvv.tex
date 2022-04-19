@@ -1,0 +1,76 @@
+\section{RVV}\label{chap:bg:sec:rvv}
+% RISC-V has extensions
+RISC-V is an open family of ISAs which defines ``base integer ISAs'' (e.g. all 64-bit RISC-V cores implement the RV64I Base Integer Instruction Set) and extensions (e.g. the ``M'' extension for integer multiplication).
+A base instruction set combined with a set of extensions is known as a RISC-V ISA.
+Because RISC-V is open, anyone can design, manufacture, and sell chips implementing any RISC-V ISA.
+% RVV is the vector one
+RVV is the officially ratified vector extension for RISC-V, and going forward all RISC-V chips with vector processing capabilities should implement it instead of designing their own custom vector extensions.
+This section is based on the RVV Specification v1.0\todocite{RVV spec 1.0}.
+
+\subsection{Vector model}
+RVV defines thirty-two vector registers, each of an implementation-defined width VLEN.
+These registers can be interpreted as vectors of varying element sizes, and the largest possible element size is ELEN.
+RVV also adds some state that defines how the vector registers are used.
+\todoref{diagram of added state}
+
+\subsubsection{\code{vl} and \code{vstart}}
+The first piece of state is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
+The program updates this value through fault-only-first loads (\todoref{fof load}) and more commonly the \code{vsetvl} instruction family (\todoref{vsetvl}).
+
+In the simple case, \code{vl} is equal to the total available elements (see \todoref{figure - full vl}).
+It can also be fewer (see \todoref{figure - partial vl}), in which case vector instructions will not write to elements in the \enquote{tail} (i.e. elements past \code{vl}).
+This eliminates the need for a `cleanup loop' common in fixed-length vector programs.
+
+In a similar vein, \code{vstart} specifies \enquote{the index of the first element to be executed by a vector instruction}.
+This is usually only set by the hardware whenever it is interrupted mid-instruction (see \todoref{figure - vstart}) so that the instruction can be re-executed later without corrupting completed values.
+The program \emph{can} set this value manually, but it may not always work.
+If an implementation couldn't arrive at the value itself, then it is allowed to reject it.
+The specification gives an example where a vector implementation never takes interrupts during an arithmetic instruction, so it would never set \code{vstart} during an arithmetic instruction, so it could raise an exception if \code{vstart} was nonzero for an arithmetic instruction.
+
+\subsubsection{\code{vtype}}
+\code{vtype} contains two key fields.
+The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
+It can be 8, 16, 32, or 64.
+Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
+
+The second field is the Vector Register Group Multiplier (\code{LMUL}).
+Vector instructions do not necessarily operate over a single register, but over a register \emph{group} as defined by this field.
+For example, if \code{LMUL=8} then each instruction would operate over 8 register's worth of elements.
+In some implementations this may increase throughput, which by itself is beneficial for applications.
+
+However, the true utility of \code{LMUL} lies in widening/narrowing operations (see \todoref{LMUL widening}).
+For example, an 8-by-8-bit multiplication can produce 16-bit results.
+Because the element size doubles, the number of vector registers required to hold the same number of elements also doubles.
+Doubling \code{LMUL} after such an operation allows subsequent instructions to handle all the results at once.
+
+\code{vtype} also encodes two flags: mask-agnostic and tail-agnostic.
+If these are set, the implementation is \emph{allowed} to overwrite any masked-out or tail elements with all 1s.
+
+\subsubsection{Masking}
+Most vector instructions allow for per-element \emph{masking}.
+When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector.
+If the mask bit is 1, that element will be `masked out' and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
+
+\subsubsection{Summary}
+\todoref{full diagram} shows all of the above features used in a single configuration:
+\begin{itemize}
+    \item The instruction was previously interrupted and restarted, so \code{vstart=2}
+    \item Elements are 16-bit
+    \item \code{LMUL=4} to try and increase throughput
+    \item Only 29 of the 32 available elements were requested, so \code{vl=29}
+    \item Some elements are masked out (in this case seemingly at random)
+\end{itemize}
+
+\subsection{Memory accesses}
+
+\subsubsection{Unit + Strided}
+
+\subsubsection{Unit fault-only-first load}
+\subsubsection{Unit bytemask load}
+\subsubsection{Unit whole-register load}
+
+\subsubsection{Indexed}
+
+\subsection{Interaction with exceptions}
+
+\subsection{Implementations}

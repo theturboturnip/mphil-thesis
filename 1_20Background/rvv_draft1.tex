@@ -1,0 +1,47 @@
+\section{RVV}\label{chap:bg:sec:rvv}
+% RISC-V has extensions
+RISC-V defines a vast number of 
+% RVV is the vector one
+
+% RVV adds registers
+RVV defines thirty-two new vector registers, each of implementation-defined length VLEN.
+\begin{itemize}
+    \item vtype (SEW + LMUL)
+    \item vlen
+    \item vstart
+\end{itemize}
+% registers are scalable
+% vsetvl family for getting `vector length' based on `vtype'
+% vtype
+% Every vector instruction operates on at most vlen elements of SEW width
+% `at most' => elements can be excluded based on vstart and masking
+
+% If vector instructions are interrupted after completing X elements, e.g. crossing a page boundary and faulting during a memory access, the implementation may set `vstart=X' and resume the instruction from that element later
+% Explored further in \cref{??}
+% Thus each instruction operates on elements between vstart and vlen
+
+% masking is common to other fixed-length architectures
+% set bits in register v0 - 1 = masked \emph{out}, 0 = performs as normal
+
+\subsection{Motivation for scalable vectors}
+\todomark{I originally wrote this for the introduction, but I felt it was taking up too much time. It could be useful for someone familiar with fixed-length vectors but not scalable ones. Should it be here, or move somewhere else?}
+Many vector implementations (Intel SSE/AVX, Arm's Advanced SIMD and Neon) use fixed-length vectors - e.g. 128-bit vectors which a program interprets as four 32-bit elements.
+As the industry's desire for parallelism grew, new implementations had to be designed with longer vectors of more elements.
+For example, Intel SSE/SSE2 (both 128-bit) was succeeded by AVX (128 and 256-bit), then AVX2 (entirely 256-bit), then AVX-512 (512-bit).
+Programs built for one extension, and hence designed for a specific vector size, could not automatically take advantage of longer vectors.
+
+Scalable vectors address this by not specifying the vector length, and instead calculating it on the fly.
+Instead of hardcoding \enquote{this loop iteration uses a single vector of four 32-bit elements}, the program has to ask \enquote{how many 32-bit elements will this iteration use?}.
+This gives hardware designers more freedom, letting them select a suitable hardware vector length for their power/timing targets, while guaranteeing consistent execution of programs on arbitrarily-sized vectors.
+
+
+\subsection{Memory accesses}
+unit/strided,
+indexed,
+fof,
+bytemask,
+wholeregister.
+
+\subsection{Interaction with exceptions}
+
+\subsection{Implementations}

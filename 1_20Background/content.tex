@@ -20,7 +20,7 @@ A great deal of work has gone into compressing capabilities down into a reasonab
 For example, on 64-bit RISC-V a standard capability is 128-bits long.
 The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
 
-In order to keep track of what is and isn't a capability, registers and memory are both tagged.
+In order to keep track of what is and isn't a valid capability, registers and memory are both tagged.
 Each 128-bit register and each aligned 128-bit region of memory has an associated tag bit, which denotes if its data encodes a valid capability\footnote{This has the side-effect that capabilities must be 128-bit aligned in memory.}.
 If any non-capability data is written to any part of the region, the tag bit is zeroed out.
 \todomark{Can you have a capability with tag=1, but the cursor is outside the bounds?}
@@ -31,39 +31,13 @@ As above, significant work has gone into the implementation to reduce the DRAM o
 
 \todomark{Explain CHERI capability instructions vs. legacy instructions that use DDC}
 
-% Hybrid vs. Pure-Capability code
+\todomark{Hybrid vs. Pure-Capability code}
 
 \subsection{CHERI RISC-V}
 Integer vs. Capability mode in hardware?
 
-\section{RVV}\label{chap:bg:sec:rvv}
+\include{1_20Background/rvv}
 
-\subsection{Scalable vs. fixed-size vectors}
-Many vector implementations (Intel SSE/AVX, Arm's Advanced SIMD and Neon) use fixed-length vectors - e.g. 128-bit vectors which a program interprets as four 32-bit elements.
-As the industry's desire for parallelism grew, new implementations had to be designed with longer vectors of more elements.
-For example, Intel SSE/SSE2 (both 128-bit) was succeeded by AVX (128 and 256-bit), then AVX2 (entirely 256-bit), then AVX-512 (512-bit).
-Programs built for one extension, and hence designed for a specific vector size, could not automatically take advantage of longer vectors.
-
-Scalable vectors address this by not specifying the vector length, and instead calculating it on the fly.
-Instead of hardcoding \enquote{this loop iteration uses a single vector of four 32-bit elements}, the program has to ask \enquote{how many 32-bit elements will this iteration use?}.
-This gives hardware designers more freedom, letting them select a suitable hardware vector length for their power/timing targets, while guaranteeing consistent execution of programs on arbitrarily-sized vectors.
-\todomark{move the above}
-
-
-\subsection{General vector model}
-e.g. LMUL, vstart, vsetvli, masking
-
-\subsection{Access types}
-unit/strided,
-indexed,
-fof,
-bytemask,
-wholeregister.
-
-\subsection{Interaction with exceptions}
-
-\subsection{Implementations}
-
-\section{Other Vector Models}
+\section{Other vector models}
 \subsection{Arm SVE}
 \subsection{Intel SSE/AVX}
