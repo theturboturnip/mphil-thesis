@@ -111,3 +111,54 @@
 %% Custom formatting commands
 
 \newcommand{\code}[1]{{\texttt{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Formatting-agnostic figures code
+
+\RequirePackage{pgfkeys}
+\RequirePackage{etoolbox}
+% Create a pgfkey directory for figinput
+\pgfkeys{
+ /figinput/.is family, /figinput,
+ default/.style = 
+  {width = \textwidth, pos = htbp},
+ width/.estore in = \figinputWidth,
+ pos/.estore in = \figinputPos,
+}
+% figinput - example \figinput[width=0.7\textwidth,pos=htbp]{fig_RVV_added_state}
+% Sets configuration vars, inputs the file in the main argument
+% The main argument file should respect the \figinputWidth and \figinputPos variables.
+% The \basicfig environment is a simple way to do this for single-graphic figures.
+\newcommand{\figinput}[2][]{%
+    % Unpack the figure options
+    \pgfkeys{/figinput, default, #1}%
+    % Input the figure page
+    \input{#2}%
+    % Zero out the parameters
+    % The figure page can check if it's been imported through \figinput by looking at these values
+    \renewcommand{\figinputWidth}{}
+    \renewcommand{\figinputPos}{}
+}
+
+% Assert the pgfkeys are non-empty
+\newcommand{\figcheckinputs}{
+\ifdefempty{\figinputWidth}{\PackageError{turnipadjfig}{figinputWidth empty}{This file expected arguments from figinput - make sure you include the figure file through figinput!}}{}
+\ifdefempty{\figinputPos}{\PackageError{turnipadjfig}{figinputPos empty}{This file expected arguments from figinput - make sure you include the figure file through figinput!}}{}
+}
+
+% Example usage:
+% \begin{basicfig}{Figures/RVV_LMUL_Widening.pdf}
+%     \caption{This is RVV\_LMUL\_widening}
+%     \label{fig:RVV_LMUL_widening}
+% \end{basicfig}
+\newenvironment{basicfig}[1]{%
+% Assert the keys are non-empty
+\figcheckinputs{}
+% Start of environment
+% Use \expended to expand the value of \figinputPos in the right place, and put \noexpand at the start to make sure the \begin{figure} itself isn't expanded yet.
+\expanded{\noexpand\begin{figure}[\figinputPos]}
+    \centering
+    \includegraphics[width=\figinputWidth]{#1}
+}{%
+\end{figure}
+}

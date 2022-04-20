@@ -11,7 +11,8 @@ This section is based on the RVV Specification v1.0\todocite{RVV spec 1.0}.
 RVV defines thirty-two vector registers, each of an implementation-defined width VLEN.
 These registers can be interpreted as vectors of varying element sizes, and the largest possible element size is ELEN.
 RVV also adds some state that defines how the vector registers are used (see \cref{fig:RVV_added_state}).
-\input{1_20Background/figures/fig_RVV_added_state}
+
+\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_added_state}
 
 \subsubsection{\code{vl} and \code{vstart}}
 The first piece of state is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
@@ -21,7 +22,7 @@ In the simple case, \code{vl} is equal to the total available elements (see \cre
 It can also be fewer (see \cref{fig:RVV_vl_short}), in which case vector instructions will not write to elements in the \enquote{tail} (i.e. elements past \code{vl}).
 This eliminates the need for a `cleanup loop' common in fixed-length vector programs.
 
-\input{1_20Background/figures/fig_RVV_vl}
+\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vl}
 
 In a similar vein, \code{vstart} specifies \enquote{the index of the first element to be executed by a vector instruction}.
 This is usually only set by the hardware whenever it is interrupted mid-instruction (see \cref{fig:RVV_vstart_trap}) so that the instruction can be re-executed later without corrupting completed values.
@@ -29,7 +30,7 @@ The program \emph{can} set this value manually, but it may not always work.
 If an implementation couldn't arrive at the value itself, then it is allowed to reject it.
 The specification gives an example where a vector implementation never takes interrupts during an arithmetic instruction, so it would never set \code{vstart} during an arithmetic instruction, so it could raise an exception if \code{vstart} was nonzero for an arithmetic instruction.
 
-\input{1_20Background/figures/fig_RVV_vstart_trap}
+\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vstart_trap}
 
 \subsubsection{\code{vtype}}
 \code{vtype} contains two key fields.
@@ -42,7 +43,7 @@ Vector instructions do not necessarily operate over a single register, but over 
 For example, if \code{LMUL=8} then each instruction would operate over 8 register's worth of elements.
 In some implementations this may increase throughput, which by itself is beneficial for applications.
 
-\input{1_20Background/figures/fig_RVV_LMUL_widening}
+\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_LMUL_widening}
 
 However, the true utility of \code{LMUL} lies in widening/narrowing operations (see \cref{fig:RVV_LMUL_widening}).
 For example, an 8-by-8-bit multiplication can produce 16-bit results.
@@ -57,10 +58,10 @@ Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV
 When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector.
 If the mask bit is 1, that element will be `masked out' and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
 
-\input{1_20Background/figures/fig_RVV_mask_example}
+\figinput[width=0.8\textwidth,pos=t]{1_20Background/figures/fig_RVV_mask_example}
 
 \subsubsection{Summary}
-\input{1_20Background/figures/fig_RVV_examples_combined}
+\figinput[width=\textwidth,pos=t]{1_20Background/figures/fig_RVV_examples_combined}
 \cref{fig:RVV_examples_combined} shows all of the above features used in a single configuration:
 \begin{itemize}
     \item The instruction was previously interrupted and restarted, so \code{vstart=2}
