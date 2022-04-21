@@ -7,15 +7,30 @@ Because RISC-V is open, anyone can design, manufacture, and sell chips implement
 RVV is the officially ratified vector extension for RISC-V, and going forward all RISC-V chips with vector processing capabilities should implement it instead of designing their own custom vector extensions.
 This section is based on the RVV Specification v1.0\todocite{RVV spec 1.0}.
 
+%---------------------------------
+%---------------------------------
+%---------------------------------
 \subsection{Vector model}
+\emph{Summarizes \todocite[Sections 1-4]{RVV spec}}
+\todomark{Add prestart/active/inactive/body/tail definitions, would bump up to 1-5}
+
+
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
+
+
 RVV defines thirty-two vector registers, each of an implementation-defined width VLEN.
-These registers can be interpreted as vectors of varying element sizes, and the largest possible element size is ELEN.
+These registers can be interpreted as \emph{vectors} of \emph{elements}.
+The program can configure the size of elements, and the implementation defines a maximum width ELEN.
+\cref{fig:RVV_simple_widths} shows a simple example of a 128-bit vector, where the maximum element length is 32-bits.
+
+
 RVV also adds some state that defines how the vector registers are used (see \cref{fig:RVV_added_state}).
+These are stored in RISC-V Control and Status Registers (CSRs), which the program can read.
 
-\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_added_state}
-
-\subsubsection{\code{vl} and \code{vstart}}
-The first piece of state is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
+%---------------------------------
+\subsubsection{\code{vl} and \code{vstart}}\label{chap:bg:sec:rvv:vstart}
+The first CSR is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
 The program updates this value through fault-only-first loads (\todoref{fof load}) and more commonly the \code{vsetvl} instruction family (\todoref{vsetvl}).
 
 In the simple case, \code{vl} is equal to the total available elements (see \cref{fig:RVV_vl_full}).
@@ -26,12 +41,15 @@ This eliminates the need for a `cleanup loop' common in fixed-length vector prog
 
 In a similar vein, \code{vstart} specifies \enquote{the index of the first element to be executed by a vector instruction}.
 This is usually only set by the hardware whenever it is interrupted mid-instruction (see \cref{fig:RVV_vstart_trap}) so that the instruction can be re-executed later without corrupting completed values.
-The program \emph{can} set this value manually, but it may not always work.
+Whenever a vector instruction completes, \code{vstart} is reset to zero.
+
+The program \emph{can} set \code{vstart} manually, but it may not always work.
 If an implementation couldn't arrive at the value itself, then it is allowed to reject it.
 The specification gives an example where a vector implementation never takes interrupts during an arithmetic instruction, so it would never set \code{vstart} during an arithmetic instruction, so it could raise an exception if \code{vstart} was nonzero for an arithmetic instruction.
 
 \figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vstart_trap}
 
+%---------------------------------
 \subsubsection{\code{vtype}}
 \code{vtype} contains two key fields.
 The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
@@ -41,6 +59,7 @@ Most instructions\footnote{Except where the width is encoded in the instruction,
 The second field is the Vector Register Group Multiplier (\code{LMUL}).
 Vector instructions do not necessarily operate over a single register, but over a register \emph{group} as defined by this field.
 For example, if \code{LMUL=8} then each instruction would operate over 8 register's worth of elements.
+These groups must use aligned register indices, so if \code{LMUL=4} all vector register operands should be multiples of 4 e.g. \code{v0, v4, v8} etc.
 In some implementations this may increase throughput, which by itself is beneficial for applications.
 
 \figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_LMUL_widening}
@@ -53,15 +72,18 @@ Doubling \code{LMUL} after such an operation allows subsequent instructions to h
 \code{vtype} also encodes two flags: mask-agnostic and tail-agnostic.
 If these are set, the implementation is \emph{allowed} to overwrite any masked-out or tail elements with all 1s.
 
+\pagebreak
+\figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
+%---------------------------------
 \subsubsection{Masking}
 Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV_mask_example}).
 When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector.
 If the mask bit is 1, that element will be `masked out' and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
 
-\figinput[width=0.8\textwidth,pos=t]{1_20Background/figures/fig_RVV_mask_example}
 
+\figinput[width=\textwidth,pos=h]{1_20Background/figures/fig_RVV_examples_combined}
+%---------------------------------
 \subsubsection{Summary}
-\figinput[width=\textwidth,pos=t]{1_20Background/figures/fig_RVV_examples_combined}
 \cref{fig:RVV_examples_combined} shows all of the above features used in a single configuration:
 \begin{itemize}
     \item The instruction was previously interrupted and restarted, so \code{vstart=2}
@@ -71,17 +93,106 @@ If the mask bit is 1, that element will be `masked out' and not written to (or d
     \item Some elements are masked out (in this case seemingly at random)
 \end{itemize}
 
-\subsection{Basic memory accesses}
+\pagebreak
+%---------------------------------
+%---------------------------------
+%---------------------------------
+\subsection{Strip mining and \code{vsetvl}}
+\emph{Summarizes \todocite[Section 6]{RVV spec}}
+\todomark{example usage of the above, introduces vsetvli}
 
-\subsubsection{Unit + Strided}
+\pagebreak
+%---------------------------------
+%---------------------------------
+%---------------------------------
+\subsection{Exception handling}
+\emph{Summarizes \todocite[Section 17]{RVV spec}}
 
-\subsubsection{Indexed}
+During the execution of a vector instruction, two events can prevent an instruction from fully completing: a synchronous exception in the instruction itself, or an asynchronous interrupt from another part of the system.
+Implementations may choose to wait until an instruction fully completes before handling asynchronous interrupts, making it unnecessary to pause the instruction halfway through, but synchronous exceptions cannot be avoided in this way (particularly for those performing memory accesses).
+The RVV specification defines two modes for `trapping' these events, which implementations may choose between depending on the context (e.g. the offending instruction), and notes two further modes which may be used in further extensions.
+All modes start by saving the PC of the trapping instruction to a CSR \code{*epc}.
 
-\subsection{}
-\subsubsection{Fault-only-first load}
-\subsubsection{Bytemask load}
-\subsubsection{Whole-register load/store}
+%---------------------------------
+\subsubsection{Imprecise vector traps}
+Imprecise traps are intended for events that are not recoverable, where \enquote{reporting an error and terminating execution is the appropriate response}.
+They do not impose any extra requirements on the implementation.
+For example, an implementation that executes instructions out-of-order does not need to guarantee that instructions older than \code{*epc} have completed, and is allowed to have completed instructions newer than \code{*epc}.
 
-\subsection{Interaction with exceptions}
+If the trap was triggered by a synchronous exception, the \code{vstart} CSR must be updated with the element that caused it.
+\todomark{inconsistency in spec - Ch17 first para says "the vstart CSR contains the element index on which the trap was taken", but the imprecise trap section only specifies this for synchronous exceptions}
 
+The specification also states \enquote{There is no support for imprecise traps in the current standard extensions}, \todomark{what does this mean?}
+
+%---------------------------------
+\subsubsection{Precise vector traps}
+Precise vector traps are intended for instructions that can be resumed after handling the interrupting event.
+This means the architectural state (i.e. register values) when starting the trap could be saved and reloaded before continuing execution.
+Therefore it must look like instructions were completed in-order, even if the implementation is out-of-order:
+\begin{itemize}
+    \item Instructions older than \code{*epc} must have completed (committed all results to the architectural state)
+    \item Instructions newer than \code{*epc} must \textbf{not} have altered architectural state.
+\end{itemize}
+
+On a precise trap, regardless of what caused it, the \code{vstart} CSR must be set to the element index on which the trap was taken.
+The save-and-reload expectation then add two constraints on the trapping instruction's execution:
+\begin{itemize}
+    \item Operations affecting elements preceding \code{vstart} must have committed their results
+    \item Operations affecting elements at or following \code{vstart} must either
+    \begin{itemize}
+        \item not have committed results or otherwise affected architectural state
+        \item be \emph{idempotent} i.e. produce exactly the same result when repeated.
+    \end{itemize}
+\end{itemize}
+
+The idempotency option gives implementations a lot of leeway.
+Some instructions \todomark{examples} are specifically prohibited from overwriting their inputs to make them idempotent.
+If an instruction is idempotent, an implementation is even allowed to repeat operations on elements \emph{preceding} \code{vstart}.
+However for memory accesses the idempotency depends on the memory being accessed.
+For example, writing to a memory-mapped I/O region may not be idempotent.
+
+Another memory-specific issue is that of \emph{demand-paging}, where the OS needs to step in and move virtual memory pages into physical memory for an instruction to use.
+This use-case is specifically called out by the specification for precise traps.
+Usually, this is triggered by some element of a vector memory access raising a synchronous exception, invoking a precise trap, and \todomark{using \code{vstart} to show the OS which address it wants?}
+Because \code{vstart} must be set to the element that demanded the page, and operations preceding \code{vstart} must have completed, any elements that could potentially trigger demand-paging \emph{must} wait for the preceding elements to complete.
+This always applies, no matter what the instruction's specific ordering guarantees are.
+
+%---------------------------------
+\subsubsection{Other modes}
+The RVV spec mentions two other potential trap modes.
+First is \enquote{Selectable precise/imprecise traps}, where an implementation provides a bit that selects between precise or imprecise traps.
+The intent is to allow precise traps to be selected for e.g. debugging purposes, and for imprecise traps to be selected for extra performance.
+
+The second mode is \enquote{Swappable traps}, where a trap handler could use special instructions to \enquote{save and restore the vector unit microarchitectural state}.
+The intent seems to be to support context switching with imprecise traps, which could also require the \emph{opaque} state (i.e. internal state not visible to the program) to be saved and restored.
+Right now, it seems that context switching always requires a precise trap.
+
+Neither of these modes are actually defined, but they are simply noted as possibilities for the future.
+
+\pagebreak
+%---------------------------------
+%---------------------------------
+%---------------------------------
+\subsection{Memory access instructions}
+\emph{Summarizes \todocite[Sections 7-9]{RVV spec}}
+
+% RVV defines five broad categories of memory access instructions.
+
+
+\subsubsection{Segment accesses}
+
+\subsubsection{Unit and Strided accesses}
+
+\subsubsection{Fault-only-first unit loads}
+
+\subsubsection{Indexed accesses}
+
+\subsubsection{Whole-register accesses}
+
+\subsubsection{Bytemask accesses}
+
+
+%---------------------------------
+%---------------------------------
+%---------------------------------
 \subsection{Implementations}
