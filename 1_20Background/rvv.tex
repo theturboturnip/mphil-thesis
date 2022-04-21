@@ -5,13 +5,13 @@ A base instruction set combined with a set of extensions is known as a RISC-V IS
 Because RISC-V is open, anyone can design, manufacture, and sell chips implementing any RISC-V ISA.
 % RVV is the vector one
 RVV is the officially ratified vector extension for RISC-V, and going forward all RISC-V chips with vector processing capabilities should implement it instead of designing their own custom vector extensions.
-This section is based on the RVV Specification v1.0\todocite{RVV spec 1.0}.
+This section summarizes Sections 1-9 and 17 of the RVV Specification v1.0\cite{RISCVVectorExtension2021}.
 
 %---------------------------------
 %---------------------------------
 %---------------------------------
 \subsection{Vector model}
-\emph{Summarizes \todocite[Sections 1-4]{RVV spec}}
+\emph{Summarizes \cite[Sections 1-4]{RISCVVectorExtension2021}}
 \todomark{Add prestart/active/inactive/body/tail definitions, would bump up to 1-5}
 
 
@@ -98,7 +98,7 @@ If the mask bit is 1, that element will be `masked out' and not written to (or d
 %---------------------------------
 %---------------------------------
 \subsection{Strip mining and \code{vsetvl}}
-\emph{Summarizes \todocite[Section 6]{RVV spec}}
+\emph{Summarizes \cite[Section 6]{RISCVVectorExtension2021}}
 \todomark{example usage of the above, introduces vsetvli}
 
 \pagebreak
@@ -106,7 +106,7 @@ If the mask bit is 1, that element will be `masked out' and not written to (or d
 %---------------------------------
 %---------------------------------
 \subsection{Exception handling}
-\emph{Summarizes \todocite[Section 17]{RVV spec}}
+\emph{Summarizes \cite[Section 17]{RISCVVectorExtension2021}}
 
 During the execution of a vector instruction, two events can prevent an instruction from fully completing: a synchronous exception in the instruction itself, or an asynchronous interrupt from another part of the system.
 Implementations may choose to wait until an instruction fully completes before handling asynchronous interrupts, making it unnecessary to pause the instruction halfway through, but synchronous exceptions cannot be avoided in this way (particularly for those performing memory accesses).
@@ -174,7 +174,7 @@ Neither of these modes are actually defined, but they are simply noted as possib
 %---------------------------------
 %---------------------------------
 \subsection{Memory access instructions}
-\emph{Summarizes \todocite[Sections 7-9]{RVV spec}}
+\emph{Summarizes \cite[Sections 7-9]{RISCVVectorExtension2021}}
 
 % RVV defines five broad categories of memory access instructions.
 

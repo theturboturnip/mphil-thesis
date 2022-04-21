@@ -1,6 +1,326 @@
-@Misc{example,
-  author = {Jean Martina and Rok Strni{\v s}a and Matej Urbas},
-  title  = {{Cambridge Ph.D.~\LaTeX{} class file}},
-  year   = 2008,
-  month  = jul,
+
+@online{AndesCoreNX27VProcessor,
+  title = {{{AndesCore NX27V Processor}}},
+  shorttitle = {{{RISC-V}}},
+  url = {https://www.andestech.com/en/products-solutions/andescore-processors/riscv-nx27v/},
+  urldate = {2021-12-11},
+  abstract = {AndesCore™ NX27V Processor 64-bit CPU with RISC-V Vector Extension AndesCore™ NX27V Overview AndeStar™ V5 Instruction Set Architecture (ISA), compliant to RISC-V technology RISC-V vector extension Vector Processing Unit (VPU) boost the performance of AI, AR/VR, computer vision, cryptography, and multimedia processing Andes extensions, architected for performance and functionality enhancements Separately licensable Andes Custom Extension™ (ACE)...},
+  langid = {english},
+  organization = {{Andes Technology}},
+  file = {/home/samuel/Zotero/storage/ULFBUUSF/riscv-nx27v.html}
 }
+
+@video{andestechnologyTutorialRISCVVector2021,
+  title = {Tutorial: {{RISC-V Vector Extension Demystified}} - 2020 {{RISC-V Summit}}},
+  shorttitle = {Tutorial},
+  editor = {{Andes Technology}},
+  date = {2021-03-11},
+  url = {https://www.youtube.com/watch?v=oTaOd8qr53U},
+  urldate = {2022-01-07},
+  editortype = {director}
+}
+
+@article{armstrongISASemanticsARMv8a2019,
+  title = {{{ISA}} Semantics for {{ARMv8-a}}, {{RISC-v}}, and {{CHERI-MIPS}}},
+  author = {Armstrong, Alasdair and Bauereiss, Thomas and Campbell, Brian and Reid, Alastair and Gray, Kathryn E. and Norton, Robert M. and Mundkur, Prashanth and Wassell, Mark and French, Jon and Pulte, Christopher and Flur, Shaked and Stark, Ian and Krishnaswami, Neel and Sewell, Peter},
+  date = {2019-01-02},
+  journaltitle = {Proceedings of the ACM on Programming Languages},
+  shortjournal = {Proc. ACM Program. Lang.},
+  volume = {3},
+  pages = {71:1--71:31},
+  doi = {10/gf5cb8},
+  url = {https://doi.org/10.1145/3290384},
+  urldate = {2021-10-06},
+  abstract = {Architecture specifications notionally define the fundamental interface between hardware and software: the envelope of allowed behaviour for processor implementations, and the basic assumptions for software development and verification. But in practice, they are typically prose and pseudocode documents, not rigorous or executable artifacts, leaving software and verification on shaky ground. In this paper, we present rigorous semantic models for the sequential behaviour of large parts of the mainstream ARMv8-A, RISC-V, and MIPS architectures, and the research CHERI-MIPS architecture, that are complete enough to boot operating systems, variously Linux, FreeBSD, or seL4. Our ARMv8-A models are automatically translated from authoritative ARM-internal definitions, and (in one variant) tested against the ARM Architecture Validation Suite. We do this using a custom language for ISA semantics, Sail, with a lightweight dependent type system, that supports automatic generation of emulator code in C and OCaml, and automatic generation of proof-assistant definitions for Isabelle, HOL4, and (currently only for MIPS) Coq. We use the former for validation, and to assess specification coverage. To demonstrate the usability of the latter, we prove (in Isabelle) correctness of a purely functional characterisation of ARMv8-A address translation. We moreover integrate the RISC-V model into the RMEM tool for (user-mode) relaxed-memory concurrency exploration. We prove (on paper) the soundness of the core Sail type system. We thereby take a big step towards making the architectural abstraction actually well-defined, establishing foundations for verification and reasoning.},
+  issue = {POPL},
+  keywords = {Instruction Set Architectures,Semantics,Theorem Proving},
+  file = {/home/samuel/Zotero/storage/TRKLIMWZ/Armstrong et al. - 2019 - ISA semantics for ARMv8-a, RISC-v, and CHERI-MIPS.pdf}
+}
+
+@unpublished{assirArrowRISCVVector2021,
+  title = {Arrow: {{A RISC-V Vector Accelerator}} for {{Machine Learning Inference}}},
+  shorttitle = {Arrow},
+  author = {Assir, Imad Al and Iskandarani, Mohamad El and Sandid, Hadi Rayan Al and Saghir, Mazen A. R.},
+  date = {2021-07-15},
+  eprint = {2107.07169},
+  eprinttype = {arxiv},
+  primaryclass = {cs},
+  url = {http://arxiv.org/abs/2107.07169},
+  urldate = {2021-12-11},
+  abstract = {In this paper we present Arrow, a configurable hardware accelerator architecture that implements a subset of the RISC-V v0.9 vector ISA extension aimed at edge machine learning inference. Our experimental results show that an Arrow co-processor can execute a suite of vector and matrix benchmarks fundamental to machine learning inference 2 - 78x faster than a scalar RISC processor while consuming 20\% - 99\% less energy when implemented in a Xilinx XC7A200T-1SBG484C FPGA.},
+  archiveprefix = {arXiv},
+  keywords = {⛔ No DOI found,B.5.1,C.1.4,C.3,C.4,Computer Science - Hardware Architecture},
+  file = {/home/samuel/Zotero/storage/9UNSA9QK/Assir et al. - 2021 - Arrow A RISC-V Vector Accelerator for Machine Lea.pdf;/home/samuel/Zotero/storage/5MTKQAMX/2107.html}
+}
+
+@article{cavalcanteAra1GHzScalable2020,
+  title = {Ara: {{A}} 1-{{GHz}}+ {{Scalable}} and {{Energy-Efficient RISC-V Vector Processor With Multiprecision Floating-Point Support}} in 22-Nm {{FD-SOI}}},
+  shorttitle = {Ara},
+  author = {Cavalcante, Matheus and Schuiki, Fabian and Zaruba, Florian and Schaffner, Michael and Benini, Luca},
+  date = {2020-02},
+  journaltitle = {IEEE Transactions on Very Large Scale Integration (VLSI) Systems},
+  volume = {28},
+  number = {2},
+  pages = {530--543},
+  issn = {1557-9999},
+  doi = {10/gnrd7v},
+  abstract = {In this article, we present Ara, a 64-bit vector processor based on the version 0.5 draft of RISC-V's vector extension, implemented in GlobalFoundries 22FDX fully depleted silicon-on-insulator (FD-SOI) technology. Ara's microarchitecture is scalable, as it is composed of a set of identical lanes, each containing part of the processor's vector register file and functional units. It achieves up to 97\% floating-point unit (FPU) utilization when running a 256 × 256 double-precision matrix multiplication on 16 lanes. Ara runs at more than 1 GHz in the typical corner (TT/0.80 V/25 °C), achieving a performance up to 33 DP-GFLOPS. In terms of energy efficiency, Ara achieves up to 41 DP-GFLOPS W-1 under the same conditions, which is slightly superior to similar vector processors found in the literature. An analysis on several vectorizable linear algebra computation kernels for a range of different matrix and vector sizes gives insight into performance limitations and bottlenecks for vector processors and outlines directions to maintain high energy efficiency even for small matrix sizes where the vector architecture achieves suboptimal utilization of the available FPUs.},
+  eventtitle = {{{IEEE Transactions}} on {{Very Large Scale Integration}} ({{VLSI}}) {{Systems}}},
+  keywords = {Instruction sets,Multicore processing,Open source software,Parallel processing,Registers,RISC-V,single-instruction–multiple-data (SIMD),vector processor,Vector processors},
+  file = {/home/samuel/Zotero/storage/AC9J3NX4/Cavalcante et al. - 2020 - Ara A 1-GHz+ Scalable and Energy-Efficient RISC-V.pdf;/home/samuel/Zotero/storage/TY8FU9II/8918510.html}
+}
+
+@inproceedings{davisCheriABIEnforcingValid2019,
+  title = {{{CheriABI}}: {{Enforcing Valid Pointer Provenance}} and {{Minimizing Pointer Privilege}} in the {{POSIX C Run-time Environment}}},
+  shorttitle = {{{CheriABI}}},
+  booktitle = {Proceedings of the {{Twenty-Fourth International Conference}} on {{Architectural Support}} for {{Programming Languages}} and {{Operating Systems}}},
+  author = {Davis, Brooks and Watson, Robert N. M. and Richardson, Alexander and Neumann, Peter G. and Moore, Simon W. and Baldwin, John and Chisnall, David and Clarke, Jessica and Filardo, Nathaniel Wesley and Gudka, Khilan and Joannou, Alexandre and Laurie, Ben and Markettos, A. Theodore and Maste, J. Edward and Mazzinghi, Alfredo and Napierala, Edward Tomasz and Norton, Robert M. and Roe, Michael and Sewell, Peter and Son, Stacey and Woodruff, Jonathan},
+  date = {2019-04-04},
+  pages = {379--393},
+  publisher = {{ACM}},
+  location = {{Providence RI USA}},
+  doi = {10.1145/3297858.3304042},
+  url = {https://dl.acm.org/doi/10.1145/3297858.3304042},
+  urldate = {2022-04-18},
+  eventtitle = {{{ASPLOS}} '19: {{Architectural Support}} for {{Programming Languages}} and {{Operating Systems}}},
+  isbn = {978-1-4503-6240-5},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/LP7Z49LM/Davis et al. - 2019 - CheriABI Enforcing Valid Pointer Provenance and M.pdf}
+}
+
+@article{dimascioOnBoardDecisionMaking2021,
+  title = {On-{{Board Decision Making}} in {{Space}} with {{Deep Neural Networks}} and {{RISC-V Vector Processors}}},
+  author = {Di Mascio, Stefano and Menicucci, Alessandra and Gill, Eberhard and Furano, Gianluca and Monteleone, Claudio},
+  date = {2021-08-01},
+  journaltitle = {Journal of Aerospace Information Systems},
+  volume = {18},
+  number = {8},
+  pages = {553--570},
+  publisher = {{American Institute of Aeronautics and Astronautics}},
+  doi = {10/gnrfch},
+  url = {https://arc.aiaa.org/doi/10.2514/1.I010916},
+  urldate = {2021-12-11},
+  abstract = {The use of deep neural networks (DNNs) in terrestrial applications went from niche to widespread in a few years, thanks to relatively inexpensive hardware for both training and inference, and large datasets available. The applicability of this paradigm to space systems, where both large datasets and inexpensive hardware are not readily available, is more difficult and thus still rare. This paper analyzes the impact of DNNs on the system-level capabilities of space systems in terms of on-board decision making (OBDM) and identifies the specific criticalities of deploying DNNs on satellites. The workload of DNNs for on-board image and telemetry analysis is analyzed, and the results are used to drive the preliminary design of a RISC-V vector processor to be employed as a generic platform to enable energy-efficient OBDM for both payload and platform applications. The design of the memory subsystem is carried out in detail to allow full exploitation of the computational resources in typically resource-constrained space systems.},
+  keywords = {Application Specific Integrated Circuits,Constellations,Convolutional Neural Network,Energy Consumption,Ground Station,Satellite Constellations,Space Systems,Telemetry,Triple Modular Redundancy,Vector Processor},
+  file = {/home/samuel/Zotero/storage/P5ZFSBL9/Di Mascio et al. - 2021 - On-Board Decision Making in Space with Deep Neural.pdf}
+}
+
+@article{filardoCornucopiaTemporalSafety,
+  title = {Cornucopia: {{Temporal Safety}} for {{CHERI Heaps}}},
+  author = {Filardo, Nathaniel Wesley and Gutstein, Brett F and Woodruff, Jonathan and Ainsworth, Sam and Paul-Trifu, Lucian and Davis, Brooks and Xia, Hongyan and Napierala, Edward Tomasz and Richardson, Alexander and Baldwin, John and Chisnall, David and Clarke, Jessica and Gudka, Khilan and Joannou, Alexandre and Markettos, A Theodore and Mazzinghi, Alfredo and Norton, Robert M and Roe, Michael and Sewell, Peter and Son, Stacey and Jones, Timothy M and Moore, Simon W and Neumann, Peter G and Watson, Robert N M},
+  pages = {18},
+  abstract = {Use-after-free violations of temporal memory safety continue to plague software systems, underpinning many highimpact exploits. The CHERI capability system shows great promise in achieving C and C++ language spatial memory safety, preventing out-of-bounds accesses. Enforcing language-level temporal safety on CHERI requires capability revocation, traditionally achieved either via table lookups (avoided for performance in the CHERI design) or by identifying capabilities in memory to revoke them (similar to a garbage-collector sweep). CHERIvoke, a prior feasibility study, suggested that CHERI’s tagged capabilities could make this latter strategy viable, but modeled only architectural limits and did not consider the full implementation or evaluation of the approach.},
+  langid = {english},
+  keywords = {⛔ No DOI found},
+  file = {/home/samuel/Zotero/storage/44Y279L2/Filardo et al. - Cornucopia Temporal Safety for CHERI Heaps.pdf}
+}
+
+@inproceedings{joannouEfficientTaggedMemory2017,
+  title = {Efficient {{Tagged Memory}}},
+  booktitle = {2017 {{IEEE International Conference}} on {{Computer Design}} ({{ICCD}})},
+  author = {Joannou, Alexandre and Woodruff, Jonathan and Kovacsics, Robert and Moore, Simon W. and Bradbury, Alex and Xia, Hongyan and Watson, Robert N.M. and Chisnall, David and Roe, Michael and Davis, Brooks and Napierala, Edward and Baldwin, John and Gudka, Khilan and Neumann, Peter G. and Mazzinghi, Alfredo and Richardson, Alex and Son, Stacey and Markettos, A. Theodore},
+  date = {2017-11},
+  pages = {641--648},
+  issn = {1063-6404},
+  doi = {10/ghnj26},
+  abstract = {We characterize the cache behavior of an in-memory tag table and demonstrate that an optimized implementation can typically achieve a near-zero memory traffic overhead. Both industry and academia have repeatedly demonstrated tagged memory as a key mechanism to enable enforcement of powerful security invariants, including capabilities, pointer integrity, watchpoints, and information-flow tracking. A single-bit tag shadowspace is the most commonly proposed requirement, as one bit is the minimum metadata needed to distinguish between an untyped data word and any number of new hardware-enforced types. We survey various tag shadowspace approaches and identify their common requirements and positive features of their implementations. To avoid non-standard memory widths, we identify the most practical implementation for tag storage to be an in-memory table managed next to the DRAM controller. We characterize the caching performance of such a tag table and demonstrate a DRAM traffic overhead below 5\% for the vast majority of applications. We identify spatial locality on a page scale as the primary factor that enables surprisingly high table cache-ability. We then demonstrate tag-table compression for a set of common applications. A hierarchical structure with elegantly simple optimizations reduces DRAM traffic overhead to below 1\% for most applications. These insights and optimizations pave the way for commercial applications making use of single-bit tags stored in commodity memory.},
+  eventtitle = {2017 {{IEEE International Conference}} on {{Computer Design}} ({{ICCD}})},
+  keywords = {Caches,Computer architecture,Error correction codes,Hardware,Memory,Metadata,Pipelines,Processor,Random access memory,Safety,Security},
+  file = {/home/samuel/Zotero/storage/8A8P7ITH/Joannou et al. - 2017 - Efficient Tagged Memory.pdf;/home/samuel/Zotero/storage/JN25TPSN/201711-iccd2017-efficient-tags.pdf;/home/samuel/Zotero/storage/DAVFE4IB/8119285.html}
+}
+
+@inproceedings{johnsMinimalRISCVVector2020a,
+  title = {A {{Minimal RISC-V Vector Processor}} for {{Embedded Systems}}},
+  booktitle = {2020 {{Forum}} for {{Specification}} and {{Design Languages}} ({{FDL}})},
+  author = {Johns, Matthew and Kazmierski, Tom J.},
+  date = {2020-09},
+  pages = {1--4},
+  issn = {1636-9874},
+  doi = {10/gnrfdb},
+  abstract = {This paper presents the first RISC-V vector processor design aimed at microcontrollers that uses the new RISC-V `V' extension for vectors, part of the open-source RISC-V instruction set architecture (ISA). Being aimed at small embedded devices, it demonstrates a simpler method of parallel execution than traditional vector architectures to minimise logic. It has been synthesised for testing on an FPGA at 50MHz. Typical vector-compatible applications have been used as benchmarks. Performance has been improved by up to 5.8x for the demonstrated applications relative to a comparable scalar RISC-V processor, for an increase in FPGA resource utilisation of at most 2.6x.},
+  eventtitle = {2020 {{Forum}} for {{Specification}} and {{Design Languages}} ({{FDL}})},
+  keywords = {Accelerator architectures,Benchmark testing,Computer architecture,Field programmable gate arrays,Microcontrollers,Random access memory,Registers,Vector processors},
+  file = {/home/samuel/Zotero/storage/N5G9WGCN/Johns and Kazmierski - 2020 - A Minimal RISC-V Vector Processor for Embedded Sys.pdf;/home/samuel/Zotero/storage/MEVVNTLT/9232940.html}
+}
+
+@article{kolodzeyCRAY1ComputerTechnology1981,
+  title = {{{CRAY-1 Computer Technology}}},
+  author = {Kolodzey, J.},
+  date = {1981-06},
+  journaltitle = {IEEE Transactions on Components, Hybrids, and Manufacturing Technology},
+  volume = {4},
+  number = {2},
+  pages = {181--186},
+  issn = {1558-3082},
+  doi = {10.1109/TCHMT.1981.1135787},
+  abstract = {Hardware and packaging technology which provide the high performance of the CRAY-I computer are reviewed. A brief overview of the computer is given, followed by a description of the computer circuits, packaging, power distribution, and cooling system.},
+  eventtitle = {{{IEEE Transactions}} on {{Components}}, {{Hybrids}}, and {{Manufacturing Technology}}},
+  keywords = {Central Processing Unit,Ceramics,Cooling,Distributed computing,Error correction,Hardware,Logic circuits,Packaging,Random access memory,Read-write memory},
+  file = {/home/samuel/Zotero/storage/7FQZMB2R/Kolodzey - 1981 - CRAY-1 Computer Technology.pdf;/home/samuel/Zotero/storage/CFC67EQ5/1135787.html}
+}
+
+@report{leeHwachaMicroarchitectureManual2015,
+  title = {The {{Hwacha Microarchitecture Manual}}, {{Version}} 3.8.1},
+  author = {Lee, Yunsup and Ou, Albert and Schmidt, Colin and Karandikar, Sagar and Mao, Howard and Asanović, Krste},
+  date = {2015-12},
+  number = {UCB/EECS-2015-263},
+  institution = {{EECS Department, University of California, Berkeley}},
+  url = {http://www2.eecs.berkeley.edu/Pubs/TechRpts/2015/EECS-2015-263.html}
+}
+
+@inproceedings{patsidisRISCV2ScalableRISCV2020,
+  title = {{{RISC-V2}}: {{A Scalable RISC-V Vector Processor}}},
+  shorttitle = {{{RISC-V2}}},
+  booktitle = {2020 {{IEEE International Symposium}} on {{Circuits}} and {{Systems}} ({{ISCAS}})},
+  author = {Patsidis, Kariofyllis and Nicopoulos, Chrysostomos and Sirakoulis, Georgios Ch. and Dimitrakopoulos, Giorgos},
+  date = {2020-10},
+  pages = {1--5},
+  issn = {2158-1525},
+  doi = {10/gnfrn3},
+  abstract = {Machine learning adoption has seen a widespread bloom in recent years, with neural network implementations being at the forefront. In light of these developments, vector processors are currently experiencing a resurgence of interest, due to their inherent amenability to accelerate data-parallel algorithms required in machine learning environments. In this paper, we propose a scalable and high-performance RISC-V vector processor core. The presented processor employs a triptych of novel mechanisms that work synergistically to achieve the desired goals. An enhanced vector-specific incarnation of register renaming is proposed to facilitate dynamic hardware loop unrolling and alleviate instruction dependencies. Moreover, a cost-efficient decoupled execution scheme splits instructions into execution and memory-access streams, while hardware support for reductions accelerates the execution of key instructions in the RISC-V ISA. Extensive performance evaluation and hardware synthesis analysis validate the efficiency of the new architecture.},
+  eventtitle = {2020 {{IEEE International Symposium}} on {{Circuits}} and {{Systems}} ({{ISCAS}})},
+  keywords = {Acceleration,Artificial neural networks,Computer architecture,Hardware,Pipelines,Registers,Vector processors},
+  file = {/home/samuel/Zotero/storage/STGKZJVX/Patsidis et al. - 2020 - RISC-V2 A Scalable RISC-V Vector Processor.pdf;/home/samuel/Zotero/storage/WG7UTJRK/9181071.html}
+}
+
+@inproceedings{platzerVicunaTimingPredictableRISCV2021,
+  title = {Vicuna: {{A Timing-Predictable RISC-V Vector Coprocessor}} for {{Scalable Parallel Computation}}},
+  shorttitle = {Vicuna},
+  booktitle = {33rd {{Euromicro Conference}} on {{Real-Time Systems}} ({{ECRTS}} 2021)},
+  author = {Platzer, Michael and Puschner, Peter},
+  editor = {Brandenburg, Björn B.},
+  date = {2021},
+  series = {Leibniz {{International Proceedings}} in {{Informatics}} ({{LIPIcs}})},
+  volume = {196},
+  pages = {1:1--1:18},
+  publisher = {{Schloss Dagstuhl – Leibniz-Zentrum für Informatik}},
+  location = {{Dagstuhl, Germany}},
+  issn = {1868-8969},
+  doi = {10/gnfrn2},
+  url = {https://drops.dagstuhl.de/opus/volltexte/2021/13932},
+  urldate = {2021-11-12},
+  isbn = {978-3-95977-192-4},
+  keywords = {Real-time Systems,RISC-V,Vector Processors},
+  file = {/home/samuel/Zotero/storage/HSTXY7G2/Platzer and Puschner - 2021 - Vicuna A Timing-Predictable RISC-V Vector Coproce.pdf;/home/samuel/Zotero/storage/E3H2J2KA/13932.html}
+}
+
+@online{ProgrammingRISCVVector,
+  title = {Programming with {{RISC-V Vector Instructions}}},
+  url = {https://gms.tf/riscv-vector.html},
+  urldate = {2021-12-11},
+  abstract = {Perhaps the most interesting part of the open RISC-V instruction set architecture (ISA) is the vector extension (RISC-V "V"). In contrast to the average single-instruction multipe-data (SIMD) instruction set, RISC-V vector instructions are vector length agnostic (VLA). Thus, a RISC-V "V" CPU is flexible in choosing a vector register size …},
+  langid = {english},
+  organization = {{Georg's Log}},
+  file = {/home/samuel/Zotero/storage/3UDDAVJU/riscv-vector.html}
+}
+
+@misc{RISCVVectorExtension2021,
+  title = {{{RISC-V}} "{{V}}" {{Vector Extension}}},
+  date = {2021-09-20},
+  url = {https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spec-1.0.pdf},
+  annotation = {v1.0}
+}
+
+@software{RISCVVectorIntrinsicsv0.1,
+  title = {{{RISC-V Vector Extension Intrinsics}} (v0.1)},
+  date = {2021-11-16T07:43:42Z},
+  origdate = {2020-01-31T08:48:24Z},
+  url = {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/00882f19a84ab354dc8cf6a10c100b8daa2654e4/rvv-intrinsic-api.md},
+  urldate = {2021-11-16},
+  organization = {{RISC-V Non-ISA Specifications}}
+}
+
+@article{stephensARMScalableVector2017,
+  title = {The {{ARM Scalable Vector Extension}}},
+  author = {Stephens, Nigel and Biles, Stuart and Boettcher, Matthias and Eapen, Jacob and Eyole, Mbou and Gabrielli, Giacomo and Horsnell, Matt and Magklis, Grigorios and Martinez, Alejandro and Premillieu, Nathanael and Reid, Alastair and Rico, Alejandro and Walker, Paul},
+  date = {2017-03},
+  journaltitle = {IEEE Micro},
+  shortjournal = {IEEE Micro},
+  volume = {37},
+  number = {2},
+  pages = {26--39},
+  issn = {0272-1732},
+  doi = {10.1109/MM.2017.35},
+  url = {http://ieeexplore.ieee.org/document/7924233/},
+  urldate = {2022-04-18},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/2LFA4P6W/Stephens et al. - 2017 - The ARM Scalable Vector Extension.pdf}
+}
+
+@letter{wangLlvmdevLLVMRISCV2021,
+  type = {E-mail},
+  title = {[Llvm-Dev]  {{LLVM}} with {{RISC-V V-extension}} Intrinsic Support},
+  author = {Wang, Kai},
+  date = {2021-05-14},
+  url = {https://lists.llvm.org/pipermail/llvm-dev/2021-May/150592.html},
+  urldate = {2021-11-16},
+  file = {/home/samuel/Zotero/storage/YD5PIJYG/150592.html}
+}
+
+@report{watsonCapabilityHardwareEnhanced2020,
+  title = {Capability {{Hardware Enhanced RISC Instructions}}: {{CHERI Instruction-Set Architecture}} ({{Version}} 8)},
+  shorttitle = {Capability {{Hardware Enhanced RISC Instructions}}},
+  author = {Watson, Robert N. M. and Neumann, Peter G. and Woodruff, Jonathan and Roe, Michael and Almatary, Hesham and Anderson, Jonathan and Baldwin, John and Barnes, Graeme and Chisnall, David and Clarke, Jessica and Davis, Brooks and Eisen, Lee and Filardo, Nathaniel Wesley and Grisenthwaite, Richard and Joannou, Alexandre and Laurie, Ben and Markettos, A. Theodore and Moore, Simon W. and Murdoch, Steven J. and Nienhuis, Kyndylan and Norton, Robert and Richardson, Alexander and Rugg, Peter and Sewell, Peter and Son, Stacey and Xia, Hongyan},
+  date = {2020},
+  number = {UCAM-CL-TR-951},
+  institution = {{University of Cambridge, Computer Laboratory}},
+  url = {https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.html},
+  urldate = {2021-10-06},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/TM8T4CY3/Watson et al. - 2020 - Capability Hardware Enhanced RISC Instructions CH.pdf;/home/samuel/Zotero/storage/VQSYPAPN/UCAM-CL-TR-951.html}
+}
+
+@article{watsonCHERIHybridCapabilitySystem,
+  title = {{{CHERI}}: {{A Hybrid Capability-System Architecture}} for {{Scalable Software Compartmentalization}}},
+  author = {Watson, Robert N M and Woodruff, Jonathan and Neumann, Peter G and Moore, Simon W and Anderson, Jonathan and Chisnall, David and Dave, Nirav and Davis, Brooks and Gudka, Khilan and Laurie, Ben and Murdoch, Steven J and Norton, Robert and Roe, Michael and Son, Stacey and Vadera, Munraj},
+  pages = {18},
+  doi = {10/gfpgzz},
+  abstract = {CHERI extends a conventional RISC InstructionSet Architecture, compiler, and operating system to support fine-grained, capability-based memory protection to mitigate memory-related vulnerabilities in C-language TCBs. We describe how CHERI capabilities can also underpin a hardware-software object-capability model for application compartmentalization that can mitigate broader classes of attack. Prototyped as an extension to the open-source 64-bit BERI RISC FPGA softcore processor, FreeBSD operating system, and LLVM compiler, we demonstrate multiple orders-of-magnitude improvement in scalability, simplified programmability, and resulting tangible security benefits as compared to compartmentalization based on pure Memory-Management Unit (MMU) designs. We evaluate incrementally deployable CHERI-based compartmentalization using several real-world UNIX libraries and applications.},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/24C8EBM9/Watson et al. - CHERI A Hybrid Capability-System Architecture for.pdf}
+}
+
+@article{watsonIntroductionCHERI,
+  title = {An {{Introduction}} to {{CHERI}}},
+  author = {Watson, Robert N M and Moore, Simon W and Sewell, Peter and Neumann, Peter G},
+  pages = {43},
+  abstract = {CHERI (Capability Hardware Enhanced RISC Instructions) extends conventional processor Instruction-Set Architectures (ISAs) with architectural capabilities to enable fine-grained memory protection and highly scalable software compartmentalization. CHERI’s hybrid capability-system approach allows architectural capabilities to be integrated cleanly with contemporary RISC architectures and microarchitectures, as well as with MMU-based C/C++language software stacks.},
+  langid = {english},
+  keywords = {⛔ No DOI found},
+  file = {/home/samuel/Zotero/storage/6E5CXE26/Watson et al. - An Introduction to CHERI.pdf}
+}
+
+@online{williamsSiFiveRemindsEveryone,
+  title = {{{SiFive}} Reminds Everyone You Don't Always Need to Offload Vector Math: {{Here}}'s a {{RISC-V CPU}} That Can Process It, Too},
+  shorttitle = {{{SiFive}} Reminds Everyone You Don't Always Need to Offload Vector Math},
+  author = {Williams, Chris and in Chief, Editor},
+  url = {https://www.theregister.com/2020/10/21/sifive_vector_cpu_core/},
+  urldate = {2021-12-11},
+  abstract = {VIU75 core is 64-bit, runs Linux, supports RV vector extension},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/FMC6NPT3/sifive_vector_cpu_core.html}
+}
+
+@article{woodruffCHERIConcentratePractical2019,
+  title = {{{CHERI Concentrate}}: {{Practical Compressed Capabilities}}},
+  author = {Woodruff, Jonathan and Joannou, Alexandre and Xia, Hongyan and Fox, Anthony and Norton, Robert and Bauereiss, Thomas and Chisnall, David and Davis, Brooks and Gudka, Khilan and Filardo, Nathaniel W and Markettos, A Theodore and Roe, Michael and Neumann, Peter G and Watson, Robert N M and Moore, Simon W},
+  date = {2019},
+  pages = {15},
+  doi = {10/gm9ngf},
+  abstract = {We present CHERI Concentrate, a new fat-pointer compression scheme applied to CHERI, the most developed capability-pointer system at present. Capability fat pointers are a primary candidate to enforce fine-grained and non-bypassable security properties in future computer systems, although increased pointer size can severely affect performance. Thus, several proposals for capability compression have been suggested elsewhere that do not support legacy instruction sets, ignore features critical to the existing software base, and also introduce design inefficiencies to RISC-style processor pipelines. CHERI Concentrate improves on the state-of-the-art region-encoding efficiency, solves important pipeline problems, and eases semantic restrictions of compressed encoding, allowing it to protect a full legacy software stack. We present the first quantitative analysis of compiled capability code, which we use to guide the design of the encoding format. We analyze and extend logic from the open-source CHERI prototype processor design on FPGA to demonstrate encoding efficiency, minimize delay of pointer arithmetic, and eliminate additional load-to-use delay. To verify correctness of our proposed high-performance logic, we present a HOL4 machine-checked proof of the decode and pointer-modify operations. Finally, we measure a 50\% to 75\% reduction in L2 misses for many compiled C-language benchmarks running under a commodity operating system using compressed 128-bit and 64-bit formats, demonstrating both compatibility with and increased performance over the uncompressed, 256-bit format.},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/T4F3NQ5A/Woodruff et al. - CHERI Concentrate Practical Compressed Capabiliti.pdf}
+}
+
+@article{xiaCHERIvokeCharacterisingPointer2019,
+  title = {{{CHERIvoke}}: {{Characterising Pointer Revocation}} Using {{CHERI Capabilities}} for {{Temporal Memory Safety}}},
+  author = {Xia, Hongyan and Woodruff, Jonathan and Ainsworth, Sam and Filardo, Nathaniel W and Roe, Michael and Richardson, Alexander and Rugg, Peter and Neumann, Peter G and Moore, Simon W and Watson, Robert N M and Jones, Timothy M},
+  date = {2019},
+  pages = {14},
+  doi = {10/gm9ngg},
+  abstract = {A lack of temporal safety in low-level languages has led to an epidemic of use-after-free exploits. These have surpassed in number and severity even the infamous buffer-overflow exploits violating spatial safety. Capability addressing can directly enforce spatial safety for the C language by enforcing bounds on pointers and by rendering pointers unforgeable. Nevertheless, an efficient solution for strong temporal memory safety remains elusive.},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/W94KPW5U/Xia et al. - 2019 - CHERIvoke Characterising Pointer Revocation using.pdf}
+}
+
+

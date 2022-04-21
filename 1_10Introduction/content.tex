@@ -14,7 +14,7 @@ Scalable Software Compartmentalization}.
 Industry leaders have recognized the value CHERI provides.
 Arm Inc have manufactured the Morello System-on-Chip, based on their Neoverse N1 CPU, which incorporates CHERI capabilities into the Armv8.2 ISA.
 While this represents a great step forward, there are still elements on the SoC that haven't fully embraced CHERI (e.g. the GPU), and architecture extensions that haven't been investigated in the context of CHERI.
-One such example is Arm's Scalable Vector Extension (introduced in Armv8.2 but not included in Neoverse N1), which is designed to remain in use well into the future\todocite{stephensARMScalableVector2017}.
+One such example is Arm's Scalable Vector Extension (introduced in Armv8.2 but not included in Neoverse N1), which is designed to remain in use well into the future\cite{stephensARMScalableVector2017}.
 Supporting this and other scalable vector ISAs in CHERI is essential to CHERI's long-term relevance.
 
 % \todomark{para on what vectors are}
@@ -40,7 +40,7 @@ But adding CHERI's bounds-checking to the mix may affect these semantics, and co
 % \todomark{if this were the only priority, vectorized memory access doesn't need to be that fast relative to arithmetic?}
 Vector memory access performance is more critical than one may initially assume, because vectors are used for more than just computation.
 % \todomark{memcpy is a very common operation, vectorized on many platforms (cite)}
-A prime example is \code{memcpy}: for \code{x86\_64}, \code{glibc} includes multiple versions of the function\footnote{It appears memcpy is implemented as a copy of memmove.} taking advantage of vector platforms, then selects one to use at runtime\todocite{https://github.com/bminor/glibc/blob/master/sysdeps/x86_64/multiarch/ifunc-memmove.h}
+A prime example is \code{memcpy}: for \code{x86\_64}, \code{glibc} includes multiple versions of the function\footnote{It appears memcpy is implemented as a copy of memmove.} taking advantage of vector platforms, then selects one to use at runtime\todocite{https://github.com/bminor/glibc/blob/master/sysdeps/x86_64/multiarch/ifunc-memmove.h}.
 % \todomark{thus memory accesses themselves should be optimized}
 These implementations are written in assembly and heavily optimized.
 If the memory accesses are hitting the cache, a few extra cycles of bounds-checking for each access could actually make a noticeable difference.
@@ -57,7 +57,7 @@ This may require more guarantees than otherwise necessary - for example, each ve
 % \todomark{CHERI has a RISC-V ISA + various implementations, wants to support vectors}
 % \todomark{scalable vector support useful for future Arm support}
 % \todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
-To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \todocite{risc-v v spec}).
+To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \cite{RISCVVectorExtension2021}).
 As of November 2021 this has been ratified by RISC-V International\todocite{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}, and will be RISC-V's standard vector instruction set moving forward.
 Choosing it has two key benefits.
 Firstly, the CHERI project maintains three open-source cores (Piccolo, Flute, and Tooba\todocite{cheri risc-v page?}) implementing CHERI-RISC-V, none of which support vector processing.
