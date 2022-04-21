@@ -10,7 +10,7 @@ This section summarizes Sections 1-9 and 17 of the RVV Specification v1.0\cite{R
 %---------------------------------
 %---------------------------------
 %---------------------------------
-\subsection{Vector model}
+\subsection{Vector model}\label{chap:bg:sec:rvv:vector_model}
 \emph{Summarizes \cite[Sections 1-4]{RISCVVectorExtension2021}}
 \todomark{Add prestart/active/inactive/body/tail definitions, would bump up to 1-5}
 
@@ -51,7 +51,7 @@ The specification gives an example where a vector implementation never takes int
 
 %---------------------------------
 \subsubsection{\code{vtype}}
-\code{vtype} contains two key fields.
+\code{vtype} contains two key fields that describe how vector instructions interpret the contents of vector registers.
 The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
 It can be 8, 16, 32, or 64.
 Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
@@ -72,6 +72,11 @@ Doubling \code{LMUL} after such an operation allows subsequent instructions to h
 \code{vtype} also encodes two flags: mask-agnostic and tail-agnostic.
 If these are set, the implementation is \emph{allowed} to overwrite any masked-out or tail elements with all 1s.
 
+Most vector instructions will interpret their operands using \code{vtype}, but this is not always the case.
+Some instructions (such as memory accesses) use different Effective Element Widths (\code{EEW}) and Effective LMULs (\code{EMUL}) for their operands.
+In the case of memory accesses, these are encoded in the instruction bits.
+Another example is widening/narrowing operations, which by definition have to interpret the destination registers differently from the sources.
+
 \pagebreak
 \figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
 %---------------------------------
@@ -80,6 +85,7 @@ Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV
 When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector.
 If the mask bit is 1, that element will be `masked out' and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
 
+\todomark{There will always be enough bits in a single register to mask all elements. maximum element count comes from smallest SEW (8 bits) and largest LMUL (8 registers). Max elements = VLEN * LMUL / SEW = VLEN * 8 / 8 = VLEN elements, there are VLEN bits in a single register.}
 
 \figinput[width=\textwidth,pos=h]{1_20Background/figures/fig_RVV_examples_combined}
 %---------------------------------
@@ -176,22 +182,81 @@ Neither of these modes are actually defined, but they are simply noted as possib
 \subsection{Memory access instructions}
 \emph{Summarizes \cite[Sections 7-9]{RISCVVectorExtension2021}}
 
-% RVV defines five broad categories of memory access instructions.
-
+RVV defines five broad categories of memory access instructions, which this subsection describes.
+For the most part, they handle their operands as described in \cref{chap:bg:sec:rvv:vector_model}.
+\code{EEW} and \code{EMUL} are usually derived from the instruction encoding, rather than reading the \code{vtype} CSR.
+In one case (\todoref{bytemask access}) the Effective Vector Length \code{EVL} is different from the \code{vl} CSR, so for simplicity all instructions are described in terms of \code{EVL}.
 
 \subsubsection{Segment accesses}
+Three of the five categories (unit/strided, fault-only-first, and indexed) support \emph{segmented} access.
+This is used for unpacking contiguous structures of $n$ \emph{fields} and placing each field in a separate vector.
+Rather than 
 
+\pagebreak
 \subsubsection{Unit and Strided accesses}
 
+
+\begin{tabular}{ll}
+\toprule
+    \code{EEW} & From Instruction \\
+    \code{EMUL} & From Instruction \\
+    \midrule
+    \code{NFIELDS} & From Instruction \\
+    \code{EVL} & \code{vl} \\
+    \bottomrule
+\end{tabular}
+
+\pagebreak
 \subsubsection{Fault-only-first unit loads}
 
+\begin{tabular}{ll}
+\toprule
+    \code{EEW} & From Instruction \\
+    \code{EMUL} & From Instruction \\
+    \midrule
+    \code{NFIELDS} & From Instruction \\
+    \code{EVL} & \code{vl} \\
+    \bottomrule
+\end{tabular}
+
+\pagebreak
 \subsubsection{Indexed accesses}
+\begin{tabular}{ll}
+\toprule
+    Element \code{EEW} & \code{vtype.SEW} \\
+    Element \code{EMUL} & \code{vtype.LMUL} \\
+    \midrule
+    Index Width & From Instruction \\
+    Index \code{MUL} & From Instruction \\
+    \midrule
+    \code{NFIELDS} & From Instruction \\
+    \code{EVL} & \code{vl} \\
+    \bottomrule
+\end{tabular}
 
+\pagebreak
 \subsubsection{Whole-register accesses}
+\begin{tabular}{ll}
+\toprule
+    \code{EEW} & From Instruction \\
+    \midrule
+    \code{NFIELDS} & From Instruction \\
+    \code{EVL} & \code{NFIELDS * VLEN / EEW} \\
+    \bottomrule
+\end{tabular}
 
+\pagebreak
 \subsubsection{Bytemask accesses}
+\begin{tabular}{ll}
+\toprule
+    \code{EEW} & 8-bits \\
+    \code{EMUL} & 1 \\
+    \midrule
+    \code{EVL} & \code{ceil(vl/8)} \\
+    \bottomrule
+\end{tabular}
 
-
+\pagebreak
 %---------------------------------
 %---------------------------------
 %---------------------------------
