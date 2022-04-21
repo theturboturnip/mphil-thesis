@@ -190,11 +190,16 @@ In one case (\todoref{bytemask access}) the Effective Vector Length \code{EVL} i
 \subsubsection{Segment accesses}
 Three of the five categories (unit/strided, fault-only-first, and indexed) support \emph{segmented} access.
 This is used for unpacking contiguous structures of $n$ \emph{fields} and placing each field in a separate vector.
-Rather than 
+\cref{fig:RVV_mem_unit} demonstrates a common example: the extraction of separate R, G, and B components from a color.
+Without segmentation, as in \cref{fig:RVV_mem_unit_noseg}, each consecutive memory address maps to a consecutive element in a single vector register group.
+With segmentation, elements are grouped into segments of $n$ fields, where each field is mapped to a different vector register group.
+
+\figinput[width=0.48\textwidth,pos=t]{1_20Background/figures/fig_RVV_mem_unit}
 
 \pagebreak
 \subsubsection{Unit and Strided accesses}
 
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_strided}
 
 \begin{tabular}{ll}
 \toprule
@@ -221,6 +226,7 @@ Rather than
 
 \pagebreak
 \subsubsection{Indexed accesses}
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_indexed}
 \begin{tabular}{ll}
 \toprule
     Element \code{EEW} & \code{vtype.SEW} \\
