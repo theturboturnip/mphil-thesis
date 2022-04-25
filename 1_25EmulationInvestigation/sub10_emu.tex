@@ -1,0 +1,28 @@
+\section{Developing the emulator}\label{chap:software:sec:emu}
+Rust was selected due to its memory safety and runtime speed, and provides language constructs that suit themselves well to emulation.
+Rust Enums are equivalent to \enquote{variant} types in other languages like C++, which \todomark{}.
+\todomark{something something match statements}.
+
+\subsection{Emulating CHERI}
+
+\subsubsection{\code{rust-cheri-compressed-cap}}
+\todomark{128-bit values interop}
+
+\subsubsection{CHERI-RISC-V ISA}
+
+\subsubsection{Capability Relocations}
+
+\subsubsection{Integer/Capability mode}
+
+\subsubsection{Integrating into the emulator}
+% i.e. using MemoryOf trait to make all memory addressable only by capabilities
+% i.e. using addr, provenance split to understand
+
+\subsection{Emulating vectors}
+
+\subsubsection{Decoding phase}
+
+\subsubsection{Fast-path check phase}
+
+\subsubsection{Execution phase}
+
