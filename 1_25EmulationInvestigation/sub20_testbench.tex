@@ -8,14 +8,21 @@
 \subsubsection{Auto-vectorization}
 \subsubsection{Intrinsics}
 \subsubsection{Inline ASM}
+% CHERI-Clang has undocumented "c" constraint
 \subsubsection{Comparison vs. Arm SVE}
 
 \subsection{CHERI-Clang issues}
 \subsubsection{Using CHERI-Clang from scratch}
 % i.e. the things we had to do because CHERIbuild wasn't setting the arguments for us
 \subsubsection{Updating RVV instructions to use capabilities}
-\subsubsection{Allocating vectors on the stack}
 \subsubsection{Experiments with ASM wrappers}
+% Tried ASM wrappers, didn't work because can't return/pass vectors as args (cite ABI)
+% Therefore moved to ASM 
+\subsubsection{Allocating vectors on the stack}
+% ASM wrappers also exposed that CHERI fails to something
+\subsubsection{Other}
+% note difference with CJALR/JALR?
+
 
 \subsection{Final testbench structure}
 

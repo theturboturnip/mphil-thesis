@@ -29,12 +29,37 @@ As above, significant work has gone into the implementation to reduce the DRAM o
 
 \todomark{Explain the three properties of a capability from davisCheriABIEnforcingValid2019?}
 
-\todomark{Explain CHERI capability instructions vs. legacy instructions that use DDC}
 
-\todomark{Hybrid vs. Pure-Capability code}
+\todomark{rewrite above section - just copied over some stuff previously from Emulation Investigation and it doesn't flow}
 
-\subsection{CHERI RISC-V}
-Integer vs. Capability mode in hardware?
+
+\subsection{CHERI-RISC-V ISA}
+The Cambridge Computer Lab's TR-951 report\todocite{TR-951} describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V.
+CHERI-RISC-V is a mostly straightforward set of additions to basic RISC-V ISAs.
+It adds thirty-two general-purpose capability registers, thirty-two Special Capability Registers (SCRs), and many new instructions.
+
+The new general-purpose capability registers are each of size \code{CLEN = 2 * XLEN} plus a tag bit.
+These registers store compressed capabilities.
+While there is always a logical distinction between the pre-existing \emph{integer} registers \code{x0-x31} and the \emph{capability} registers \code{cx0-cx31}, the architecture may store them in a Split or Merged register file.
+A Split register file stores the integer registers separately from capability registers, so programs can manipulate them independently.
+A Merged register file stores thirty-two registers of length \code{CLEN}, using the full width for the capability registers, and aliases the integer registers to the bottom \code{XLEN} bits.
+Under a merged register file, writing to an integer register makes the capability counterpart invalid, so programs have to be more careful with register usage.
+
+\todomark{diagram for split/merged register file?}
+
+\todomark{All new CHERI instructions specify if their operands are integers or capabilities, and pull from the correct set of logical registers.}
+\todomark{Non-CHERI enabled instructions default to integer representations, and in some cases can be switched to use capabilities using the Integer/Capability encoding mode flag}
+
+Many of the new SCRs are intended to support the privileged ISA extensions for e.g. hypervisors or operating systems.
+The emulator doesn't use these, so their SCRs are not listed here, but there are two highly relevant SCRs for all modes: the Program Counter Capability and the Default Data Capability.
+The PCC supplements \todomark{replaces?} the program counter by adding more metadata, ensuring instruction fetches have the same security as normal loads and stores.
+
+
+\subsection{Integer/Capability mode}
+\todomark{Capability mode flag overrides behaviour of RISC-V }
+
+\subsection{Capability Relocations}
+\todomark{talk about ELF cap-relocs table, how they work and why}
 
 \include{1_20Background/rvv}
 

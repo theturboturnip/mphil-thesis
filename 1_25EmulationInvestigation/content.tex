@@ -2,9 +2,9 @@
 In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \enquote{riscv-v-lite}.
 This emulator can emulate three RISC-V ISAs: 
 \begin{itemize}
-    \item \code{rv32imv} - 32-bit + Integer, Multiply, Vector extensions
-    \item \code{rv64imv} - 64-bit + Integer, Multiply, Vector extensions
-    \item \code{rv64imvxcheri} - 64-bit + CHERI + Integer, Multiply, Vector extensions
+    \item \code{rv32imv} - 32-bit + Multiply and Vector extensions
+    \item \code{rv64imv} - 64-bit + Multiply and Vector extensions
+    \item \code{rv64imvxcheri} - 64-bit + CHERI, Multiply, and Vector extensions
 \end{itemize}
 Each ISA's vector behaviour is tested with a set of \code{memcpy}-esque testbench programs.
 These are written in C, using RISC-V vector intrinsics where possible, and compiled with a variety of C compilers to examine compatibility.
