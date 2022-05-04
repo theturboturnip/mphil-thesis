@@ -1,19 +1,42 @@
-\chapter{Emulation investigation}
-In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \enquote{riscv-v-lite}.
-This emulator can emulate three RISC-V ISAs: 
-\begin{itemize}
-    \item \code{rv32imv} - 32-bit + Multiply and Vector extensions
-    \item \code{rv64imv} - 64-bit + Multiply and Vector extensions
-    \item \code{rv64imvxcheri} - 64-bit + CHERI, Multiply, and Vector extensions
-\end{itemize}
-Each ISA's vector behaviour is tested with a set of \code{memcpy}-esque testbench programs.
-These are written in C, using RISC-V vector intrinsics where possible, and compiled with a variety of C compilers to examine compatibility.
-An experimental capabilities-in-vectors concept is also tested.
+\chapter{Hardware emulation investigation}
+% In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \enquote{riscv-v-lite}.
+% This emulator can emulate three RISC-V ISAs: 
+% \begin{itemize}
+%     \item \code{rv32imv} - 32-bit + Multiply and Vector extensions
+%     \item \code{rv64imv} - 64-bit + Multiply and Vector extensions
+%     \item \code{rv64imvxcheri} - 64-bit + CHERI, Multiply, and Vector extensions
+% \end{itemize}
+% Each ISA's vector behaviour is tested with a set of \code{memcpy}-esque testbench programs.
+% These are written in C, using RISC-V vector intrinsics where possible, and compiled with a variety of C compilers to examine compatibility.
+% An experimental capabilities-in-vectors concept is also tested.
 
-\cref{chap:software:sec:emu} describes the emulator, focusing on how vector instructions are emulated.
-\cref{chap:software:sec:testbench} describes the testbench, the various techniques used to emit vector instructions on different compilers, and the results of each testbench for each architecture and compiler.
-\cref{chap:software:sec:capinvec} explains the experiments done with capabilities-in-vectors.
+% \cref{chap:software:sec:emu} describes the emulator, focusing on how vector instructions are emulated.
+% \cref{chap:software:sec:testbench} describes the testbench, the various techniques used to emit vector instructions on different compilers, and the results of each testbench for each architecture and compiler.
+% \cref{chap:software:sec:capinvec} explains the experiments done with capabilities-in-vectors.
+
+\todomark{introduction}
 
 \include{1_25EmulationInvestigation/sub10_emu}
-\include{1_25EmulationInvestigation/sub20_testbench}
-\include{1_25EmulationInvestigation/sub30_capinvec}
+% \include{1_25EmulationInvestigation/sub20_testbench}
+% \include{1_25EmulationInvestigation/sub30_capinvec}
+
+\section{Going beyond the emulator}
+The emulator is a single example of a conformant CHERI-RVV implementation, and does not exercise every part of the specification.
+Two properties stand out:
+\begin{itemize}
+    \item Segments/elements are always accessed in order, despite the spec not enforcing ordering
+    \item Imprecise traps are used for all exceptions - precise exception behaviour is not explored.
+\end{itemize}
+This section notes how relaxed access ordering and precise exceptions may affect the hardware in ways not previously explored.
+
+\subsection{Precise exceptions}
+\todomark{precise exceptions}
+
+\subsection{Relaxed access ordering}
+\todomark{relaxed access ordering}
+
+\section{Testing hypotheses}
+\todomark{Move the fast-path stuff here?}
+
+\todomark{H-A - yes}
+\todomark{H-B - yes, depending on hardware constraints. A fast-path that checks a single super-range may always be fallible, so hardware must always be prepared to do a slow per-element check}

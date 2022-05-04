@@ -1,0 +1,20 @@
+\chapter{The CHERI-RVV software stack}
+
+\section{Compiling Vector Code}
+\subsection{Automatic vectorization}
+\subsection{Vector intrinsics}
+\subsection{Inline assembly}
+\subsection{Comparing ARM SVE with RVV} 
+
+\section{Complications with CHERI-Clang}
+\subsection{Adapting intrinsics for CHERI}
+\subsection{CHERI-agnostic assembly}
+\subsection{Storing scalable vectors on-stack}
+
+\section{Testing hypotheses}
+
+\todomark{H-C: At machine level, yes - a program compiled for CHERI-RVV will have the exact same vector instruction encodings as a non-CHERI RVV.
+Practically:
+Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets ported, Yes under inline-assembly WITH a simple macro}
+
+\todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
