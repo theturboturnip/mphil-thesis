@@ -7,6 +7,31 @@ While this support is very advanced for well established vector models, like x86
 It can even be difficult to get the compiler to generate any vector instructions at all.
 This section examines support across the Clang and GCC compilers for various vectorization methods on RVV.
 
+\subsection{Required command-line options}
+Before you can compile vector code, the compiler must be told to use a vector ISA.
+This is fortunately quite easy, only requiring an addition to the architecture feature string \todomark{is it called that?} in most cases.
+On Clang 13 and other LLVM-13-based compilers, version 0.1 of the vector specification is supported as an experimental extension, so an extra command.
+Clang/LLVM~14 and up support RVV v1.0.
+GCC is an interesting case - there is a branch of \code{riscv-gcc-toolchain} that supports RVV v0.1, based on RISC-V GCC 10.1, but it hasn't been touched for more than a year.
+See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and building this version.
+
+\begin{table}[]
+    \centering
+\begin{tabular}{llp{0.55\linewidth}}
+    \toprule
+    Compiler & Required Arguments & Notes \\ 
+    \midrule
+    Clang-13 & \code{-march=rv64gv0p10}  & Supports intrinsics, inline assembly for RVV v0.1 \\
+    & \code{-menable-experimental-extensions} & \\
+    Clang-14+ & \code{-march=rv64gv} & Supports intrinsics, inline assembly for RVV v1.0 \\
+    GCC 10.1 & \code{-march=rv64g_v} & Requires special toolchain (see \cref{appx:building_rvv_gcc_toolchain}) and has incomplete support (see \todoref{bit from testing where we talk about GCC being iffy}) \\
+    \bottomrule
+\end{tabular}
+    \caption{Command-line arguments for compiling RVV code on various compilers\\(assuming the base ISA is \code{rv64g})}
+    \label{tab:rvv_cmdline_nocheri}
+\end{table}
+
+
 \subsection{Automatic vectorization}
 \todomark{Figure page showing generated ASM for increment loop - see godbolt links MD}
 Compilers with auto-vectorization can automatically create vectorized code from a scalar program.
@@ -26,7 +51,7 @@ The compiler then handles low-level decisions like register allocation under the
 % The programmer is strongly encouraged to use a \code{vsetvl} intrinsic to generate the length first, but could also pass the 
 % which allow (and strongly suggest) the programmer to get the vector length with a \code{vsetvl} function, then pass it to an 
 
-RVV has a comprehensive set of vector intrinsics\todocite{RISCVVectorIntrinsicsv0.1}, implemented in a special version of RISC-V~GCC~10.1\footnote{See \cref{appx:building_rvv_gcc_toolchain} to find and build this version.} and Clang~13 onwards.
+RVV has a comprehensive set of vector intrinsics\todocite{RISCVVectorIntrinsicsv0.1}, implemented in the aforementioned special version of GCC and Clang~13+.
 With these, the general strip-mining loop is easy to construct:
 \todomark{example based on \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
 \begin{enumerate}
@@ -79,34 +104,92 @@ It is used extensively in the testbench code for the evaluation (\todoref{evalua
     \todomark{Beautify this table}
 \end{table}
 
-\subsection{Compiler support summary}
-\begin{tabular}{lll}
-    \toprule
-    Compiler & Required Arguments & Notes \\ 
-    \midrule
-    Clang/LLVM-13 & \code{-march=rv64gv0p10 -menable-experimental-extensions} & Supports intrinsics, inline assembly for RVV v0.1 \\
-    Clang/LLVM-14+ & \code{-march=rv64gv} & Supports intrinsics, inline assembly for RVV v1.0 \\
-    RISC-V GCC 10.1 & \code{-march=rv64g_v} & Requires special toolchain (see \cref{appx:building_rvv_gcc_toolchain}) and has incomplete support (see \todoref{bit from testing where we talk about GCC being iffy}) \\
-    \bottomrule
-\end{tabular}
-
-\subsubsection{vs. Arm SVE}\label{chap:soft:compiling:armsve}
+\subsection{vs. Arm SVE}\label{chap:soft:compiling:armsve}
 \todomark{Arm SVE has extensive auto-vectorization, RISC-V V does not.}
 \todomark{Would it be easy to bring this auto-vectorization code to RISC-V V?}
 \todomark{Arm SVE and RVV have comparable(?) intrinsics}
 \todomark{Arm SVE and RVV have comparable(?) abilities, and can both achieve these through inline assembly?}
 \todomark{Can you use Arm SVE intrinsic types with inline ASM?}
 
+\pagebreak
 \section{Compiling vector code with CHERI-Clang}
-\subsection{Making vector instructions take capabilities}
+Current CHERI compiler work is done on CHERI-Clang, a fork of Clang and other LLVM tools that supports capabilities.
+It's based on LLVM~13 so supports RVV v0.1, but none of the vector-extension related code had been updated to work with capabilities.
+This section outlines the changes one has to make to CHERI-Clang and vector code to compile programs for CHERI-RVV.
+
+\subsection{Required command-line options}
+\begin{table}[]
+    \centering
+\begin{tabular}{llp{0.55\linewidth}}
+    \toprule
+    Compiler & Required Arguments & Notes \\ 
+    \midrule
+    CHERI-Clang  & \code{-march=rv64gv0p10xcheri}  & Supports intrinsics, inline assembly for RVV v0.1. \\
+    \multicolumn{1}{c}{(LLVM-13)} & \code{-menable-experimental-extensions} & LLVM 13 RVV support is experimental. \\
+    & \code{-mabi=l64pc128} & ABI string required to set capability width. \\
+    & \code{-mno-relax} & Linker relaxations must be disabled. \\
+    \bottomrule
+\end{tabular}
+    \caption{Command-line arguments for compiling CHERI-RVV code\\(assuming the base ISA is \code{rv64g})}
+    \label{tab:rvv_cmdline_cheri}
+\end{table}
+
+By default CHERI-Clang doesn't actually compile capability-enabled code.
+The documentation on enabling capabilities is unfortunately sparse and outdated.
+In particular, the CHERI-Clang help menu states that \code{--cheri} will \enquote{Enable CHERI support with the default capability size}, but this has no effect (at least on RISC-V).
+To find up-to-date answers, the CHERIbuild (\todocite{https://github.com/CTSRD-CHERI/cheribuild}) build tool was consulted.
+
+CHERIbuild's code\footnote{\url{https://github.com/CTSRD-CHERI/cheribuild/blob/ba3a0b6388436224968c906192c61d2ccbdd7616/pycheribuild/config/compilation_targets.py\#L176}} revealed three requirements:
+\begin{itemize}
+    \item The architecture string must contain \code{xcheri}
+    \item The capability length must be set using the ABI string
+    \begin{itemize}
+        \item In pure-capability mode, pointers and capabilities are \code{CLEN} long
+        \begin{itemize}
+            \item Example string: \code{l64pc128}
+            \item Integer width (\code{long}, or \code{l}) = XLEN = 64-bits
+            \item Pointer width (\code{p}) = Capability width (\code{p}) = CLEN = 128-bits
+        \end{itemize}
+        \item In legacy mode, pointers remain \code{XLEN} long and capabilities are still \code{CLEN} long
+        \begin{itemize}
+            \item Example string: \code{lp32c64}
+            \item Integer width (\code{l}) = XLEN = Pointer width (\code{p}) = 32-bits
+            \item Capability width (\code{c}) = CLEN = 64-bits
+        \end{itemize}
+    \end{itemize}
+    \item ``Linker relaxations'', where function calls are converted to short jumps\cite{chenCompilerSupportLinker2019}, must be disabled.
+    \begin{itemize}
+        \item This is likely because CHERI requires function calls to go through capabilities
+        \item However the code that adds this option wasn't documented, so there may be more to it
+    \end{itemize}
+\end{itemize}
+
+Once the above options are set, plain CHERI-RISC-V code compiles without a hitch.
+Changes to CHERI-Clang itself are required to compile vectors.
+
+\subsection{Pure-capability vector instructions}
+\todomark{This requires a definition of how CHERI-RVV instructions should behave - do they *always* take caps, breaking legacy mode? Do they take caps in cap mode but raw addresses in legacy mode?}
+\todomark{If the second one, how to do that in LLVM?}
+\todomark{Need to add CHERI-enabled but integer-mode toolchain?}
+
+% LLVM uses a domain-specific language to describe the instructions it can emit for a given target.
+% The RISC-V target describes multiple register sets that RISC-V instructions can use.
+% For example, most instructions use general purpose registers to hold integer arguments, so the RISC-V target defines a GPR set.
+% CHERI-Clang added a GPCR set, i.e. the General Purpose Capability Registers.
+
+
 \subsection{Adapting vector intrinsics to CHERI}
 \subsection{CHERI-agnostic inline assembly}
 \subsection{Storing scalable vectors on-stack}
 
+\pagebreak
 \section{Testing hypotheses}
 
-\todomark{H-C: At machine level, yes - a program compiled for CHERI-RVV will have the exact same vector instruction encodings as a non-CHERI RVV.
+\todomark{H-C: At machine level, yes - a program compiled for pure-cap CHERI-RVV will have the exact same vector instruction encodings as a no-capability RVV.
+Although if it were recompiled for integer-mode-CHERI it may end up using different registers for the capabilities.
 Practically:
 Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets ported, Yes under inline-assembly WITH a simple macro}
 
 \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
+
+\todomark{where to put something on how CHERI-Clang should change?}
