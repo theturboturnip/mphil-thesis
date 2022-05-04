@@ -65,29 +65,75 @@ Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be buil
 Secondly, RVV is a \emph{scalable} vector model.
 This has more potential roadblocks than a fixed-length vector model, and investigating them here will make life easier if Arm wish to integrate their Scalable Vector Extension with CHERI later down the road.
 
-\section{Aims}
-The aim of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI's memory protection system.
+% \section{Aims}
+% The aim of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI's memory protection system.
+% In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
+
+% % Investigate the reprecussions of adding scalable vector support to CHERI systems.
+% % \todomark{Identify where potential roadblocks could be, and where they couldn't be.}
+% % What are potential performance/compatibility roadblocks?
+% This project does not try to implement CHERI-RVV in a hardware description language.
+% Instead, it uses an emulator written in Rust to experiment with potential integration methods.
+% A higher-level approach allows us to evaluate what's plausible for hardware without getting stuck in the weeds of implementing it in full.
+
+% % \todomark{Investigate from both hardware and software perspectives}
+% Software and the user story for writing CHERI-RVV programs is also considered. 
+% Where possible, vector code is generated from C source code using the CHERI-Clang compiler, rather than hand-writing assembly.
+% This reveals many problems CHERI-Clang has with vector intrinsics, which we later propose solutions to.
+
+% % \todomark{Investigate from both (adding CHERI to vector) and (adding vectors to CHERI) perspectives}
+% As scalar CHERI processors and vector non-CHERI processors both already exist, we consider integration from both sides: how does vector processing change when adding CHERI, and how does CHERI change when adding vectors?
+% Examples of these perspectives include the following:
+% \begin{itemize}
+%     \item When adding CHERI to vectors, do vectors need to be able to hold capabilities? If so, what changes are necessary?
+%     \item When adding vectors to scalar CHERI, what are the benefits/drawbacks of using a separate hardware vector unit vs. an integrated scalar+vector pipeline?
+% \end{itemize}
+
+% % How does CHERI impact vector implementations (i.e. storing capabilities inside vectors for generic memcpy)
+% % How do vectors impact CHERI implementations (particularly scalable vectors?)
+
+\section{Hypotheses and Aims}
+The goal of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI's memory protection system.
 In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
 
-% Investigate the reprecussions of adding scalable vector support to CHERI systems.
-% \todomark{Identify where potential roadblocks could be, and where they couldn't be.}
-% What are potential performance/compatibility roadblocks?
-This project does not try to implement CHERI-RVV in a hardware description language.
-Instead, it uses an emulator written in Rust to experiment with potential integration methods.
-A higher-level approach allows us to evaluate what's plausible for hardware without getting stuck in the weeds of implementing it in full.
+The investigation was carried out by designing and testing a CHERI-RVV emulator written in Rust, but that is only a single implementation.
+To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to prove \todomark{five} hypotheses (\cref{tab:hypotheses}).
+\todoref{H-A,H-B} take the point of view of the hardware, considering basic feasibility and potential performance issues.
+\todoref{H-C,H-D} examine the current CHERI-RVV software stack, checking if adding CHERI to vector programs causes compatibility problems.
+\todoref{H-E,H-F,H-G} considers capabilities-on-vectors: the conditions under which vector registers can hold capabilities, and the conditions under which vectorized memory accesses and other instructions can manipulate them.
 
-% \todomark{Investigate from both hardware and software perspectives}
-Software and the user story for writing CHERI-RVV programs is also considered. 
-Where possible, vector code is generated from C source code using the CHERI-Clang compiler, rather than hand-writing assembly.
-This reveals many problems CHERI-Clang has with vector intrinsics, which we later propose solutions to.
-
-% \todomark{Investigate from both (adding CHERI to vector) and (adding vectors to CHERI) perspectives}
-As scalar CHERI processors and vector non-CHERI processors both already exist, we consider integration from both sides: how does vector processing change when adding CHERI, and how does CHERI change when adding vectors?
-Examples of these perspectives include the following:
+Along with testing these hypotheses, this document serves as a practical explanation of the following:
 \begin{itemize}
-    \item When adding CHERI to vectors, do vectors need to be able to hold capabilities? If so, what changes are necessary?
-    \item When adding vectors to scalar CHERI, what are the benefits/drawbacks of using a separate hardware vector unit vs. an integrated scalar+vector pipeline?
+    \item The changes to RISC-V required by CHERI-RISC-V
+    \item The RISC-V-V vector model, and all memory-related instructions
+    \item How to compile CHERI-RVV code for a baremetal platform (with no operating system)
+    \item How to execute CHERI-RVV code compiled for a baremetal platform
+    \item The limitations of the current CHERI-RVV software stack
 \end{itemize}
+\todomark{fill out this para more, have an actual end sentence}
 
-% How does CHERI impact vector implementations (i.e. storing capabilities inside vectors for generic memcpy)
-% How do vectors impact CHERI implementations (particularly scalable vectors?)
+\begin{table}[b]
+    \centering
+    \begin{tabular}{lp{0.9\linewidth}}
+    \toprule
+    \multicolumn{2}{l}{\emph{Hardware Hypotheses - \todoref{Chapter X}}} \\
+    \midrule
+        H-A & It is possible to use CHERI capabilities as memory references in all vector instructions. \\
+        H-B & The cost of capability bounds checks can be amortised over multiple per-vector-element accesses. \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Software Hypotheses - \todoref{Chapter X}}} \\
+    \midrule
+        H-C & Vector code can be compiled into a pure-capability form from a legacy form with no source code changes. \\
+        H-D & CHERI-vector code can run correctly in multiprocessing systems, where execution may be paused and resumed on interrupts or context switches. \\
+    \midrule
+    \multicolumn{2}{l}{\emph{Capabilities-in-Vectors - \todoref{Chapter X}}} \\
+    \midrule
+        H-E & It is possible for vector registers to hold capabilities to enable copying without violating CHERI's security principles. \\
+        H-F & It is possible for vector memory accesses to load and store capabilities from vector registers without violating CHERI's security principles. \\
+        H-G & It is possible for vector instructions to manipulate capabilities in vector registers without violating CHERI's security principles. \\
+    \bottomrule
+    \end{tabular}
+    \caption{Project Hypotheses}
+    \label{tab:hypotheses}
+    \todomark{Make hypotheses ref-able, similar to requirements from TYP}
+\end{table}
