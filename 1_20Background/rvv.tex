@@ -110,19 +110,6 @@ When masking is disabled, all elements are \emph{active}.
 %---------------------------------
 %---------------------------------
 %---------------------------------
-\subsection{Motivation for scalable vectors}
-\todomark{I originally wrote this for the introduction, but I felt it was taking up too much time. It could be useful for someone familiar with fixed-length vectors but not scalable ones. Should it be here, or move somewhere else?}
-Many vector implementations (Intel SSE/AVX, Arm's Advanced SIMD and Neon) use fixed-length vectors - e.g. 128-bit vectors which a program interprets as four 32-bit elements.
-As the industry's desire for parallelism grew, new implementations had to be designed with longer vectors of more elements.
-For example, Intel SSE/SSE2 (both 128-bit) was succeeded by AVX (128 and 256-bit), then AVX2 (entirely 256-bit), then AVX-512 (512-bit).
-Programs built for one extension, and hence designed for a specific vector size, could not automatically take advantage of longer vectors.
-
-Scalable vectors address this by not specifying the vector length, and instead calculating it on the fly.
-Instead of hardcoding \enquote{this loop iteration uses a single vector of four 32-bit elements}, the program has to ask \enquote{how many 32-bit elements will this iteration use?}.
-This gives hardware designers more freedom, letting them select a suitable hardware vector length for their power/timing targets, while guaranteeing consistent execution of programs on arbitrarily-sized vectors.
-%---------------------------------
-%---------------------------------
-%---------------------------------
 \subsection{Strip mining and \code{vsetvl}}\label{chap:bg:sec:rvv:vsetvl}
 \emph{Summarizes \cite[Section 6]{RISCVVectorExtension2021}}
 \todomark{This section would introduce the general programming paradigm for scalable vectors and the \code{vsetvl} instruction family.

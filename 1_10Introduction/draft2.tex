@@ -3,7 +3,7 @@
 % 2-3 pages
 
 % \todomark{para on what capabilities are}
-Since 2010, the Cambridge Computer Lab (in association with SRI) has been developing the  CHERI\footnote{Capability Hardware Enhanced RISC Instructions} architecture extension, which improves the security of any given architecture by checking all memory accesses in hardware.
+Since 2010, the Cambridge Computer Lab (in association with SRI) has been developing the CHERI\footnote{Capability Hardware Enhanced RISC Instructions} architecture extension, which improves the security of any given architecture by checking all memory accesses in hardware.
 The core impact of CHERI, on a hardware level, is that memory can no longer be accessed directly through raw addresses, but must pass through a \emph{capability}\todocite{TR-951?}.
 Capabilities are unforgeable tokens that grant fine-grained access to ranges of memory.
 Instead of generating them from scratch, capabilities must be \emph{derived} from another capability with greater permissions.

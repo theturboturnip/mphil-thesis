@@ -61,6 +61,20 @@ The PCC supplements \todomark{replaces?} the program counter by adding more meta
 \subsection{Capability Relocations}
 \todomark{talk about ELF cap-relocs table, how they work and why}
 
+%---------------------------------
+%---------------------------------
+%---------------------------------
+\section{A brief history of vector processing}
+Many vector implementations (Intel SSE/AVX, Arm's Advanced SIMD and Neon) use fixed-length vectors - e.g. 128-bit vectors which a program interprets as four 32-bit elements.
+As the industry's desire for parallelism grew, new implementations had to be designed with longer vectors of more elements.
+For example, Intel SSE/SSE2 (both 128-bit) was succeeded by AVX (128 and 256-bit), then AVX2 (entirely 256-bit), then AVX-512 (512-bit).
+Programs built for one extension, and hence designed for a specific vector size, could not automatically take advantage of longer vectors.
+
+Scalable vectors address this by not specifying the vector length, and instead calculating it on the fly.
+Instead of hardcoding \enquote{this loop iteration uses a single vector of four 32-bit elements}, the program has to ask \enquote{how many 32-bit elements will this iteration use?}.
+This gives hardware designers more freedom, letting them select a suitable hardware vector length for their power/timing targets, while guaranteeing consistent execution of programs on arbitrarily-sized vectors.
+RVV uses a scalable vector model.
+
 \include{1_20Background/rvv}
 
 \section{Other vector models}
