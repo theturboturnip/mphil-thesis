@@ -86,9 +86,9 @@ In future research it should be doable to perform the relocations entirely in ba
 Vector instructions are executed by a Vector ISA module, which stores all registers and other state.
 \code{VLEN} is hardcoded as 128-bits, and the maximum \code{ELEN} is \todomark{64} 32-bits.
 To support both CHERI and non-CHERI execution pointers are separated into an address and a \emph{provenance} - \todomark{short definition of provenance}.
-The vector unit retreives an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory.
-On CHERI, provenance is defined in terms of the base register e.g. \enquote{the provenance is provided by capability register X}.
-On non-CHERI platforms, provenance has no meaning and is not checked.
+The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory.
+When using capabilities, provenance is defined in terms of the base register e.g. \enquote{the provenance is provided by capability register X}.
+On non-CHERI platforms, or when emulating a CHERI processor in integer mode\footnote{See \cref{chap:emu:rvv_int_mode} for the reasoning behind this decision.}, the vector unit doesn't check provenance.
 
 Arithmetic and configuration instructions are generally simple to implement, so aren't covered here.
 The emulator splits memory access instructions into three phases: decoding (\todoref{}), fast-path (\todoref{}), and execution (\todoref{}).
@@ -202,3 +202,9 @@ Any capability failure triggers an immediate synchronous exception, performing a
 If the fast-path check is unsuccessful, the emulator immediately returns (thus performing an imprecise trap) \todomark{although it doesn't yet correctly set vstart}.
 For readability, the emulator separates this into two phases: determining the mapping of vector elements to accessed memory addresses, then performing those accesses.
 The pseudocode for each access can be found in \todoref{appendix}, and this step is otherwise not noteworthy.
+
+\subsubsection{Integer vs. capability mode}\label{chap:emu:rvv_int_mode}
+As noted in \todoref{chap:bg:sec:cheri:integer_capability_mode?} CHERI-RISC-V defines two execution modes that the program can switch between.
+In Integer mode \enquote{address operands to existing RISC-V load and store opcodes contain integer addresses} which are implicitly dereferenced relative to the default data capability, and in Capability mode those opcodes are modified to use capability operands.
+Integer mode was included in the interests of maintaining compatibility with legacy code that hasn't been adapted to capabilities.
+As similar vector code may also exist, CHERI-RVV treats vector memory access instructions as \enquote{existing RISC-V load and store opcodes} and requires that they respect integer/capability mode.

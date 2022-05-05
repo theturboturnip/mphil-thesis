@@ -150,11 +150,10 @@ CHERIbuild's code\footnote{\url{https://github.com/CTSRD-CHERI/cheribuild/blob/b
             \item Integer width (\code{long}, or \code{l}) = XLEN = 64-bits
             \item Pointer width (\code{p}) = Capability width (\code{p}) = CLEN = 128-bits
         \end{itemize}
-        \item In legacy mode, pointers remain \code{XLEN} long and capabilities are still \code{CLEN} long
+        \item For hybrid mode, pointers remain \code{XLEN} long and capability length is not specified
         \begin{itemize}
-            \item Example string: \code{lp32c64}
+            \item Example string: \code{lp32}
             \item Integer width (\code{l}) = XLEN = Pointer width (\code{p}) = 32-bits
-            \item Capability width (\code{c}) = CLEN = 64-bits
         \end{itemize}
     \end{itemize}
     \item ``Linker relaxations'', where function calls are converted to short jumps\cite{chenCompilerSupportLinker2019}, must be disabled.
@@ -167,19 +166,32 @@ CHERIbuild's code\footnote{\url{https://github.com/CTSRD-CHERI/cheribuild/blob/b
 Once the above options are set, plain CHERI-RISC-V code compiles without a hitch.
 Changes to CHERI-Clang itself are required to compile vectors.
 
-\subsection{Pure-capability vector instructions}
-\todomark{This requires a definition of how CHERI-RVV instructions should behave - do they *always* take caps, breaking legacy mode? Do they take caps in cap mode but raw addresses in legacy mode?}
-\todomark{If the second one, how to do that in LLVM?}
-\todomark{Need to add CHERI-enabled but integer-mode toolchain?}
+\subsection{Adapting vector assembly instructions to CHERI}
+LLVM uses a domain-specific language to describe the instructions it can emit for a given target.
+The RISC-V target describes multiple register sets that RISC-V instructions can use.
+Vanilla RVV vector memory accesses use the General Purpose Registers (GPR) to store the base address of each access.
+CHERI-Clang added a GPCR set, i.e. the General Purpose Capability Registers.
+As noted in \cref{chap:emu:rvv_int_mode} CHERI-RVV requires the vector memory accesses to support integer \emph{and} capability mode, therefore two versions of the vector accesses must be created: versions which take a capability base address, only available in CHERI/Capability mode, and versions which take integer base addresses for Integer mode.
 
-% LLVM uses a domain-specific language to describe the instructions it can emit for a given target.
-% The RISC-V target describes multiple register sets that RISC-V instructions can use.
-% For example, most instructions use general purpose registers to hold integer arguments, so the RISC-V target defines a GPR set.
-% CHERI-Clang added a GPCR set, i.e. the General Purpose Capability Registers.
+\todomark{Appendix on how this was done?}
+With the above changes, inline assembly could be used to insert capability-enabled vector instructions\todomark{Example}.
+However, as this requires using a capability register constraint for the base address, inline assembly code written for CHERI-RVV is not inherently compatible with vanilla RVV.
+For un-annotated pointers (e.g. \code{int*}), which are only capabilities in pure-capability code and integers in legacy or hybrid code, a conditional macro can be used to insert the correct constraint: \todoref{example}.
+However, this falls apart in hybrid code for manually annotated pointers (e.g. \code{int* \_\_capability}) because the macro cannot detect the annotation.
 
 
 \subsection{Adapting vector intrinsics to CHERI}
-\subsection{CHERI-agnostic inline assembly}
+Vector intrinsics are another story entirely.
+When compiling for pure-capability libraries, all attempts to use vector intrinsics crash CHERI-Clang \todoref{example of error message}.
+This is due to a similar issue to inline assembly: the intrinsics (both the Clang intrinsic functions and the underlying LLVM IR intrinsics) were designed to take regular pointers and cannot handle it when capabilities are used instead.
+\todoref{Appendix which covers what I know so far about this problem?}
+Unfortunately the code for generating the intrinsics on both levels is spread across many files, and there's no simple way to change the associated pointer type (much less changing it for pure capability vs. hybrid mode).
+
+It seems that significant compiler development work is required to bring vector intrinsics up to scratch on CHERI-Clang.
+We did experiment with creating replacement wrapper functions, where each function tried to mimic an intrinsic using inline asssembly.
+These were rejected for two reasons: the increased overhead of a function call on every vector instruction\footnote{This could have been eliminated by using preprocessor macros instead of real functions, but they are difficult to program and do not easily support returning values like intrinsics do.}, and the lack of support for passing vector types as arguments or return values.
+The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\todocite{RISCV-ABI}, and CHERI has its own issues with allocating vector registers on the stack.
+
 \subsection{Storing scalable vectors on-stack}
 
 \pagebreak
@@ -193,3 +205,5 @@ Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets
 \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
 
 \todomark{where to put something on how CHERI-Clang should change?}
+
+\todomark{``unforeseen consequences'' of making instructions compatible with Capability and Integer mode, intrinsics have to be compatible too?}
