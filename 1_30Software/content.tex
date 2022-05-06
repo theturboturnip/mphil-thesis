@@ -190,9 +190,22 @@ Unfortunately the code for generating the intrinsics on both levels is spread ac
 It seems that significant compiler development work is required to bring vector intrinsics up to scratch on CHERI-Clang.
 We did experiment with creating replacement wrapper functions, where each function tried to mimic an intrinsic using inline asssembly.
 These were rejected for two reasons: the increased overhead of a function call on every vector instruction\footnote{This could have been eliminated by using preprocessor macros instead of real functions, but they are difficult to program and do not easily support returning values like intrinsics do.}, and the lack of support for passing vector types as arguments or return values.
-The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\todocite{RISCV-ABI}, and CHERI has its own issues with allocating vector registers on the stack.
+The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\todocite{RISCV-ABI}, and CHERI has its own issues with saving vector registers on the stack.
 
-\subsection{Storing scalable vectors on-stack}
+\todomark{segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to}
+
+\subsection{Storing scalable vectors on the stack}
+If a program uses more data than can fit in registers, or calls a function which may overwrite important register values, the compiler will save those register values to memory on the stack.
+Because vector registers are temporary, and thus may be overwritten by called functions, they must also be saved/restored from the stack\todomark{Example https://godbolt.org/z/KPTW7rcvY}.
+RVV provides the whole-register memory access instructions explicitly to make this process easy.
+
+CHERI-Clang contains an LLVM IR pass\footnote{llvm/lib/CodeGen/CheriBoundAllocas.cpp} which enforces strict bounds on so-called ``stack capabilities'' (capabilities pointing to stack-allocated data), which by definition requires knowing the size of the data ahead of time.
+This pass assumes all stack-allocated data has a static size, and crashes when dynamically-sized types e.g. scalable vectors are allocated.
+It is therefore impossible (for now) to save vectors on the stack in CHERI-Clang, although it's clear that it's theoretically possible.
+For example, the length of the required vector allocations could be calculated based on \code{VLEN} before each stack allocation is performed, or if performance is a concern stack bounds for those allocations could potentially be ignored altogether.
+These possibilities are investigated further in the next section.
+
+\todocite{LLVM IR pass investigated in https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-949.pdf \$3.8.2, couldn't find earlier reference to it}
 
 \pagebreak
 \section{Testing hypotheses}
