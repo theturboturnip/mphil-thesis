@@ -107,7 +107,7 @@ If any of these values are found, the instruction is interpreted as a vector acc
 Once the generic parameters are extracted, the \paramt{mop} is checked to determine the indexing method (Unit, Strided, Indexed-Ordered, or Indexed-Unordered).
 If a unit access is selected, the second argument field encodes an extra value to choose between different unit-stride archetypes (normal unit access, fault-only-first, whole register, or bytemask).
 Strided and indexed accesses just use their dedicated archetypes.
-Once the archetype is found supplemental calculations can be performed (e.g. computing \code{EVL = ceil(vl/8)} for bytemask accesses) and the relevant information is returned as a \code{DecodedMemOp} enumeration.
+Once the archetype is found, supplemental calculations can be performed (e.g. computing \code{EVL = ceil(vl/8)} for bytemask accesses), and the relevant information is returned as a \code{DecodedMemOp} enumeration.
 
 \todomark{diagram of floating point ld/st vs. vector ld/st}
 \todomark{Decision tree for operation decoding}

@@ -118,23 +118,30 @@ Along with testing these hypotheses, this document serves as a practical explana
     \toprule
     \multicolumn{2}{l}{\emph{Hardware Hypotheses - \todoref{Chapter X}}} \\
     \midrule
-        H-A & It is possible to use CHERI capabilities as memory references in all vector instructions. \\
-        H-B & The cost of capability bounds checks can be amortised over multiple per-vector-element accesses. \\
+        \newhyp{}\label{hyp:hw_cap_as_vec_mem_ref} &
+            It is possible to use CHERI capabilities as memory references in all vector instructions. \\
+        \newhyp{}\label{hyp:hw_cap_bounds_checks_amortized} &
+            The cost of capability bounds checks can be amortised over multiple per-vector-element accesses. \\
     \midrule
     \multicolumn{2}{l}{\emph{Software Hypotheses - \todoref{Chapter X}}} \\
     \midrule
-        H-?? & Vector code can be compiled in legacy forms (with integer addressing) and still function correctly on CHERI. \\
-        H-C & Vector code can be compiled into a pure-capability form from a legacy form with no source code changes. \\
-        H-D & CHERI-vector code can run correctly in multiprocessing systems, where execution may be paused and resumed on interrupts or context switches. \\
+        \newhyp{}\label{hyp:sw_vec_legacy}  &
+            Vector code can be compiled in legacy forms (with integer addressing) and still function correctly on CHERI. \\
+        \newhyp{}\label{hyp:sw_pure_compat} &
+            Vector code can be compiled into a pure-capability form from a legacy form with no source code changes. \\
+        \newhyp{}\label{hyp:sw_multiproc} &
+            CHERI-vector code can run correctly in multiprocessing systems, where execution may be paused and resumed on interrupts or context switches. \\
     \midrule
     \multicolumn{2}{l}{\emph{Capabilities-in-Vectors - \todoref{Chapter X}}} \\
     \midrule
-        H-E & It is possible for vector registers to hold capabilities to enable copying without violating CHERI's security principles. \\
-        H-F & It is possible for vector memory accesses to load and store capabilities from vector registers without violating CHERI's security principles. \\
-        H-G & It is possible for vector instructions to manipulate capabilities in vector registers without violating CHERI's security principles. \\
+        \newhyp{}\label{hyp:cap_in_vec_storage} &
+            It is possible for vector registers to hold capabilities to enable copying without violating CHERI's security principles. \\
+        \newhyp{}\label{hyp:cap_in_vec_load_store} &
+            It is possible for vector memory accesses to load and store capabilities from vector registers without violating CHERI's security principles. \\
+        \newhyp{}\label{hyp:cap_in_vec_manip} &
+            It is possible for vector instructions to manipulate capabilities in vector registers without violating CHERI's security principles. \\
     \bottomrule
     \end{tabular}
     \caption{Project Hypotheses}
     \label{tab:hypotheses}
-    \todomark{Make hypotheses ref-able, similar to requirements from TYP}
 \end{table}
