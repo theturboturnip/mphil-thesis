@@ -1,0 +1,81 @@
+\section{Fast-path calculations}
+Because CHERI, and indeed the vector extension, target all levels of computer architecture from embedded systems to cloud servers, it's important for fast-paths to be scalable and adjust to the implementation complexity.
+To that end, we propose a method of generating the address range for accesses of each archetype, noting where architectural complexity can be traded off for tighter coverage.
+
+\subsection{Possible fast-path outcomes}
+In some cases, a failed address range check may not mean the access fails.
+The obvious case is fault-only-first loads, where synchronous exceptions (such as capability checks) are explicitly handled.
+The address range calculations ignore masking in all cases\footnote{Shrinking the address range to remove masked-out elements would likely require a linear search through all elements, which makes the fast-path redundant.} so even if the address range falls outside the capability bounds, the individual accesses outside those bounds could all be masked out.
+Therefore a fast-path check can have three outcomes:
+\begin{itemize}
+    \item Success - All accesses will succeed
+    \begin{itemize}
+        \item The fast-path address range is entirely contained by the capability
+    \end{itemize}
+    \item Indeterminate - At least one access \emph{may} fail
+    \begin{itemize}
+        \item The fast-path address range could not be calculated, or is not entirely contained by the capability for fault-only-first accesses.
+    \end{itemize}
+    \item Failure - At least one access \emph{must} fail, triggering a synchronous exception.
+    \begin{itemize}
+        \item The fast-path address range is not entirely contained by the capability
+        \item Not a fault-only-first access
+    \end{itemize}
+\end{itemize}
+
+\todomark{tight vs superset range?}
+
+In the case of indeterminate failure, accesses need to be individually checked to see if failure actually occurs.
+If precise exceptions are used, even the failure case needs to perform each individual access to ensure accesses before the offending element are completed.
+Because all access archetypes may be masked, therefore the fast-path check may always be indeterminate, implementations must always contain a slow-path fallback option which does each access in turn for every archetype.
+% This slow-path 
+% In cases where precise exceptions are used, this slow-path must also respect the necessary ordering guarantees.
+% \todomark{this isn't a good place to talk about precise exceptions/ordering}
+
+% If masking is enabled, any elements that cause the address range check to fail could be masked out.
+% In all cases masking is ignored - masked-out elements should not trigger capability checks or capability failure \todomark{why?} but checking 
+
+\noindent\emph{Unit accesses}\\
+\noindent For unit segmented accesses, which includes fault-only first, the tight address range for an access is
+$base + [vstart * nf * eew, evl * nf * eew)$.
+Unit unsegmented accesses where $nf = 1$, which includes whole register and bytemask accesses, can simplify this by fixing \code{nf} and \code{eew}.
+
+\code{nf} is not guaranteed to be a power of two (except for the whole-register case), so calculating the `tight' address range would require a multiplication by an arbitrary four-bit value between 1 and 8.
+If this multiplication is too expensive, implementations could choose to classify all $nf > 1$ cases as indeterminate.
+\todomark{if nf == 1; as normal; if nf != 1 indeterminate}
+
+Unless extra restrictions are placed on \code{vstart} calculating the start of this range requires another arbitrary multiplication.
+To avoid this, one could assume \code{vstart} is zero for the calculation, perform the capability check and treat failures as indeterminate (because the failure could be due to an element before \code{vstart}).
+\todomark{make it clear that in this case vstart = 0 would still be a complete failure}
+Once could also classify all nonzero \code{vstart} accesses as indeterminate immediately, without performing any calculations.
+\todomark{if vstart == 0 failure = failure; if vstart != 0 all = indeterminate}
+
+Even if the previous two optimizations are applied, the final range still requires a multiplication $evl * eew$.
+Thankfully, because \paramt{eew} may only be one of four powers-of-two, this can be encoded as a simple shift.
+
+
+\noindent\emph{Strided accesses}\\
+\noindent Strided accesses bring further complication, especially as the stride may be negative.
+For a $stride >= 0$ : $base + [vstart * stride, (evl - 1) * stride + nf * eew)$
+For $stride < 0$: $base + [(evl - 1) * stride, vstart * stride + nf * eew)$
+
+This is formed of three components:
+\begin{itemize}
+    \item $vstart * stride$, the start of the first segment. This can be simplified as 0, just like for unit accesses, to avoid an arbitrary multiplication.
+    \item $(evl - 1) * stride$, the start of the final segment. This requires an arbitrary multiplication, unless strided accesses are not fast-pathed at all.
+    \item $nf * eew$, the length of a segment, which can be implemented with a shift.
+\end{itemize}
+% Because the stride is not guaranteed to be larger than a segment (or even larger than a single element)
+
+% \todomark{stride may be negative}
+
+\noindent\emph{Indexed accesses}\\
+\noindent This is the most complicated access of the bunch, because the addresses cannot be computed without reading the index register.
+
+$base + [min(offsets[vstart..evl]), max(offsets[vstart..evl]) + nf * eew)$
+
+The most expensive components here are of course $min,max$ of the offsets.
+These could be calculated in hardware through parallel reductions, making it slightly more efficient than looping over each element.
+A low-hanging optimization could be to remove the $vstart..evl$ range condition, performing the reduction over the whole register group, which would make failures indeterminate where $vstart != 0 || evl != VLMAX$.
+This calculation could also be restricted to certain register configurations to reduce the amount of required hardware.
+Indeed, the amount of hardware could be reduced to zero by simply classifying all indexed accesses as indeterminate.

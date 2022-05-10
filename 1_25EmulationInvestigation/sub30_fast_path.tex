@@ -1,0 +1,117 @@
+\section{Fast-path calculations}
+Because CHERI, and indeed the vector extension, target all levels of computer architecture from embedded systems to cloud servers, it's important for fast-paths to be scalable and adjust to the implementation complexity.
+To that end, we propose a method of generating the address range for accesses of each archetype, noting where architectural complexity can be traded off for tighter coverage.
+
+\subsection{Possible fast-path outcomes}
+In some cases, a failed address range check may not mean the access fails.
+The obvious case is fault-only-first loads, where capability exceptions may be handled without triggering a trap.
+Implementations may also choose to calculate wider bounds for the sake of simplicity, or even forego a fast-path check altogether.
+Thus, a fast-path check can have three outcomes depending on the circumstances:
+\begin{itemize}
+    \item Success - All accesses will succeed
+    \item Indeterminate - At least one access \emph{may} raise an exception
+    \item Failure - At least one access \emph{must} raise an exception
+\end{itemize}
+
+\todomark{if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: INDETERMINATE else: FAILURE}
+\todomark{if an address range isn't calculated: INDETERMINATE}
+\todomark{Put the above into an algorithm format}
+
+A Success means no per-access capability checks are required.
+Indeterminate results mean each access must be checked, to see if any of them actually raise an exception.
+Unfortunately, accesses still need to be checked under Failure, because both precise and imprecise traps need to report the offending element in \code{vstart}\footnote{In very particular cases, e.g. unmasked unit-strided accesses where \code{nf = 1}, the capability bounds could be used to calculate what the offending element must have been. We believe this is too niche of a use case to investigate further, particularly given the complexity of the resulting hardware.}.
+
+Because all archetypes may have Failure or Indeterminate outcomes, hardware must provide a fallback slow-path for each archetype which checks/performs each access in turn.
+In theory, a CHERI-RVV specification could relax the \code{vstart} requirement for imprecise traps, and state that all capability exceptions trigger imprecise traps.
+In this case, only archetypes that produce Indeterminate outcomes need the slow-path.
+However, it is likely that for complexity reasons all masked accesses will use wide ranges, thus producing Indeterminate outcomes and requiring slow-paths for all archetypes anyway.
+Because the Indeterminate and Failure cases require the slow-path anyway, computing the fast-path can only be worthwhile if Success is the common case.
+
+\newcommand{\vstart}{\code{vstart}}
+\newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
+\newcommand{\evl}{\code{evl}}
+\newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
+\newcommand{\baseaddr}{\mathit{base}}
+
+\subsection{Masked accesses}
+For all masked accesses, masked-out/inactive segments should not trigger capability exceptions.
+Therefore, a tight bounds must include only the smallest and largest active segments.
+These segments can be found by inspecting the mask vector: either checking each bit in turn or using parallel logic to find the lowest/highest set bits.
+Care must be taken with these checks to ensure elements outside the range $[\textit{vstart}, \textit{evl})$ are not counted.
+
+\begin{align}
+    \vstartactive{} &= \min(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) \\
+    \evlactive{}    &= \max(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) + 1
+\end{align}
+
+\subsubsection*{Tradeoffs}
+If using parallel logic to find the lowest/highest bits, it could be difficult to account for $[\textit{vstart}, \textit{evl})$.
+An implementation could choose to only calculate tight bounds when the mask is fully utilized, i.e. $\textit{vstart} = 0, \textit{evl} = \textit{VLEN}$, and assume wider bounds otherwise.
+
+Accounting for masked accesses at all may not be worth the extra complexity.
+Only elements masked off on the edges make any difference, and it may be uncommon for long runs of edge elements to be masked off.
+Thus, an implementation could choose to ignore masking entirely when computing the ranges.
+This does mean that all failures become Indeterminate when masking is enabled, because all elements outside the capability bounds may be masked off.
+
+\todomark{iterating over elements may still be more energy-efficient than doing individual capability checks?}
+
+\subsection{Unit accesses}
+For unit segmented accesses, which includes fault-only first, the tight address range for an access is simple to calculate.
+Whole register and bytemask accesses can simplify this by fixing \code{nf = 1} and \code{eew = 8}.
+
+\begin{equation}
+    \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
+\end{equation}
+\todomark{Note that the equation is a simplification of strided for \code{stride = nf * eew}}
+
+\subsubsection*{Tradeoffs}
+\code{nf} is not guaranteed to be a power of two (except for the whole-register case), so calculating the `tight' address range would require a multiplication by an arbitrary four-bit value between 1 and 8.
+If this multiplication is too expensive, implementations could choose to classify all $\code{nf} > 1$ cases as indeterminate.
+% \todomark{if nf == 1; as normal; if nf != 1 indeterminate}
+
+Unless extra restrictions are placed on \code{vstart}, calculating the start of this range requires another arbitrary multiplication.
+To avoid this one could assume \code{vstart = 0} and treat failures as Indeterminate for other cases.
+%for the calculation, perform the capability check and treat failures as indeterminate (because the failure could be due to an element before \code{vstart}).
+% \todomark{make it clear that in this case vstart = 0 would still be a complete failure}
+Once could also classify all nonzero \code{vstart} accesses as indeterminate immediately, without performing any calculations.
+% \todomark{if vstart == 0 failure = failure; if vstart != 0 all = indeterminate}
+
+Even if the previous two optimizations are applied, the final range still requires a multiplication $\evl{} * \code{eew}$.
+Thankfully, because \code{eew} may only be one of four powers-of-two, this can be encoded as a simple shift.
+
+\subsection{Strided accesses}
+Strided accesses bring further complication, especially as the stride may be negative.
+
+\begin{equation}
+\mathit{bounds}(\code{stride}) = \baseaddr{} + \left\{
+    \begin{array}{ll}
+          [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
+          
+          [(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew}) & \code{stride} < 0
+    \end{array} 
+\right.
+\end{equation}
+
+This is formed of three components:
+\begin{itemize}
+    \item $\vstartactive{} * \code{stride}$, the start of the first segment. This can be simplified as 0, just like for unit accesses, to avoid an arbitrary multiplication.
+    \item $(\evlactive{} - 1) * \code{stride}$, the start of the final segment. This requires an arbitrary multiplication, unless strided accesses are not fast-pathed at all.
+    \item $\code{nf} * \code{eew}$, the length of a segment, which can be implemented with a shift.
+\end{itemize}
+% Because the stride is not guaranteed to be larger than a segment (or even larger than a single element)
+
+% \todomark{stride may be negative}
+
+\subsection{Indexed accesses}
+This is the most complicated access of the bunch, because the addresses cannot be computed without reading the index register.
+
+\begin{align}
+    [&\baseaddr{}\ +\ \min(\code{offsets}[\vstartactive{}..\evlactive{}]), \\
+    &\baseaddr{}\ +\ \max(\code{offsets}[\vstartactive{}..\evlactive{}])\ +\ \code{nf} * \code{eew})
+\end{align}
+
+The most expensive components here are of course $min,\,max$ of the offsets.
+These could be calculated in hardware through parallel reductions, making it slightly more efficient than looping over each element.
+A low-hanging optimization could be to remove the $\vstartactive{}..\evlactive{}$ range condition, performing the reduction over the whole register group, which would make failures indeterminate where $\vstartactive{}\ !=\ 0\ ||\ \evlactive{}\ !=\ \code{VLMAX}$.
+This calculation could also be restricted to certain register configurations to reduce the amount of required hardware.
+Indeed, the amount of hardware could be reduced to zero by simply classifying all indexed accesses as indeterminate.

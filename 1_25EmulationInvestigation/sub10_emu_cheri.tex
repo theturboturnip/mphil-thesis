@@ -1,0 +1,60 @@
+\subsection{Emulating CHERI}
+
+Manipulating CHERI capabilities securely and correctly is a must for any CHERI-enabled emulator.
+Capability encoding logic is not trivial by any means, so the \code{cheri-compressed-cap} C library was re-used rather than implementing it from scratch.
+Rust has generally decent interoperability with C, but some of the particulars of this library caused issues.
+
+\subsubsection{\code{rust-cheri-compressed-cap}}
+\code{cheri-compressed-cap} provides two versions of the library by default, for 64-bit and 128-bit capabilities, which are generated from a common source through extensive use of the preprocessor.
+Each variant defines a set of preprocessor macros (e.g. the widths of various fields) before including two common header files \code{cheri\_compressed\_cap\_macros.h} and \code{cheri\_compressed\_cap\_common.h}.
+The latter then defines every relevant structure or function based on those preprocessor macros.
+For example, a function \code{compute_base_top} is generated twice, once as  \code{cc64\_decompress\_mem} returning \code{cc64\_cap\_t} and another time as \code{cc128\_decompress\_mem} returning \code{cc128\_cap\_t}.
+Elegantly capturing both sets was the main challenge for the Rust wrapper.
+
+\todomark{table of relevant structures/functions?}
+
+One of Rust's core language elements is the Trait - a set of functions and \enquote{associated types} that can be \emph{implemented} for any type.
+This gives a simple way to define a consistent interface for two different data types: define a trait \code{CompressedCapability} with all of the functions from \code{cheri\_compressed\_cap\_common.h}, and implement it for both.
+In the future, this would allow the Morello versions of capabilities to be added easily.
+A struct \code{CcxCap<T>} is also defined which uses specific types for addresses and lengths pulled from a \code{CompressedCapability}.
+For example, the 64-bit capability structure holds a 32-bit address value, and the 128-bit capability a 64-bit address.
+
+128-bit capabilities can cover a 64-bit address range, and thus can have a length of $2^{64}$.
+Storing this length requires 65-bits, so all math in \code{cheri\_compressed\_cap\_common.h} uses 128-bit length values.
+C doesn't have any standardized 128-bit types, but GCC and LLVM provide so-called ``extension types'' which are used instead.
+However, the x86-64 ABI doesn't define any rules for how 128-bit values must be stored or passed as arguments\todocite{x86-64 ABI rules}, which causes great pain to anyone who needs to pass them across a language boundary i.e. us\footnote{Rust explicitly warns against passing 128-bit values across FFI, and the Clang users manual even states that passing \code{i128} by value is incompatible with the Microsoft x64 calling convention\todocite{clang/docs/UsersManual.rst:3384}.}.
+While this can be resolved through close examination\footnote{For example, on LLVM 128-bit values are passed to functions in two 64-bit registers\todocite{LLVM 13 clang/lib/CodeGen/TargetInfo.cpp:2941}. This could be replicated in Rust by passing two 64-bit arguments rather than one 128-bit one.}, instead we take advantage of Rust compiling with LLVM under the hood to assume the 128-values on both sides have equal semantics.
+
+\todomark{C code wasn't documented, Rust is}
+\todomark{document the rust code :)}
+
+The CHERI-RISC-V documentation contains formal specifications of all the new CHERI instructions, expressed in the Sail architecture definition  language\todocite{https://github.com/rems-project/sail}.
+These definitions are used in the CHERI-RISC-V formal model (\todocite{https://github.com/CTSRD-CHERI/sail-cheri-riscv}), and require a few helper functions (see \todocite{TR-951 Ch8.2}).
+To make it easier to port the formal definitions directly into the emulator the \code{rust-cheri-compressed-cap} library also provides those helper functions through a wrapper trait.
+
+\todomark{documentation is available on a github.io, not crates.io yet because I don't have access to CSTRD-CHERI and they'd likely want to host it}
+
+\subsubsection{Integrating into the emulator}
+% i.e. using MemoryOf trait to make all memory addressable only by capabilities
+Integrating capabilities into the emulator was relatively simple thanks to the modular emulator structure.
+A capability-addressed memory type was created, which wraps a simple integer-addressed memory in logic which performs the relevant capability checks.
+For integer encoding mode, a further integer-addressed memory type was created which wraps the capability addressed mode, where all integer addresses are bundled with the DDC before passing through to the capability-addressed memory.
+Similarly, a merged capability register file type was created that exposed integer-mode and capability-mode accesses.
+This layered approach meant code for basic RV64I operations did not need to be modified to handle CHERI at all - simply passing the integer-mode memory and register file would perform all relevant checks.
+
+\todomark{diagram}
+
+% i.e. isn't the module system nice for overriding specific behaviour like Capability-mode RV64I :)
+Integrating capability instructions was also simple.
+Two new ISA modules were created: \code{XCheri64} for the new CHERI instructions, and \code{Rv64imCapabilityMode} to override the behaviour of legacy instructions in capability-encoding-mode.
+\todomark{show the program flow for using modules}
+The actual Processor structure was left mostly unchanged.
+Integer addresses were changed to capabilities throughout,
+memory and register file types were changed as described above, and the PCC/DDC were added.
+
+% i.e. doing capability relocation
+The final hurdle was the capability relocations outlined in \todoref{capability relocations}.
+Because we're emulating a bare-metal platform, there is no operating system to do this step for us.
+A bare-metal C function has been written to perform the relocations\todocite{https://github.com/CTSRD-CHERI/device-model/blob/master/src/crt_init_globals.c}, which could be compiled into the emulated program.
+However, I was skeptical of how to find the addresses of the generated relocations in C, so I performed the relocations in Rust by examining the compiled ELF file before starting emulation.
+In future research it should be doable to perform the relocations entirely in bare-metal C.

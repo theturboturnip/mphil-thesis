@@ -16,9 +16,31 @@
 
 \todomark{introduction}
 
-\include{1_25EmulationInvestigation/sub10_emu}
-% \include{1_25EmulationInvestigation/sub20_testbench}
-% \include{1_25EmulationInvestigation/sub30_capinvec}
+\section{Developing the emulator}\label{chap:software:sec:emu}
+Rust was selected due to its memory safety and runtime speed, and provides language constructs that suit themselves well to emulation.
+Rust Enums are equivalent to \enquote{variant} types in other languages like C++, which \todomark{}.
+\todomark{something something match statements}.
+
+\subsection{Basic emulation}
+The emulator for each architecture follows a similar pattern.
+A \code{Processor} struct stores the register file and the available RAM.
+A separate \code{ProcessorModules} struct holds all ISA modules the processor can execute (e.g. the base RV64 Integer ISA, the Multiply extension, and the Vector extension).
+
+The gap between the \code{Processor} and the ISA modules is bridged by a module-specific ``connector'' struct, which holds references to data in the \code{Processor} that is required by the ISA module.
+For example, the RV64 Integer ISA's connector contains the current PC, a virtual reference to a register file, and a virtual reference to memory.
+This allows different \code{Processor} structs (e.g. a normal RV64 and a CHERI-enabled RV64) to reuse the same ISA modules despite using different register file implementations.
+
+Each \code{Processor} implements a single stage pipeline.
+Instructions are fetched, decoded with a common decoder function\footnote{The decoder, and therefore all emulated processors, doesn't support RISC-V Compressed instructions.}, and executed.
+The processor asks each ISA module in turn if it wants to handle the instruction, and uses the first module to say yes.
+If the ISA module returns a new PC value it is immediately applied, otherwise it is automatically incremented.
+This structure easily represents basic RISC-V architectures, and can scale up to support many different new modules.
+
+\todomark{What did the emulator set out to emulate? i.e. no supervisor, pure-capability code only}
+
+\input{1_25EmulationInvestigation/sub10_emu_cheri}
+\input{1_25EmulationInvestigation/sub20_emu_vec}
+\input{1_25EmulationInvestigation/sub30_fast_path}
 
 \section{Going beyond the emulator}
 The emulator is a single example of a conformant CHERI-RVV implementation, and does not exercise every part of the specification.
@@ -35,4 +57,9 @@ This section notes how relaxed access ordering and precise exceptions may affect
 \subsection{Relaxed access ordering}
 \todomark{relaxed access ordering}
 
+\todomark{This section should have bits for atomicity?}
+\todomark{This section should have bits for alignment}
+
 \input{1_25EmulationInvestigation/sub50_hyp}
+
+\todomark{where to note that capability checks count as a synchronous exception? centralized point for "here are the differences between RVV and CHERI-RVV?}
