@@ -92,16 +92,21 @@
 %% cleverref
 %%
 \usepackage[capitalize,nameinlink]{cleveref}
+% Compatibility with hyperrref
+% https://tex.stackexchange.com/a/485979
+\usepackage{crossreftools}
+
+\let\ORGhypersetup\hypersetup
+\protected\def\hypersetup{\ORGhypersetup}
+\pdfstringdefDisableCommands{%
+  \def\hypersetup#1{}%
+  \let\Cref\crtCref
+  \let\cref\crtcref
+}
 
 
 %%%
 %% Hypothesis counter and labels
-% \usepackage{enumitem}
-% % Define F-requirements list, where items are listed and referenced as Fi or Fi.j
-% \newlist{hyp}{enumerate}{1}
-% \setlist[hyp,1]{label=\textbf{H-\arabic*},ref={H-\arabic*}}
-% % \setlist[hyp,2]{label*=\textbf{.\arabic*},ref={H-\arabic{hypi}.\arabic*}}
-% \crefname{hypi}{Hyp.}{Hyps.}
 \newcounter{hypI} % hyp counter
 \setcounter{hypI}{0}
 % Representation of hyp counter: H-<hypI>
@@ -109,8 +114,32 @@
 \newcommand{\newhyp}{%
     \refstepcounter{hypI}% Step hypothesis counter
     \thehypI% Print hypothesis counter
-}%label{#1}}% Mark with label
+}
+\crefname{hypI}{Hypothesis}{Hyps.}
 
+\begin{luacode*}
+hypothesis_text = {}
+function add_hypothesis(code, text)
+    hypothesis_text[code] = text
+end
+function get_hypothesis(code)
+    text = hypothesis_text[code]
+    if text == nil then
+        error("Hypothesis code " + code + " doesn't have associated text")
+    end
+    return text
+end
+\end{luacode*}
+\newcommand{\sethyptext}[2]{\luadirect{add_hypothesis(\luastring{#1}, \luastring{#2})}}
+\newcommand{\gethyptext}[1]{\luadirect{tex.sprint(get_hypothesis(\luastring{#1}))}}
+
+% Arg 1: hypothesis label
+% Arg 2: summary
+\newcommand{\hypsubsection}[2]{
+\subsection*{\cref*{#1} - #2}
+\addcontentsline{toc}{subsection}{Hypothesis \ref*{#1} - #2}
+\begin{quote}\textit{\gethyptext{#1}}\end{quote}
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Content commands

@@ -1,0 +1,16 @@
+\section{Testing hypotheses}
+
+\hypsubsection{hyp:sw_vec_legacy}{Compiling legacy code for integer mode}
+
+\hypsubsection{hyp:sw_pure_compat}{Converting legacy code to pure-capability code}
+\todomark{At machine level, yes - a program compiled for pure-cap CHERI-RVV will have the exact same vector instruction encodings as a no-capability RVV.
+Although if it were recompiled for integer-mode-CHERI it may end up using different registers for the capabilities.
+Practically:
+Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets ported, Yes under inline-assembly WITH a simple macro}
+\todomark{``unforeseen consequences'' of making instructions compatible with Capability and Integer mode, intrinsics have to be compatible too?}
+
+\hypsubsection{hyp:sw_stack_vectors}{Saving vectors on the stack}
+\todomark{Yes vectors can be stored on the stack}
+
+\hypsubsection{hyp:sw_multiproc}{Running CHERI-RVV code in a multiprocessing system}
+\todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}

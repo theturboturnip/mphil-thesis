@@ -197,6 +197,7 @@ The RISC-V ABI treats all vector registers as temporary and explicitly states th
 \subsection{Storing scalable vectors on the stack}
 If a program uses more data than can fit in registers, or calls a function which may overwrite important register values, the compiler will save those register values to memory on the stack.
 Because vector registers are temporary, and thus may be overwritten by called functions, they must also be saved/restored from the stack\todomark{Example https://godbolt.org/z/KPTW7rcvY}.
+This also applies to multiprocessing systems where a process can be paused, have the state saved, and resume later.
 RVV provides the whole-register memory access instructions explicitly to make this process easy.
 
 CHERI-Clang contains an LLVM IR pass\footnote{llvm/lib/CodeGen/CheriBoundAllocas.cpp} which enforces strict bounds on so-called ``stack capabilities'' (capabilities pointing to stack-allocated data), which by definition requires knowing the size of the data ahead of time.
@@ -208,15 +209,5 @@ These possibilities are investigated further in the next section.
 \todocite{LLVM IR pass investigated in https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-949.pdf \$3.8.2, couldn't find earlier reference to it}
 
 \pagebreak
-\section{Testing hypotheses}
-
-\todomark{H-C: At machine level, yes - a program compiled for pure-cap CHERI-RVV will have the exact same vector instruction encodings as a no-capability RVV.
-Although if it were recompiled for integer-mode-CHERI it may end up using different registers for the capabilities.
-Practically:
-Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets ported, Yes under inline-assembly WITH a simple macro}
-
-\todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
-
-\todomark{where to put something on how CHERI-Clang should change?}
-
-\todomark{``unforeseen consequences'' of making instructions compatible with Capability and Integer mode, intrinsics have to be compatible too?}
+\input{1_30Software/sub50_hyp}
+\input{1_30Software/sub60_chericlangchanges}
