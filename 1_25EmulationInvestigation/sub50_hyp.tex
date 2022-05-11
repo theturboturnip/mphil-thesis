@@ -1,17 +1,62 @@
 \section{Testing hypotheses}
 
 \hypsubsection{hyp:hw_cap_as_vec_mem_ref}{Feasibility}
-\todomark{yes}
+% \subsubsection{In theory?}
+This is true.
+All vector memory access instructions index the scalar general-purpose register file to read the base address, and CHERI-RVV implementations can simply use this index for the scalar capability register file instead.
+% rather than a general-purpose register.
+This can be considered through the lens of adding CHERI to any RISC-V processor, and in particular adding Capability mode to adjust the behaviour of legacy instructions.
+RVV instructions can have their behaviour adjusted in exactly the same way as the scalar memory access instructions.
+
+That approach then scales to other base architectures that have CHERI variants.
+For example, on Morello scalar Arm instructions were modified to use CHERI capabilities as memory references\todocite{There's definitely an Arm CHERI v8 document somewhere}, so one may simply try to apply those modifications to e.g. Arm SVE instructions.
+This only works where Arm SVE accesses memory references in the same way as scalar Arm instructions did i.e. through a scalar register file.
+Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a set of 64-bit addresses\todocite{https://developer.arm.com/documentation/100891/0612/coding-considerations/using-sve-intrinsics-directly-in-your-c-code}, which require more specific attention.
+
+% \subsubsection{In practice?}
+% Yes.
+
+% The practical hurdle for CHERI-RVV is defining the behaviour of vector instructions under Integer and Capability modes.
+% The 
 
 \hypsubsection{hyp:hw_cap_bounds_checks_amortized}{Fast-path checks}
 
-\todomark{Energy - Yes}
+\enquote{Cost} can be defined in multiple ways.
+As with all concepts in hardware, implementing fast-path capability checks requires a trade-off between competing interests, which are each considered here.
+As mentioned above, it is also assumed that successful accesses (i.e. those without any capability violations) are the common case.
+Overall, it seems the key benefit of fast-path checks is power consumption.
 
-\todomark{Area - No}
+\subsubsection*{Power - Better}
+If the fast-path check succeeds, then no power needs to be wasted on capability checks for the remaining cycles of the access.
+If the vector unit has its own dedicated capability check logic, it could even be clock gated to completely eliminate dynamic power.
+This shows a clear benefit as long as the extra logic for bounds calculations uses less power than $n - 1$ capability checks.
+Implementations which use large vectors or make careful use of the simplifications laid out in \todoref{fast-path} should fulfil this condition easily.
 
-\todomark{Throughput - No change}
+\begin{equation}
+\begin{array}{lr}
+    \mathit{slow-path} =& n\ \mathit{checks} \\
+&\\
+    \mathit{fast-path} =& 1\ \mathit{check} \\
+     &+ \mathit{bounds}\ \mathit{logic} \\
 
-\todomark{Latency - Unlikely, because the upfront cost of the fast path}
+\end{array}
+\end{equation}
 
-\todomark{yes, depending on hardware constraints. A fast-path that checks a single super-range may always be fallible, so hardware must always be prepared to do a slow per-element check}
+\subsubsection*{Area - Worse or negligible change}
+No matter how you slice it, slow-path circuitry is \emph{always} necessary for a fully conforming implementation.
+If the slow-path is always required, and always takes up area, then adding any circuitry for fast-path must require more area.
+Elements from the slow-path, e.g. capability decoding units, may be shared with the fast-path, and any spare space in a slow-path unit could also be shared with the fast-path, so it may have a \emph{negligible} impact.
+Crucially, using a fast-path will never \emph{decrease} the area of a conformant design.
 
+\subsubsection*{Throughput - No change}
+Assuming the bounds calculations can be pipelined to the same clock speed as a capability check, putting them before a set of pipelined accesses should not affect the throughput of those accesses.
+If the fast-path check is subdivided between different registers in a group, the fast-path check for one register should be performed in parallel with the accesses for other registers for maximum throughput.
+There is currently no reason to believe the bounds calculations have to significantly decrease clock speed or throughput.
+
+\subsubsection*{Latency - Worse}
+% If the actual accesses require some pre-processing, e.g. an implementation decided to calculate all the addresses it would access before actually accessing the
+If the fast-path check could be done in parallel with other memory accesses, then it would not affect latency.
+Unfortunately, performing a memory access without checking if it's allowed first completely undermines the security model!
+Under very particular circumstances, it could be tolerable: if the access is a read with no side-effects, and the read data would be thrown away on a capability violation, and side-channel attacks were impossible (i.e. no caches were present) or ignored, then an unauthorized read out-of-bounds \emph{technically} has no impact on security; but it's implausible that any architect on a CHERI design would accept this.
+
+Unfortunately, the fast-path check must always block the memory access that depends on it, so the fast-path will always increase latency (unless a separate memory access is performed in parallel).

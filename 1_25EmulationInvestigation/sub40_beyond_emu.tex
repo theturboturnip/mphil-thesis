@@ -1,0 +1,38 @@
+\section{Going beyond the emulator}
+The emulator is a single example of a conformant CHERI-RVV implementation, and does not exercise every part of the specification.
+Four properties stand out:
+\begin{itemize}
+    \item The emulator assumes all element accesses are naturally aligned, but the spec allows misaligned accesses.
+    \item The emulator doesn't consider multiple hardware threads, essentially assuming all accesses are atomic.
+    \item Segments/elements are always accessed in order, despite the spec not enforcing ordering
+    \item Imprecise traps are used for all exceptions - precise trap behaviour is not explored.
+\end{itemize}
+This section notes how relaxed access ordering and precise exceptions may affect the hardware in ways not previously explored.
+
+\subsection{Misaligned accesses}
+Implementations are allowed to handle vector accesses that are not aligned to the size of the element.
+This support is independent of misaligned scalar access support, so if e.g. misaligned 64-bit scalar accesses are allowed, misaligned vector accesses of 64-bit elements do \emph{not} have to be allowed.
+
+Changing the emulator to allow misaligned accesses of integer data would not have any impact on CHERI correctness.
+Capability loads/stores must be aligned to \code{CLEN}\todocite[\$3.5.2]{TR-951}, and an implementation cannot change this.
+Writing misaligned integer values across a \code{CLEN} boundary would need to make sure to zero the tag bit on both regions, but this applies to scalar implementations as much as vector ones.
+Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\todoref{}).
+
+\subsection{Atomicity of accesses/General memory model}
+Vector memory instructions are specified to follow the RISC-V Weak Memory Ordering model\todocite{RVV}\footnote{Behaviour under the Total Store Ordering extension hasn't been defined.}, although this model hasn't been fully explained in terms of vectors yet.
+RVWMO defines a global order of \enquote{memory operations}: atomic operations that are either loads, stores, or both\todocite[Chapter 14]{RISCV spec}.
+The RVWMO spec assumes all memory instructions create exactly one memory operation but calls out that once the vector model is formalized, vector accesses may be defined to create multiple operations.
+
+The RVV spec states \enquote{vector misaligned memory accesses follow the same rules for atomicity as scalar misaligned memory accesses}, i.e. that misaligned accesses may be decomposed into multiple memory operations of any granularity\footnote{e.g. each byte could be written in a separate access.}.
+This is the only mention of atomicity in that document.
+
+Again, atomicity of integer data doesn't really impact the fusion of CHERI and RVV, as long as tag bits are correctly zeroed on all integer writes.
+However, it does impact capabilities-in-vectors (\todoref{}).
+
+\subsection{Relaxed access ordering and precise traps}
+Ordering is only enforced insofar as it is observable.
+The only instructions that are forced to perform their accesses in order are indexed-ordered accesses, which can be used to write to e.g. I/O regions where order matters, and instructions that trigger precise traps.
+Precise traps require \code{vstart} to be set to a value such that all elements before \code{vstart} have completed their accesses, and all accesses on/after \code{vstart} have not completed or are idempotent.
+
+If a vector memory access instruction is 1. not indexed-ordered and 2. guaranteed not to trigger a precise trap\footnote{Even instructions that \emph{would} trigger precise traps but are guaranteed not to throw an exception or respond to asynchronous interrupt may execute out of order.} then it may execute out of order.
+This does not affect CHERI-RVV in any way.

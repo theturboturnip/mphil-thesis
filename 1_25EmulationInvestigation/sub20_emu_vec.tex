@@ -46,11 +46,11 @@ The emulator deviates from the spec in that \code{vstart} is \emph{not} set when
 As noted in \todoref{fast path section}, a fully compliant machine must check each access to find \code{vstart} in these cases.
 
 \subsubsection{Execution phase}
-If the fast-path check is successful or indeterminate, the emulator performs all accesses in order, checking each address against the capability.
-Any capability failure triggers an immediate synchronous exception, performing a precise trap \todomark{altho vstart isn't set?}
-If the fast-path check is unsuccessful, the emulator immediately returns (thus performing an imprecise trap) \todomark{although it doesn't yet correctly set vstart}.
-For readability, the emulator separates this into two phases: determining the mapping of vector elements to accessed memory addresses, then performing those accesses.
-The pseudocode for each access can be found in \todoref{appendix}, and this step is otherwise not noteworthy.
+If the fast-path check deems it appropriate, the emulator continues execution of the instruction in two phases.
+First, the mapping of vector elements to accessed memory addresses is found.
+The code for this step is independent of the access direction, and an effective description of how each type of access works.
+It and can be found in \todomark{appendix XYZ}.
+The previously computed tight bounds are sanity-checked against these accesses, and the accesses are actually performed.
 
 \subsubsection{Integer vs. capability mode}\label{chap:emu:rvv_int_mode}
 As noted in \todoref{chap:bg:sec:cheri:integer_capability_mode?} CHERI-RISC-V defines two execution modes that the program can switch between.

@@ -1,27 +1,26 @@
 \chapter{Hardware emulation investigation}
-% In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \enquote{riscv-v-lite}.
-% This emulator can emulate three RISC-V ISAs: 
-% \begin{itemize}
-%     \item \code{rv32imv} - 32-bit + Multiply and Vector extensions
-%     \item \code{rv64imv} - 64-bit + Multiply and Vector extensions
-%     \item \code{rv64imvxcheri} - 64-bit + CHERI, Multiply, and Vector extensions
-% \end{itemize}
-% Each ISA's vector behaviour is tested with a set of \code{memcpy}-esque testbench programs.
-% These are written in C, using RISC-V vector intrinsics where possible, and compiled with a variety of C compilers to examine compatibility.
-% An experimental capabilities-in-vectors concept is also tested.
+In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \enquote{riscv-v-lite}.
+The emulator can emulate four unprivileged\footnote{i.e. entirely bare-metal without privilege levels for OSs or hypervisors.} RISC-V ISAs (\cref{tab:emu_arches}), and was also used as the base for capabilities-in-vectors research (\todoref{capinvec}).
+This chapter explores the development of the emulator, the implementation of CHERI support (including supplementary libraries), the addition of vector support, and the conclusions drawn about the integration of CHERI and RVV (referred to as CHERI-RVV throughout).
 
-% \cref{chap:software:sec:emu} describes the emulator, focusing on how vector instructions are emulated.
-% \cref{chap:software:sec:testbench} describes the testbench, the various techniques used to emit vector instructions on different compilers, and the results of each testbench for each architecture and compiler.
-% \cref{chap:software:sec:capinvec} explains the experiments done with capabilities-in-vectors.
-
-\todomark{introduction}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{cll}
+    \toprule
+    \multicolumn{2}{c}{Architecture} & Extensions \\
+    \midrule
+    32-bit & \code{rv32imv} & Multiply, CSR, Vector  \\
+    64-bit & \code{rv64imv} & Multiply, CSR, Vector  \\
+    64-bit & \code{rv64imvxcheri} & Multiply, CSR, Vector, CHERI  \\
+    64-bit & \code{rv64imvxcheri-int} & Multiply, CSR, Vector, CHERI (Integer)  \\
+    \bottomrule
+    \end{tabular}
+    \caption{\code{riscv-v-lite} supported architectures}
+    \label{tab:emu_arches}
+\end{table}
 
 \section{Developing the emulator}\label{chap:software:sec:emu}
-Rust was selected due to its memory safety and runtime speed, and provides language constructs that suit themselves well to emulation.
-Rust Enums are equivalent to \enquote{variant} types in other languages like C++, which \todomark{}.
-\todomark{something something match statements}.
 
-\subsection{Basic emulation}
 The emulator for each architecture follows a similar pattern.
 A \code{Processor} struct stores the register file and the available RAM.
 A separate \code{ProcessorModules} struct holds all ISA modules the processor can execute (e.g. the base RV64 Integer ISA, the Multiply extension, and the Vector extension).
@@ -36,30 +35,10 @@ The processor asks each ISA module in turn if it wants to handle the instruction
 If the ISA module returns a new PC value it is immediately applied, otherwise it is automatically incremented.
 This structure easily represents basic RISC-V architectures, and can scale up to support many different new modules.
 
-\todomark{What did the emulator set out to emulate? i.e. no supervisor, pure-capability code only}
-
 \input{1_25EmulationInvestigation/sub10_emu_cheri}
 \input{1_25EmulationInvestigation/sub20_emu_vec}
 \input{1_25EmulationInvestigation/sub30_fast_path}
-
-\section{Going beyond the emulator}
-The emulator is a single example of a conformant CHERI-RVV implementation, and does not exercise every part of the specification.
-Two properties stand out:
-\begin{itemize}
-    \item Segments/elements are always accessed in order, despite the spec not enforcing ordering
-    \item Imprecise traps are used for all exceptions - precise exception behaviour is not explored.
-\end{itemize}
-This section notes how relaxed access ordering and precise exceptions may affect the hardware in ways not previously explored.
-
-\subsection{Precise exceptions}
-\todomark{precise exceptions}
-
-\subsection{Relaxed access ordering}
-\todomark{relaxed access ordering}
-
-\todomark{This section should have bits for atomicity?}
-\todomark{This section should have bits for alignment}
-
+\input{1_25EmulationInvestigation/sub40_beyond_emu}
 \input{1_25EmulationInvestigation/sub50_hyp}
 
 \todomark{where to note that capability checks count as a synchronous exception? centralized point for "here are the differences between RVV and CHERI-RVV?}
