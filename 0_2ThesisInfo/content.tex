@@ -25,12 +25,23 @@
 
 %% Word count
 \begin{luacode*}
-    local pip=io.popen("texcount -1 -sum -merge -q thesis.tex")
-    wordcount=pip:read()
-    pip:close()
+wordcount_cmd = "texcount -1 -sum -merge -q chapters.tex"
+
+local pip=io.popen(wordcount_cmd)
+wordcount=pip:read()
+pip:close()
+    
+-- From http://www.computercraft.info/forums2/index.php?/topic/8065-lua-thousand-separator/
+function format_thousand(v)
+    local s = string.format("%d", math.floor(v))
+    local pos = string.len(s) % 3
+    if pos == 0 then pos = 3 end
+    return string.sub(s, 1, pos)
+    .. string.gsub(string.sub(s, pos+1), "(...)", ",%1")
+end
 \end{luacode*}
-\wordcount{\luadirect{tex.print(wordcount)}}
-\wordcountmethod{\texttt{texcount -1 -sum -merge -q thesis.tex}\\(Does not include the title page or this declaration)}
+\wordcount{\luadirect{tex.sprint(format_thousand(wordcount))} words}
+\wordcountmethod{\texttt{\luadirect{tex.sprint(wordcount_cmd)}}\\(Covers pages \pageref{wc:start}-\pageref{wc:end})}
 
 %% PDF meta-info:
 \subjectline{Computer Science}
