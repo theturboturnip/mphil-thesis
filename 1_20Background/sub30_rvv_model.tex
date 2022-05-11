@@ -101,9 +101,9 @@ They do not impose any extra requirements on the implementation.
 For example, an implementation that executes instructions out-of-order does not need to guarantee that instructions older than \code{*epc} have completed, and is allowed to have completed instructions newer than \code{*epc}.
 
 If the trap was triggered by a synchronous exception, the \code{vstart} CSR must be updated with the element that caused it.
-\todomark{inconsistency in spec - Ch17 first para says "the vstart CSR contains the element index on which the trap was taken", but the imprecise trap section only specifies this for synchronous exceptions}
-
-The specification also states \enquote{There is no support for imprecise traps in the current standard extensions}, \todomark{what does this mean?}
+The specification calls out synchronous exceptions in particular, but does not mention asynchronous interrupts.
+It's likely that imprecise traps for asynchronous interrupts should also set \code{vstart}, but this issue has been raised with the authors for further clarification\footnote{\url{https://github.com/riscv/riscv-v-spec/issues/799}}.
+The specification also states \enquote{There is no support for imprecise traps in the current standard extensions}, meaning that the other standard RISC-V exceptions do not use and have not considered imprecise traps.
 
 %---------------------------------
 \subsubsection{Precise vector traps}
@@ -134,9 +134,14 @@ For example, writing to a memory-mapped I/O region may not be idempotent.
 
 Another memory-specific issue is that of \emph{demand-paging}, where the OS needs to step in and move virtual memory pages into physical memory for an instruction to use.
 This use-case is specifically called out by the specification for precise traps.
-Usually, this is triggered by some element of a vector memory access raising a synchronous exception, invoking a precise trap, and \todomark{using \code{vstart} to show the OS which address it wants?}
-Because \code{vstart} must be set to the element that demanded the page, and operations preceding \code{vstart} must have completed, any elements that could potentially trigger demand-paging \emph{must} wait for the preceding elements to complete.
-This always applies, no matter what the instruction's specific ordering guarantees are.
+Usually, this is triggered by some element of a vector memory access raising a synchronous exception, invoking a precise trap, and writing the ``Machine Trap Value'' scalar register with the offending address\todocite[Section 3.1.21]{risc-v privileged spec}.
+\code{vstart} must be set to an element at (or before\footnote{If the memory region is idempotent, then \code{vstart} could any value where all preceding elements had completed. It could even be zero, in which case all accesses would be retried on resume, as long as it could guarantee forward progress.}) the one that demanded the page, because that element must perform the access after reloading.
+If an implementation sets \code{vstart} to the offending element, because operations preceding \code{vstart} must have completed, any elements that could potentially trigger demand-paging \emph{must} wait for the preceding elements to complete.
+
+
+% \code{vstart} must be set to an element that demanded the page
+% Because \code{vstart} must be set to the element that demanded the page, and operations preceding \code{vstart} must have completed, any elements that could potentially trigger demand-paging \emph{must} wait for the preceding elements to complete.
+% This always applies, no matter what the instruction's specific ordering guarantees are.
 
 %---------------------------------
 \subsubsection{Other modes}
@@ -153,7 +158,6 @@ Neither of these modes are actually defined, but they are simply noted as possib
 %---------------------------------
 \subsection{Summary}\label{chap:bg:subsec:rvvsummary}
 \figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_examples_combined}
-\todomark{Tie into exception handling by saying a precise trap occurred}
 \cref{fig:RVV_examples_combined} shows all of the above features used in a single configuration:
 \begin{itemize}
     \item The instruction was previously interrupted with a precise trap and restarted, so \code{vstart=2}

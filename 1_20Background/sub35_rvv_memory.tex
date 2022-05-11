@@ -4,27 +4,48 @@
 \section{RVV memory instructions}
 \emph{Summarizes \cite[Sections 7-9]{RISCVVectorExtension2021}}
 
-\todomark{Better intro}
+RVV defines three broad categories of memory access instructions, which can be further split into five archetypes with different semantics.
+This section summarizes each archetype, their semantics, their assembly mnemonics, and demonstrates how they map memory accesses to vector elements.
 
-RVV defines five broad categories of memory access instructions.
-For the most part, they handle their operands as described in \cref{chap:bg:sec:rvv:vector_model}.
+% \begin{table}[]
+%     \centering
+%     \begin{tabular}{cc|c|}
+%     \toprule
+%         Archetype & Direction &  Category \\
+%         \midrule
+%         Unit/Strided & Load/Store & Unit/Strided \\
+%         Fault-only-First & Load & Unit \\
+%         Whole-Register & Load/Store & Unit \\
+%         Bytemask & Load/Store & Unit \\
+%         Indexed & Load/Store & Indexed
+%         \bottomrule
+%     \end{tabular}
+%     \caption{Table of categories/archetypes??}
+%     \label{tab:my_label}
+% \end{table}
+
+% RVV defines five broad categories of memory access instructions.
+For the most part, memory access instructions handle their operands as described in \cref{chap:bg:sec:rvv:vector_model}.
 \code{EEW} and \code{EMUL} are usually derived from the instruction encoding, rather than reading the \code{vtype} CSR.
 In a few cases the Effective Vector Length \code{EVL} is different from the \code{vl} CSR, so for simplicity all instructions are described in terms of \code{EVL}.
 
-\subsection{Segment accesses}
-Three of the five categories (unit/strided, fault-only-first, and indexed) support \emph{segmented} access.
-This is used for unpacking contiguous structures of $n$ \emph{fields} and placing each field in a separate vector.
+\subsection{Segmented accesses}
+Three of the five archetypes (unit/strided, fault-only-first, and indexed) support \emph{segmented} access.
+This is used for unpacking contiguous structures of $1 \le \code{nf} \le 8$ \emph{fields} and placing each field in a separate vector.
+In these instructions, the values of \code{vl}, \code{vstart}, and the mask register are interpreted in terms of segments.
+% Additionally, if an element within a segment causes a synchronous exception/trap, it
+
 \cref{fig:RVV_mem_unit} demonstrates a common example: the extraction of separate R, G, and B components from a color.
 Without segmentation, i.e. $n = 1$, each consecutive memory address maps to a consecutive element in a single vector register group.
 With segmentation, elements are grouped into segments of $n > 1$ fields, where each field is mapped to a different vector register group.
 This principle extends to \code{LMUL > 1} (\cref{fig:RVV_mem_lmul_3seg}).
 
-\todomark{vl, vstart, masks are all in terms of segments in segmented accesses.}
-\todomark{if a trap occurs, it is implementation defined if a subset of the faulting segment's accesses are performed before the trap is taken}
-\todomark{nf has range 1..8}
+% \todomark{vl, vstart, masks are all in terms of segments in segmented accesses.}
+% \todomark{if a trap occurs, it is implementation defined if a subset of the faulting segment's accesses are performed before the trap is taken}
+% \todomark{nf has range 1..8}
 
 \figinput[width=0.48\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_unit}
-\figinput[width=0.55\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_lmul_3seg}
+% \figinput[width=0.55\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_lmul_3seg}
 
 
 \pagebreak
