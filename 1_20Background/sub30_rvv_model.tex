@@ -1,31 +1,29 @@
 \section{The RVV vector model}\label{chap:bg:sec:rvv:vector_model}
-\emph{Summarizes \cite[Sections 1-4, 6, 17]{RISCVVectorExtension2021}}
-\todomark{Add prestart/active/inactive/body/tail definitions, would bump up to 1-5}
-
+\emph{Summarizes \cite[Sections 1-6, 17]{RISCVVectorExtension2021}}
 
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
-
-% RVV is the vector one
-% This section summarizes Sections 1-9 and 17 of the RVV Specification v1.0\cite{RISCVVectorExtension2021}.
-
 
 RVV defines thirty-two vector registers, each of an implementation-defined constant width \code{VLEN}.
 These registers can be interpreted as \emph{vectors} of \emph{elements}.
 The program can configure the size of elements, and the implementation defines a maximum width \code{ELEN}.
 \cref{fig:RVV_simple_widths} shows a simple example of a 128-bit vector, where the maximum element length is 32-bits.
 
-
 RVV also adds some state that defines how the vector registers are used (see \cref{fig:RVV_added_state}).
 These are stored in RISC-V Control and Status Registers (CSRs), which the program can read.
+\code{vtype} (\cref{chap:bg:subsec:vtype}) defines how the vector registers are split into elements.
+\code{vstart} and \code{vl} (\cref{chap:bg:subsec:vlvstart}) divides the elements into three disjoint subsets: \emph{prestart}, the \emph{body}, and the \emph{tail}.
+Masked accesses (\cref{chap:bg:sec:rvv:masking}) further divide the \emph{body} into \emph{active} and \emph{inactive} elements.
+This section also describes the vector exception model (\cref{chap:bg:subsec:vexceptions}).
 
 %---------------------------------
-\subsection{\code{vtype}}
+\subsection{\code{vtype}}\label{chap:bg:subsec:vtype}
+\figinput[width=0.7\textwidth,pos=b]{1_20Background/figures/fig_RVV_LMUL_widening}
 The \code{vtype} CSR contains two key fields that describe how vector instructions interpret the contents of vector registers.
 The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
 It can be 8, 16, 32, or 64.
 128-bit elements are referenced a few times throughout but haven't been formally specified (see \cite[p32]{RISCVVectorExtension2021}).
-Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
+% Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
 
 The second field is the Vector Register Group Multiplier (\code{LMUL}).
 Vector instructions don't just operate over a single register, but over a register \emph{group} as defined by this field.
@@ -33,15 +31,11 @@ For example, if \code{LMUL=8} then each instruction would operate over 8 registe
 These groups must use aligned register indices, so if \code{LMUL=4} all vector register operands should be multiples of 4 e.g. \code{v0, v4, v8} etc.
 In some implementations this may increase throughput, which by itself is beneficial for applications.
 
-\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_LMUL_widening}
-
 However, the true utility of \code{LMUL} lies in widening/narrowing operations (see \cref{fig:RVV_LMUL_widening}).
 For example, an 8-by-8-bit multiplication can produce 16-bit results.
 Because the element size doubles, the number of vector registers required to hold the same number of elements also doubles.
 Doubling \code{LMUL} after such an operation allows subsequent instructions to handle all the results at once.
 At the start of such an operation, fractional \code{LMUL} (1/2, 1/4, or 1/8) can be used to avoid subsequent results using too many registers.
-% high register usage in subsequent operations.
-% If such operations end up using too many registers, fractional LMUL (1/2, 1/4, or 1/8) can be used to 
 
 \code{vtype} also encodes two flags: mask-agnostic and tail-agnostic.
 If these are set, the implementation is \emph{allowed} to overwrite any masked-out or tail elements with all 1s.
@@ -51,14 +45,15 @@ Some instructions (such as memory accesses) use different Effective Element Widt
 In the case of memory accesses, the \code{EEW} is encoded in the instruction bits and the \code{EMUL} is calculated to keep the number of elements consistent.
 Another example is widening/narrowing operations, which by definition have to interpret the destination registers differently from the sources.
 
-\todomark{Describe vsetvli here: it's a good segue to vl + vstart}
+Programs update \code{vtype} through the \code{vsetvl} family of instructions.
+These are designed for a ``stripmining'' paradigm, where each iteration of a loop processes some elements until all elements are processed.
+\code{vsetvl} instructions take a requested \code{vtype} and the number of remaining elements to process (the Application Vector Length or \code{AVL}), and return the number of elements that will be processed in this iteration.
+This value is saved in a register for the program to use, and also saved in the internal \code{vl} CSR.
 
 %---------------------------------
-\subsection{\code{vl} and \code{vstart} - Prestart, body, tail elements}\label{chap:bg:sec:rvv:vstart}
-\todomark{This defines prestart, body, tail}
-
+\subsection{\code{vl} and \code{vstart}}\label{chap:bg:subsec:vlvstart}
 The first CSR is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
-The program updates this value through fault-only-first loads (\cref{chap:bg:sec:rvv:fof}) and more commonly the \code{vsetvl} instruction family (\cref{chap:bg:sec:rvv:vsetvl}).
+The program updates this value through fault-only-first loads (\cref{chap:bg:sec:rvv:fof}) and more commonly \code{vsetvl} instructions.
 
 In the simple case, \code{vl} is equal to the total available elements (see \cref{fig:RVV_vl_full}).
 It can also be fewer (see \cref{fig:RVV_vl_short}), in which case vector instructions will not write to elements in the \enquote{tail} (i.e. elements past \code{vl}).
@@ -67,7 +62,8 @@ This eliminates the need for a `cleanup loop' common in fixed-length vector prog
 \figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vl}
 
 In a similar vein, \code{vstart} specifies \enquote{the index of the first element to be executed by a vector instruction}.
-This is usually only set by the hardware whenever it is interrupted mid-instruction (see \cref{fig:RVV_vstart_trap}) so that the instruction can be re-executed later without corrupting completed values.
+Elements before \code{vstart} are known as the \emph{pre-start} and are not touched by executed instructions.
+It is usually only set by the hardware whenever it is interrupted mid-instruction (see \cref{fig:RVV_vstart_trap} and \cref{chap:bg:subsec:vexceptions}) so that the instruction can be re-executed later without corrupting completed values.
 Whenever a vector instruction completes, \code{vstart} is reset to zero.
 
 The program \emph{can} set \code{vstart} manually, but it may not always work.
@@ -76,23 +72,20 @@ The specification gives an example where a vector implementation never takes int
 
 \figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vstart_trap}
 
-\pagebreak
 \figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
 %---------------------------------
-\subsection{Masking - Active/inactive elements}\label{chap:bg:sec:rvv:masking}
+\subsection{Masking - Active/inactive elements}\label{chap:bg:subsec:masking}
 Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV_mask_example}).
-When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector.
+When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector\footnote{A single vector register will always have enough bits for all elements. The maximum element count is found when SEW is minimized (8 bits) and LMUL is maximized (8 registers), and is equal to \code{VLEN * LMUL / SEW = VLEN * 8 / 8 = VLEN}.}.
 If the mask bit is 0, that element is \emph{active} and will be used as normal.
 If the mask bit is 1, that element will be \emph{inactive} and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
 When masking is disabled, all elements are \emph{active}.
 
-\todomark{There will always be enough bits in a single register to mask all elements. maximum element count comes from smallest SEW (8 bits) and largest LMUL (8 registers). Max elements = VLEN * LMUL / SEW = VLEN * 8 / 8 = VLEN elements, there are VLEN bits in a single register.}
-
 \pagebreak
 %---------------------------------
 %---------------------------------
 %---------------------------------
-\subsection{Exception handling}
+\subsection{Exception handling}\label{chap:bg:subsec:vexceptions}
 \emph{Summarizes \cite[Section 17]{RISCVVectorExtension2021}}
 
 During the execution of a vector instruction, two events can prevent an instruction from fully completing: a synchronous exception in the instruction itself, or an asynchronous interrupt from another part of the system.
@@ -158,12 +151,12 @@ Right now, it seems that context switching always requires a precise trap.
 Neither of these modes are actually defined, but they are simply noted as possibilities for the future.
 
 %---------------------------------
-\subsection{Summary}
+\subsection{Summary}\label{chap:bg:subsec:rvvsummary}
 \figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_examples_combined}
 \todomark{Tie into exception handling by saying a precise trap occurred}
 \cref{fig:RVV_examples_combined} shows all of the above features used in a single configuration:
 \begin{itemize}
-    \item The instruction was previously interrupted and restarted, so \code{vstart=2}
+    \item The instruction was previously interrupted with a precise trap and restarted, so \code{vstart=2}
     \item Elements are 16-bit
     \item \code{LMUL=4} to try and increase throughput
     \item Only 29 of the 32 available elements were requested, so \code{vl=29} (3 tail elements)
