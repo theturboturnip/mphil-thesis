@@ -1,0 +1,53 @@
+\section{CHERI}\label{chap:bg:sec:cheri}
+% Concept of a capability
+In CHERI, addresses/pointers are replaced with capabilities: unforgeable tokens that provide \emph{specific kinds of access} to an \emph{address} within a \emph{range of memory}.
+The above statement is enough to understand what capabilities contain\footnote{This is a slight simplification. For the purposes of vector memory accesses the \emph{otype} of a capability can be ignored, as any type other than \code{UNSEALED} cannot be dereferenced anyway.}:
+\begin{itemize}
+    \item Permission bits, to restrict access
+    \item The \emph{cursor}, i.e. the address it currently points to
+    \item The \emph{bounds}, i.e. the range of addresses this capability could point to
+\end{itemize}
+A great deal of work has gone into compressing capabilities down into a reasonable size (see \cite{woodruffCHERIConcentratePractical2019}, \todoref{diagram from TR-941?}), and using the magic of floating-point all of this data has been reduced to just 2x the architectural register size.
+For example, on 64-bit RISC-V a standard capability is 128-bits long.
+The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
+
+In order to keep track of what is and isn't a valid capability, registers and memory are both tagged.
+Each 128-bit register and each aligned 128-bit region of memory has an associated tag bit, which denotes if its data encodes a valid capability\footnote{This has the side-effect that capabilities must be 128-bit aligned in memory.}.
+If any non-capability data is written to any part of the region, or the capability is manipulated to make it invalid (e.g. moving the cursor out-of-bounds), the tag bit is zeroed out.
+As above, significant work has gone into the implementation to reduce the DRAM overhead of this method (see \cite{joannouEfficientTaggedMemory2017} for an example).
+
+
+\todomark{Explain the three security properties from davisCheriABIEnforcingValid2019?}
+
+\subsection{CHERI-RISC-V ISA}
+The Cambridge Computer Lab's TR-951 report\todocite{TR-951} describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V.
+CHERI-RISC-V is a mostly straightforward set of additions to basic RISC-V ISAs.
+It adds thirty-two general-purpose capability registers, thirty-two Special Capability Registers (SCRs), and many new instructions.
+
+The new general-purpose capability registers are each of size \code{CLEN = 2 * XLEN} plus a tag bit.
+These registers store compressed capabilities.
+While there is always a logical distinction between the pre-existing \emph{integer} registers \code{x0-x31} and the \emph{capability} registers \code{cx0-cx31}, the architecture may store them in a Split or Merged register file.
+A Split register file stores the integer registers separately from capability registers, so programs can manipulate them independently.
+A Merged register file stores thirty-two registers of length \code{CLEN}, using the full width for the capability registers, and aliases the integer registers to the bottom \code{XLEN} bits.
+Under a merged register file, writing to an integer register makes the capability counterpart invalid, so programs have to be more careful with register usage.
+
+\todomark{diagram for split/merged register file?}
+
+\todomark{All new CHERI instructions specify if their operands are integers or capabilities, and pull from the correct set of logical registers.}
+\todomark{Non-CHERI enabled instructions default to integer representations, and in some cases can be switched to use capabilities using the Integer/Capability encoding mode flag}
+
+Many of the new SCRs are intended to support the privileged ISA extensions for e.g. hypervisors or operating systems.
+The emulator doesn't use these, so their SCRs are not listed here, but there are two highly relevant SCRs for all modes: the Program Counter Capability and the Default Data Capability.
+The PCC supplements \todomark{replaces?} the program counter by adding more metadata, ensuring instruction fetches have the same security as normal loads and stores.
+
+
+\subsection{Integer/Capability mode}
+\todomark{Capability mode flag overrides behaviour of RISC-V }
+
+\subsection{Compilation - Pure-capability and legacy modes}
+
+\subsection{Capability Relocations}
+\todomark{talk about ELF cap-relocs table, how they work and why}
+
+\subsection{Instruction reference}
+\todomark{TR-951 contains a complete reference of all added instructions in section blah, and notes legacy instructions modified by capability mode in section blah. Reproduce short list? Do so in appendix?}

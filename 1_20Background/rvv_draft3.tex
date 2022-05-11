@@ -1,8 +1,13 @@
-\section{RVV}\label{chap:bg:sec:rvv}
+\section{RISC-V and RVV}\label{chap:bg:sec:rvv}
 % RISC-V has extensions
 RISC-V is an open family of ISAs which defines ``base integer ISAs'' (e.g. all 64-bit RISC-V cores implement the RV64I Base Integer Instruction Set) and extensions (e.g. the ``M'' extension for integer multiplication).
 A base instruction set combined with a set of extensions (\todomark{example of a architecture/feature string}) is known as a RISC-V ISA.
 Because RISC-V is open, anyone can design, manufacture, and sell chips implementing any RISC-V ISA.
+
+Each RISC-V implementation has a set of constant parameters.
+The most common example is \code{XLEN}, the length of an integer register in bits, which is tied to the base integer ISA (e.g. 64-bit ISA implies \code{XLEN=64}).
+Other constant parameters include \code{CLEN}, the length of a capability in bits, defined by CHERI relative to \code{XLEN}; and \code{VLEN} and \code{ELEN}, which are used by RVV and entirely implementation-defined.
+
 % RVV is the vector one
 RVV is the officially ratified vector extension for RISC-V, and going forward all RISC-V chips with vector processing capabilities should implement it instead of designing their own custom vector extensions.
 This section summarizes Sections 1-9 and 17 of the RVV Specification v1.0\cite{RISCVVectorExtension2021}.
@@ -19,9 +24,9 @@ This section summarizes Sections 1-9 and 17 of the RVV Specification v1.0\cite{R
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
 
 
-RVV defines thirty-two vector registers, each of an implementation-defined width VLEN.
+RVV defines thirty-two vector registers, each of an implementation-defined constant width \code{VLEN}.
 These registers can be interpreted as \emph{vectors} of \emph{elements}.
-The program can configure the size of elements, and the implementation defines a maximum width ELEN.
+The program can configure the size of elements, and the implementation defines a maximum width \code{ELEN}.
 \cref{fig:RVV_simple_widths} shows a simple example of a 128-bit vector, where the maximum element length is 32-bits.
 
 
@@ -210,9 +215,6 @@ This principle extends to \code{LMUL > 1} (\cref{fig:RVV_mem_lmul_3seg}).
 
 \figinput[width=0.48\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_unit}
 \figinput[width=0.55\textwidth,pos=h]{1_20Background/figures/fig_RVV_mem_lmul_3seg}
-
-\newcommand{\param}[1]{\textbf{\textcolor{Blue}{#1}}}
-\newcommand{\paramt}[1]{\code{\param{#1}}}
 
 
 \pagebreak

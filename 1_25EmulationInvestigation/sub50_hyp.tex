@@ -46,7 +46,7 @@ Implementations which use large vectors or make careful use of the simplificatio
 No matter how you slice it, slow-path circuitry is \emph{always} necessary for a fully conforming implementation.
 If the slow-path is always required, and always takes up area, then adding any circuitry for fast-path must require more area.
 Elements from the slow-path, e.g. capability decoding units, may be shared with the fast-path, and any spare space in a slow-path unit could also be shared with the fast-path, so it may have a \emph{negligible} impact.
-Crucially, using a fast-path will never \emph{decrease} the area of a conformant design.
+Crucially, adding a fast-path will never \emph{decrease} the area of a conformant design.
 
 \subsubsection*{Throughput - No change}
 Assuming the bounds calculations can be pipelined to the same clock speed as a capability check, putting them before a set of pipelined accesses should not affect the throughput of those accesses.

@@ -163,8 +163,12 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Custom formatting commands
-
+% \RequirePackage{relsize}
 \newcommand{\code}[1]{{\texttt{#1}}}
+% parameter to an assembly instruction
+\newcommand{\param}[1]{\textbf{\textcolor{Blue}{#1}}}
+% Use instead of \param when not inside \code
+\newcommand{\paramt}[1]{\code{\param{#1}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Formatting-agnostic figures code
