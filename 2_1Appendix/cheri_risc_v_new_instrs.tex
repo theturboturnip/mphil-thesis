@@ -1,0 +1,75 @@
+\chapter{CHERI-RISC-V Instruction Listing}
+
+\todomark{If I include this, it needs to be made actually useful}
+
+\todomark{Split the instructions differently? split new instructions into memory accesses, querying/updating fields, etc.?}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{l}
+        \toprule
+        Name \\
+        \midrule
+CAndPerm \\
+CBuildCap \\
+CClear \\
+CClearTag \\
+CCopyType \\
+CCSeal \\
+CFromPtr \\
+CGetAddr \\
+CGetBase \\
+CGetFlags \\
+CGetLen \\
+CGetOffset \\
+CGetPerm \\
+CGetSealed \\
+CGetTag \\
+CGetType \\
+CIncOffset \\
+CIncOffsetImm \\
+CInvoke \\
+CJALR \\
+Clear \\
+CLoadTags \\
+CMove \\
+CRepresentableAlignmentMask \\
+CRoundRepresentableLength \\
+CSeal \\
+CSealEntry \\
+CSetAddr \\
+CSetBounds \\
+CSetBoundsExact \\
+CSetBoundsImm \\
+CSetEqualExact \\
+CSetFlags \\
+CSetOffset \\
+CSpecialRW \\
+CSub \\
+CTestSubset \\
+CToPtr \\
+CUnseal \\
+FPClear \\
+        \bottomrule
+    \end{tabular}
+    \caption{New CHERI instructions}
+    \label{tab:my_label}
+\end{table}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{l}
+        AUIPCC \\
+        LQ -> [C]LC \\
+        SQ -> [C]SC \\
+        L[BHWD][U] \\
+        S[BHWD] \\
+        FL[WDQ] \\
+        FS[WDQ] \\
+        LR \\
+        SC \\
+        AMO* \\
+    \end{tabular}
+    \caption{Legacy instructions that change behaviour in Capability mode}
+    \label{tab:my_label}
+\end{table}

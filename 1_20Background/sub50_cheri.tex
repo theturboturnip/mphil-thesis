@@ -33,21 +33,94 @@ Under a merged register file, writing to an integer register makes the capabilit
 
 \todomark{diagram for split/merged register file?}
 
-\todomark{All new CHERI instructions specify if their operands are integers or capabilities, and pull from the correct set of logical registers.}
-\todomark{Non-CHERI enabled instructions default to integer representations, and in some cases can be switched to use capabilities using the Integer/Capability encoding mode flag}
-
 Many of the new SCRs are intended to support the privileged ISA extensions for e.g. hypervisors or operating systems.
 The emulator doesn't use these, so their SCRs are not listed here, but there are two highly relevant SCRs for all modes: the Program Counter Capability and the Default Data Capability.
-The PCC supplements \todomark{replaces?} the program counter by adding more metadata, ensuring instruction fetches have the same security as normal loads and stores.
 
+The PCC replaces the program counter and adds more metadata, ensuring instruction fetches have the same security properties as normal loads and stores.
+The DDC is used to sandbox integer addressing modes.
+CHERI-RISC-V includes new instructions which use integer addressing, and allows legacy (i.e. integer addressed) code to function on CHERI systems without recompiling for CHERI-RISC-V.
+These instructions all use integer addresses relative to the DDC, and the DDC controls the permissions those instructions have.
 
-\subsection{Integer/Capability mode}
-\todomark{Capability mode flag overrides behaviour of RISC-V }
+\subsection{Instruction changes}
+TR-951\todocite[Chapter 8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
+Many of the new instructions are unrelated to pre-existing instructions, and implement capability-specific operations like accessing fields of capability registers.
+The most relevant new instructions for our case are the various loads/stores.
 
-\subsection{Compilation - Pure-capability and legacy modes}
+CHERI-RISC-V adds new instructions for loading integer and capability data, either via capabilities or using integer addressing through the DDC (\cref{tab:new_cheri_instrs}).
+These instructions are slightly more limited than the pre-existing counterparts, because they do not support immediate offsets. \todomark{is there rationale for that documented somewhere?}
+To maintain compatibility with legacy programs that haven't been compiled for CHERI-RISC-V, the behaviour of basic RISC-V load/store opcodes changes to either use capabilities as memory references or use integer addressing via the DDC, depending on the encoding mode.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccl}
+    \toprule
+        Name & Direction & Data type & Address calculation \\
+        \midrule
+        L[BHWD][U].CAP & Load & Integer & via capability register \\
+        L[BHWD][U].DDC & Load & Integer & via DDC \\
+        LC.CAP & Load & Capability & via capability register \\
+        LC.DDC & Load & Capability & via DDC \\ 
+        S[BHWD].CAP & Store & Integer & via capability register \\
+        S[BHWD].DDC & Store & Integer & via DDC \\
+        SC.CAP & Store & Capability & via capability register \\
+        SC.DDC & Store & Capability & via DDC \\ 
+    \bottomrule
+    \end{tabular}
+    \caption{New CHERI load/store instructions}
+    \label{tab:new_cheri_instrs}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+    \toprule
+        Name & Direction & Data type & \multicolumn{1}{c}{Address calculation} \\
+        &&& (Capability/Integer mode) \\
+        \midrule
+        {[C]}LC\parnote{Replaces RV128 LQ} & Load & Capability & via capability/DDC \\
+        {[C]}SC\parnote{Replaces RV128 SQ} & Store & Capability & via capability/DDC \\
+        \midrule
+        L[BWHD][U] & Load & Integer & via capability/DDC \\
+        S[BWHD] & Store & Integer & via capability/DDC \\
+        FL[WDQ] & Load & Float & via capability/DDC \\
+        FS[WDQ] & Store & Float & via capability/DDC \\
+        LR & Load & Integer & via capability/DDC \\
+        SC & Store & Integer & via capability/DDC \\
+        AMO\parnote{All atomic memory operations} & - & Integer & via capability/DDC \\
+    \bottomrule
+    \end{tabular}
+    \parnotes
+    \caption{Preexisting RISC-V load/store instructions modified by CHERI-RISC-V}
+    \label{tab:legacy_cheri_instrs}
+\end{table}
+
+\subsection{Capability and Integer encoding mode}
+CHERI-RISC-V specifies two encoding modes, selected using a flag in the PCC \code{flags} field.
+\emph{Capability mode} modifies the behaviour of pre-existing instructions to take address operands as capabilities.
+This makes the basic load/store instruction behaviour exactly equivalent to newly introduced counterparts: e.g. \code{L[BWHD][U] == L[BWHD][U].CAP}.
+The DDC may still be used in this mode via the new instructions e.g. \code{S[BWHD].DDC}.
+
+\emph{Integer mode} seeks to emulate a standard CHERI-less RISC-V architecture as much as possible.
+All pre-existing RISC-V memory access instructions take address operands as integers, which are dereferenced relative to the DDC\footnote{Of course, the DDC must be valid when it is used in this mode, and all bounds checks etc. must still pass.}.
+This makes the basic load/store instruction behaviour exactly equivalent to newly introduced counterparts: e.g. \code{L[BWHD][U] == L[BWHD][U].DDC}.
+The new instructions may still be used to dereference and inspect capability registers, but all other instructions access registers in an integer context i.e. ignoring the upper bits and tag from merged register files.
+
+\subsection{Pure-capability and Hybrid compilation modes}
+CHERI's de facto compiler, CHERI-Clang\todocite{}, supports two ways to compile CHERI-RISC-V which map to the different encoding modes.
+
+\emph{Pure-capability} mode treats all pointers as capabilities, and emits pre-existing RISC-V instructions that expect to be run in capability mode\footnote{This wasn't derived from documentation, but instead from manual inspection of emitted code.}.
+
+\emph{Hybrid} mode treats pointers as integer addresses, dereferenced relative to the DDC, unless they are annotated with \code{\_\_capability}.
+This mode emits pre-existing RISC-V instructions that take integer operands, and uses capabilities through the new instructions.
+All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
 
 \subsection{Capability Relocations}
-\todomark{talk about ELF cap-relocs table, how they work and why}
+\todomark{Summarizes TR-494 Section 4.4, Appx C}
+Binary applications compiled in pure-capability mode require some ``global'' capabilities to exist at startup, e.g. the capability which points to the \code{main()} function.
+It would be a security risk to synthesize these capabilities from thin air, or to allow the binary file itself to contain tag bits.
 
-\subsection{Instruction reference}
-\todomark{TR-951 contains a complete reference of all added instructions in section blah, and notes legacy instructions modified by capability mode in section blah. Reproduce short list? Do so in appendix?}
+Instead, CHERI ELF binaries contain a set of requested ``relocations'' (the \code{\_\_cap\_relocs} section) which instruct the runtime environment to create capabilities with specific permissions and bounds in specific places.
+This process uses the normal CHERI capability instructions, so any invalid requests will cause a program crash, maintaining security.
+Further complexity is introduced with dynamic linking, and in the future these relocations may change format, both described in \todocite{TR-494}, but the above description is sufficient to understand the rest of this paper.
+
+% \subsection{Instruction reference}
+% \todomark{TR-951 contains a complete reference of all added instructions in section blah, and notes legacy instructions modified by capability mode in section blah. Reproduce short list? Do so in appendix?}

@@ -1,11 +1,16 @@
 \chapter{Background}
 
-\todomark{Intro}
-\todomark{Summarizes relevant parts of TR-951, RVV spec 1.0 chapters XYZ}
+This chapter describes RISC-V (\cref{chap:bg:sec:riscv}), RVV (\cref{chap:bg:sec:rvv}), and CHERI (\cref{chap:bg:sec:cheri}) to the detail required to understand the rest of the dissertation.
+It summarizes the relevant sections of the RISC-V unprivileged spec\todocite{}, the RISC-V ``V'' extension specification v1.0\todocite[Sections 1-9, 17]{}, the TR-951 CHERI ISAv8 technical report\todocite[Chapters 5, 8]{TR-951}, and the TR-949 technical report about C/C++ safety on CHERI\todocite[Section 4.4, Appendix C]{TR-949}.
+Both vectors and CHERI are described, because this dissertation caters to those who may be familiar with one but not the other.
+
+% \todomark{Intro}
+% \todomark{Summarizes relevant parts of TR-951, TR-??? about capability relocations, RVV spec 1.0 chapters XYZ}
 
 \input{1_20Background/sub10_riscv}
+\pagebreak
 \input{1_20Background/sub20_briefintro}
-\include{1_20Background/sub30_rvv_model}
-\include{1_20Background/sub35_rvv_memory}
-\include{1_20Background/sub39_rvv_impls}
-\include{1_20Background/sub50_cheri}
+\input{1_20Background/sub30_rvv_model}
+\input{1_20Background/sub35_rvv_memory}
+\input{1_20Background/sub39_rvv_impls}
+\input{1_20Background/sub50_cheri}
