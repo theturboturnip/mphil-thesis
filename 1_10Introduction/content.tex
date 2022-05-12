@@ -131,7 +131,7 @@ Along with testing these hypotheses, this document serves as a practical explana
         \definehyp{hyp:sw_pure_compat}%
             {Vector code can be compiled into a pure-capability form from a legacy form with no source code changes.} \\
         \definehyp{hyp:sw_stack_vectors}%
-            {Vector code that saves variable-length vectors to/from the stack can be compiled on CHERI-RVV with no source code changes.} \\
+            {Vector code that saves/restores variable-length vectors to/from the stack can be compiled on CHERI-RVV with no source code changes.} \\
         \definehyp{hyp:sw_multiproc}%
             {CHERI-vector code can run correctly in multiprocessing systems, where execution may be paused and resumed on interrupts or context switches.} \\
     \midrule

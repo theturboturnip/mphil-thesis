@@ -130,7 +130,7 @@ The idempotency option gives implementations a lot of leeway.
 Some instructions \todomark{examples} are specifically prohibited from overwriting their inputs to make them idempotent.
 If an instruction is idempotent, an implementation is even allowed to repeat operations on elements \emph{preceding} \code{vstart}.
 However for memory accesses the idempotency depends on the memory being accessed.
-For example, writing to a memory-mapped I/O region may not be idempotent.
+For example, reading or writing a memory-mapped I/O region may not be idempotent.
 
 Another memory-specific issue is that of \emph{demand-paging}, where the OS needs to step in and move virtual memory pages into physical memory for an instruction to use.
 This use-case is specifically called out by the specification for precise traps.

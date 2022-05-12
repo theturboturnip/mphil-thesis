@@ -11,13 +11,22 @@ A great deal of work has gone into compressing capabilities down into a reasonab
 For example, on 64-bit RISC-V a standard capability is 128-bits long.
 The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
 
-In order to keep track of what is and isn't a valid capability, registers and memory are both tagged.
-Each 128-bit register and each aligned 128-bit region of memory has an associated tag bit, which denotes if its data encodes a valid capability\footnote{This has the side-effect that capabilities must be 128-bit aligned in memory.}.
-If any non-capability data is written to any part of the region, or the capability is manipulated to make it invalid (e.g. moving the cursor out-of-bounds), the tag bit is zeroed out.
+A CHERI implementation has to enforce three security properties about its capabilities\todocite[Section 1.2.1]{TR-951}:
+\begin{itemize}
+    \item Provenance - Capabilities must always be derived from valid manipulations of other capabilities.
+    \item Integrity - Corrupted capabilities cannot be dereferenced.
+    \item Monotonicity - Capabilities cannot increase their rights.
+\end{itemize}
+
+Integrity is enforced by tagging registers and memory.
+Every 128-bit register and aligned 128-bit region of memory has an associated tag bit, which denotes if its data encodes a valid capability\footnote{This has the side-effect that capabilities must be 128-bit aligned in memory.}.
+If any non-capability data is written to any part of the region the tag bit is zeroed out.
+Instructions that perform memory accesses can only do so if the provided capability has a valid tag bit.
 As above, significant work has gone into the implementation to reduce the DRAM overhead of this method (see \cite{joannouEfficientTaggedMemory2017} for an example).
 
-
-\todomark{Explain the three security properties from davisCheriABIEnforcingValid2019?}
+Provenance and Monotonicity are enforced by all instructions that manipulate capabilities.
+If an implementation detects a violation of either property, it will zero out the tag bit and rely on Integrity enforcement to ensure it is not dereferenced.
+Some CHERI-enabled architectures, such as CHERI-RISC-V, also raise a synchronous exception when this occurs.
 
 \subsection{CHERI-RISC-V ISA}
 The Cambridge Computer Lab's TR-951 report\todocite{TR-951} describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V.
@@ -110,6 +119,7 @@ CHERI's de facto compiler, CHERI-Clang\todocite{}, supports two ways to compile 
 \emph{Pure-capability} mode treats all pointers as capabilities, and emits pre-existing RISC-V instructions that expect to be run in capability mode\footnote{This wasn't derived from documentation, but instead from manual inspection of emitted code.}.
 
 \emph{Hybrid} mode treats pointers as integer addresses, dereferenced relative to the DDC, unless they are annotated with \code{\_\_capability}.
+This mode allows programs to be gradually ported to CHERI, \todomark{which is important in ways I am too tired to express}
 This mode emits pre-existing RISC-V instructions that take integer operands, and uses capabilities through the new instructions.
 All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
 

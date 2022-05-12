@@ -2,6 +2,23 @@
 
 \hypsubsection{hyp:sw_vec_legacy}{Compiling legacy code for integer mode}
 
+This is true in theory and (partially) true in practice, assuming the scalar elements of the code already have this property.
+The CHERI-RVV versions of the vector instructions used in \todoref{chapter hardware} have identical encodings to legacy RVV instructions and function correctly in Integer mode.
+Not only is it theoretically possible for an RVV program to function correctly with no changes on CHERI-RVV, it should be possible to take a vanilla RVV binary and run it without modification on CHERI-RVV.
+% As long as the CHERI-RVV instructions support Integer mode, their behaviour can be equivalent to that expected by legacy programs, so it's entirely possible to run 
+% \todomark{The proof for hypothesis 1} 
+In practice, this depends on compiler support for the three vectorization types in Hybrid compilation mode.
+
+\subsubsection*{Inline assembly - True}
+Integer mode CHERI-RVV instructions use the same general-purpose registers as memory references as in vanilla RVV.
+CHERI-Clang handles this case correctly.
+
+\subsubsection*{Intrinsics - False}
+Intrinsics do not currently function on CHERI-Clang in pure-capability \emph{or} hybrid mode.
+
+\subsubsection*{Auto-vectorization - False}
+CHERI-Clang, as well as vanilla Clang, does not have auto-vectorization for RVV.
+
 \hypsubsection{hyp:sw_pure_compat}{Converting legacy code to pure-capability code}
 \todomark{At machine level, yes - a program compiled for pure-cap CHERI-RVV will have the exact same vector instruction encodings as a no-capability RVV.
 Although if it were recompiled for integer-mode-CHERI it may end up using different registers for the capabilities.
@@ -10,7 +27,7 @@ Yes under auto-vectorization once added, Yes under vector intrinsics IFF it gets
 \todomark{``unforeseen consequences'' of making instructions compatible with Capability and Integer mode, intrinsics have to be compatible too?}
 
 \hypsubsection{hyp:sw_stack_vectors}{Saving vectors on the stack}
-\todomark{Yes vectors can be stored on the stack}
+% \todomark{Yes vectors can be stored on the stack}
 
 \hypsubsection{hyp:sw_multiproc}{Running CHERI-RVV code in a multiprocessing system}
 \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
