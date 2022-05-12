@@ -1,5 +1,9 @@
 \chapter{The CHERI-RVV software stack}
-\todomark{Introduction}
+While building hardware that can execute vector instructions is important, generating those vector instructions in software quickly and easily is equally important.
+This chapter explores the current state of the so-called ``CHERI-RVV software stack'': mainstream compiler support for vanilla RVV (\todoref{4.1}), and the modifications required to bring support to CHERI-Clang (\todoref{4.2}).
+The software hypotheses are tested with this knowledge (\todoref{4.3}), and we recommend a set of changes to bring CHERI-Clang support to par with other compilers (\todoref{4.4}).
+% First, the available compiler support for vanilla RVV is explored and briefly compared to Arm SVE .
+% that translates to CHERI-Clang and what changes were necessary to implement capabilities, and 
 
 \section{Compiling vector code}
 Modern compilers provide many ways to generate vectorized code.
@@ -114,7 +118,7 @@ It is used extensively in the testbench code for the evaluation (\todoref{evalua
 \pagebreak
 \section{Compiling vector code with CHERI-Clang}
 Current CHERI compiler work is done on CHERI-Clang, a fork of Clang and other LLVM tools that supports capabilities.
-It's based on LLVM~13 so supports RVV v0.1, but none of the vector-extension related code had been updated to work with capabilities.
+It's based on LLVM~13, so it includes support for vanilla RVV v0.1, but none of the vector-extension related code had been updated to work with capabilities.
 This section outlines the changes one has to make to CHERI-Clang and vector code to compile programs for CHERI-RVV.
 
 \subsection{Required command-line options}
