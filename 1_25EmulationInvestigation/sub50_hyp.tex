@@ -21,6 +21,9 @@ Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a
 
 \hypsubsection{hyp:hw_cap_bounds_checks_amortized}{Fast-path checks}
 
+\todomark{In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is}
+\todomark{Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.}
+
 \enquote{Cost} can be defined in multiple ways.
 As with all concepts in hardware, implementing fast-path capability checks requires a trade-off between competing interests, which are each considered here.
 As mentioned above, it is also assumed that successful accesses (i.e. those without any capability violations) are the common case.

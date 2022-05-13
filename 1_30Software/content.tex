@@ -103,17 +103,30 @@ It is used extensively in the testbench code for the evaluation (\todoref{evalua
         "C" & Store in a capability register (CHERI-Clang only) \\
         "m" & Store in memory \\
     \end{tabular}
-    \caption{Inline assembly constraints \todocite{That one GCC manual page about inline asm constraints}}
+    \caption{Inline assembly constraints \todocite{\url{https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}}}
     \label{tab:inline_asm_constraints}
     \todomark{Beautify this table}
 \end{table}
 
 \subsection{vs. Arm SVE}\label{chap:soft:compiling:armsve}
-\todomark{Arm SVE has extensive auto-vectorization, RISC-V V does not.}
-\todomark{Would it be easy to bring this auto-vectorization code to RISC-V V?}
-\todomark{Arm SVE and RVV have comparable(?) intrinsics}
-\todomark{Arm SVE and RVV have comparable(?) abilities, and can both achieve these through inline assembly?}
-\todomark{Can you use Arm SVE intrinsic types with inline ASM?}
+\emph{Summarizes \todocite{armltdArmCompilerScalable2019}}
+
+Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\todocite{stephensARMScalableVector2017}.
+Arm have released a C language extension to support SVE development (\todocite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\todocite{\url{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
+It supports all of the previously examined vectorization types.
+
+Auto-vectorization is supported, and the main focus of the user guide is helping the compiler decide whether to auto-vectorize \todocite{armltdArmCompilerScalable2019}.
+Intrinsics are also supported, and seem to cover all of the SVE instructions, but take a slightly different approach to RVV.
+Arm SVE intrinsics do not directly map to available instructions, but aim to \enquote{provide a regular interface and leave the compiler to pick the best mapping to SVE instructions}, while RVV intrinsics (at least for memory) tend to map 1:1 to existing instructions.
+Arm's approach gives more flexibility for future extensions, as the same intrinsics could be compiled to new instructions with newer compilers.
+
+Arm SVE also supports inline assembly, but the experience is notably worse than for RVV.
+The two standout issues are a lack of register allocation and the use of condition code flags for branching.
+Unlike RVV, the intrinsic types for vector values cannot be referenced in inline assembly\todocite{stephensARMScalableVector2017}, so all vector registers must be allocated and tracked by the programmer.
+Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\todocite{armltdARMLanguageExtensions2020}, do not return the number of updated elements, and instead set the condition flags based on how many elements are updated.
+Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label (see \url{https://godbolt.org/z/zoWh9jq3o}), which is more error prone than the RVV method.
+Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can be found in \todomark{appendix based on \url{https://godbolt.org/z/zoWh9jq3o}}.
+
 
 \pagebreak
 \section{Compiling vector code with CHERI-Clang}
@@ -209,6 +222,8 @@ This pass assumes all stack-allocated data has a static size, and crashes when d
 It is therefore impossible (for now) to save vectors on the stack in CHERI-Clang, although it's clear that it's theoretically possible.
 For example, the length of the required vector allocations could be calculated based on \code{VLEN} before each stack allocation is performed, or if performance is a concern stack bounds for those allocations could potentially be ignored altogether.
 These possibilities are investigated further in the next section.
+
+\todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
 
 \todocite{LLVM IR pass investigated in TR-949 \$3.8.2, couldn't find earlier reference to it}
 
