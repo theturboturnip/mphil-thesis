@@ -37,10 +37,10 @@ If the ISA module returns a new PC value it is immediately applied, otherwise it
 This structure easily represents basic RISC-V architectures, and can scale up to support many different new modules.
 
 \input{1_25EmulationInvestigation/sub10_emu_cheri}
+
+\todomark{I wrote a type-safe wrapper class for capabilities, which either represented a valid capability or raw data, unlike the C library which represents a tagged/untagged capability. I should mention that here}
+
 \input{1_25EmulationInvestigation/sub20_emu_vec}
 \input{1_25EmulationInvestigation/sub30_fast_path}
 \input{1_25EmulationInvestigation/sub40_beyond_emu}
 \input{1_25EmulationInvestigation/sub50_hyp}
-
-\todomark{where to note that capability checks count as a synchronous exception? centralized point for "here are the differences between RVV and CHERI-RVV?}
-\todomark{I wrote a type-safe wrapper for capabilities}

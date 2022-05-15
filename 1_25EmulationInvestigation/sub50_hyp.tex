@@ -21,45 +21,67 @@ Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a
 
 \hypsubsection{hyp:hw_cap_bounds_checks_amortized}{Fast-path checks}
 
-\todomark{In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is}
-\todomark{Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.}
+In theory, certainly.
+Doing $1$ fast-path check instead of $n$ individual checks will amortize the cost of the check over the $n$ elements, but depending on the definition of \emph{cost} this may not be a significant improvement.
+Here, we evaluate cost in four dimensions typically central in architectural trade-offs.
+In order to determine improvement, we compare two theoretical implementations: one performing $m$ per-element checks per cycle (i.e. a slow-path), and one which performs a single fast-path check before falling back to the slow-path.
+We assume both implementations can issue $m$ memory requests per cycle, and only differ in checking logic.
+As noted above, we also assume that instructions with successful fast-paths are the common case.
+% \todomark{In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is}
+% \todomark{Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.}
 
-\enquote{Cost} can be defined in multiple ways.
-As with all concepts in hardware, implementing fast-path capability checks requires a trade-off between competing interests, which are each considered here.
-As mentioned above, it is also assumed that successful accesses (i.e. those without any capability violations) are the common case.
-Overall, it seems the key benefit of fast-path checks is power consumption.
+% \enquote{Cost} can be defined in multiple ways.
+% As with all concepts in hardware, implementing fast-path capability checks requires a trade-off between competing interests, which are each considered here.
+% As mentioned above, it is also assumed that successful accesses (i.e. those without any capability violations) are the common case.
+% Overall, it seems the key benefit of fast-path checks is power consumption.
 
-\subsubsection*{Power - Better}
+\subsubsection*{Power --- Better}
 If the fast-path check succeeds, then no power needs to be wasted on capability checks for the remaining cycles of the access.
 If the vector unit has its own dedicated capability check logic, it could even be clock gated to completely eliminate dynamic power.
-This shows a clear benefit as long as the extra logic for bounds calculations uses less power than $n - 1$ capability checks.
-Implementations which use large vectors or make careful use of the simplifications laid out in \cref{chap:hardware:sec:fastpath} should fulfil this condition easily.
+A fast-path check uses less power if it succeeds, and the bounds calculation logic uses less energy than $n - 1$ capability checks.
+Implementations which use large vectors or make careful use of the simplifications laid out in \cref{chap:hardware:sec:fastpath} should fulfil the second condition easily.
 
-\begin{equation}
-\begin{array}{lr}
-    \mathit{slow-path} =& n\ \mathit{checks} \\
-&\\
-    \mathit{fast-path} =& 1\ \mathit{check} \\
-     &+ \mathit{bounds}\ \mathit{logic} \\
+However, if the fast-path check fails then you pay for the slow-path as well.
+Therefore, the overall benefit depends on the proportion of successful fast-path checks vs. failures, indeterminate results, and unchecked instructions.
+Assuming successful fast-paths are the common case, this approach provides a significant energy benefit.
+\todomark{Rewrite this as an energy equation? e.g. proportion of success * energy consumed by fast path etc.}
 
-\end{array}
-\end{equation}
+% This shows a clear benefit over per-element checks under two conditions: the fast-path check is usually successful, so the bounds calculation logic uses less energy than $n - 1$ capability checks.
 
-\subsubsection*{Area - Worse or negligible change}
-No matter how you slice it, slow-path circuitry is \emph{always} necessary for a fully conforming implementation.
-If the slow-path is always required, and always takes up area, then adding any circuitry for fast-path must require more area.
-Elements from the slow-path, e.g. capability decoding units, may be shared with the fast-path, and any spare space in a slow-path unit could also be shared with the fast-path, so it may have a \emph{negligible} impact.
-Crucially, adding a fast-path will never \emph{decrease} the area of a conformant design.
 
-\subsubsection*{Throughput - No change}
+% \begin{equation}
+% \begin{array}{lr}
+%     \mathit{slow-path} =& n\ \mathit{checks} \\
+% &\\
+%     \mathit{fast-path} =& 1\ \mathit{check} \\
+%      &+ \mathit{bounds}\ \mathit{logic} \\
+
+% \end{array}
+% \end{equation}
+
+\subsubsection*{Area --- Depends}
+% This depends on the relative area required for bounds calculation, and the number $m$ of parallel bounds checks in the base implementation.
+Slow-path circuitry is \emph{always} necessary for a fully conforming implementation, so the only possible area saving is in removing unnecessary capability-check logic.
+If the base implementation uses $m > 1$ capability checkers in parallel, then using a fast-path reduces that by $m - 1$ checker's worth of area.
+If the area for bounds calculation is smaller than $m - 1$ checkers, then there is a potential area saving.
+
+% No matter how you slice it, slow-path circuitry is \emph{always} necessary for a fully conforming implementation.
+% If the slow-path is always required, and always takes up area, then adding any circuitry for fast-path must require more area.
+% Elements from the slow-path, e.g. capability decoding units, may be shared with the fast-path, and any spare space in a slow-path unit could also be shared with the fast-path, so it may have a \emph{negligible} impact.
+% Crucially, adding a fast-path will never \emph{decrease} the area of a conformant design.
+
+\subsubsection*{Throughput --- No change}
 Assuming the bounds calculations can be pipelined to the same clock speed as a capability check, putting them before a set of pipelined accesses should not affect the throughput of those accesses.
 If the fast-path check is subdivided between different registers in a group, the fast-path check for one register should be performed in parallel with the accesses for other registers for maximum throughput.
 There is currently no reason to believe the bounds calculations have to significantly decrease clock speed or throughput.
 
-\subsubsection*{Latency - Worse}
-% If the actual accesses require some pre-processing, e.g. an implementation decided to calculate all the addresses it would access before actually accessing the
-If the fast-path check could be done in parallel with other memory accesses, then it would not affect latency.
-Unfortunately, performing a memory access without checking if it's allowed first completely undermines the security model!
-Under very particular circumstances, it could be tolerable: if the access is a read with no side-effects, and the read data would be thrown away on a capability violation, and side-channel attacks were impossible (i.e. no caches were present) or ignored, then an unauthorized read out-of-bounds \emph{technically} has no impact on security; but it's implausible that any architect on a CHERI design would accept this.
+\subsubsection*{Latency --- No change or worse}
+If the bounds calculation can be done in parallel with other parts of the fast-path check e.g. capability decoding, then it could be that a complete fast-path check takes as many cycles as a single per-element check.
+In that case, the latency is not affected by using a fast-path check, because it can simply replace the first per-element check.
+If the fast-path check is slower than a per-element check, the latency impact depends on the available parallelism between capability checks and their respective accesses.
 
-Unfortunately, the fast-path check must always block the memory access that depends on it, so the fast-path will always increase latency (unless a separate memory access is performed in parallel).
+In a naive implementation, where the fast-path check has to calculate the bounds and complete before any accesses can be issued, using a fast-path check would incur a higher latency.
+If it's possible to perform capability checks for accesses while they are in-flight\footnote{This runs the risk of e.g. side channel attacks, which would need to be mitigated or ignored.}, then the fast-path access could be done in parallel.
+A completely parallel fast-path check that succeeds would have zero latency cost, but a parallel fast-path failure could require the instruction to restart completely.
+
+\todomark{This hypothesis probably needs a summary}

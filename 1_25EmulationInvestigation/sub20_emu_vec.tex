@@ -32,7 +32,8 @@ Once the archetype is found, supplemental calculations can be performed (e.g. co
 
 \subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
 The initial motivation for this project was investigating the impact of capability checks on performance.
-One approach that we immediately hit upon was the concept of a \enquote{fast-path}, where certain instructions could check their whole access range against a capability immediately rather than check each individual element.
+We investigate an approach using a \enquote{fast-path}, where certain instructions could check their whole access range against a capability immediately rather than check each individual element.
+Other approaches, such as optimizing a parallel checker for $n$ elements, were too hardware-specific and couldn't be modelled in software as well.
 \cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, i.e. the minimum range of bytes that must be accessible, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
 
 The emulator calculates tight bounds for all accesses.
@@ -46,7 +47,7 @@ As noted in \cref{chap:hardware:sec:fastpath}, a fully compliant machine must ch
 If the fast-path check deems it appropriate, the emulator continues execution of the instruction in two phases.
 First, the mapping of vector elements to accessed memory addresses is found.
 The code for this step is independent of the access direction, and an effective description of how each type of access works.
-It and can be found in \todomark{appendix XYZ}.
+It can be found in \todomark{appendix XYZ}.
 The previously computed tight bounds are sanity-checked against these accesses, and the accesses are actually performed.
 
 \subsubsection{Integer vs. Capability encoding mode\label{chap:emu:rvv_int_mode}}
