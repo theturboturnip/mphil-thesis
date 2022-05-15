@@ -1,4 +1,4 @@
-\section{Testing hypotheses}
+\section{Testing hypotheses}\label{chap:software:sec:hypotheses}
 
 \hypsubsection{hyp:sw_vec_legacy}{Compiling legacy code for integer mode}
 
@@ -11,7 +11,7 @@ This is true in theory and (partially) true in practice, with two assumptions:
     \end{itemize}
 \end{itemize}
 
-The CHERI-RVV versions of the vector instructions used in \todoref{chapter hardware} have identical encodings to legacy RVV instructions and function correctly in Integer mode.
+The CHERI-RVV versions of the vector instructions used in \cref{chap:hardware} have identical encodings to legacy RVV instructions and function correctly in Integer mode.
 Not only is it theoretically possible for an RVV program to function correctly with no changes on CHERI-RVV, it should be possible to take a vanilla RVV binary and run it without modification on CHERI-RVV.
 In practice, this depends on compiler support for the three vectorization types in Hybrid compilation mode.
 

@@ -33,7 +33,7 @@ Overall, it seems the key benefit of fast-path checks is power consumption.
 If the fast-path check succeeds, then no power needs to be wasted on capability checks for the remaining cycles of the access.
 If the vector unit has its own dedicated capability check logic, it could even be clock gated to completely eliminate dynamic power.
 This shows a clear benefit as long as the extra logic for bounds calculations uses less power than $n - 1$ capability checks.
-Implementations which use large vectors or make careful use of the simplifications laid out in \todoref{fast-path} should fulfil this condition easily.
+Implementations which use large vectors or make careful use of the simplifications laid out in \cref{chap:hardware:sec:fastpath} should fulfil this condition easily.
 
 \begin{equation}
 \begin{array}{lr}

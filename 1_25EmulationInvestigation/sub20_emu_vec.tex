@@ -2,18 +2,18 @@
 % i.e. using addr, provenance split to write agnostic code?
 
 Vector instructions are executed by a Vector ISA module, which stores all registers and other state.
-\code{VLEN} is hardcoded as 128-bits, and the maximum \code{ELEN} is \todomark{64} 32-bits.
+\code{VLEN} is hardcoded as 128-bits, and the maximum \code{ELEN} is 128-bits\footnote{This is not technically supported by the specification, but is used by capabilities-in-vectors (\cref{chap:capinvec}).}.
 To support both CHERI and non-CHERI execution pointers are separated into an address and a \emph{provenance} - \todomark{short definition of provenance}.
 The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory.
 When using capabilities, provenance is defined in terms of the base register e.g. \enquote{the provenance is provided by capability register X}.
 On non-CHERI platforms, or when emulating a CHERI processor in integer mode\footnote{See \cref{chap:emu:rvv_int_mode} for the reasoning behind this decision.}, the vector unit doesn't check provenance.
 
 Arithmetic and configuration instructions are generally simple to implement, so aren't covered here.
-The emulator splits memory access instructions into three phases: decoding (\todoref{}), fast-path (\todoref{}), and execution (\todoref{}).
-A separate decoding stage may technically not be necessary in hardware (especially the parts checking for errors and reserved instruction encodings, which a hardware platform could simply assume won't happen), but it allows each memory access instruction to be classified into one of the five archetypes outlined in \todoref{chap:bg:sec:rvv:memoryaccessinstrs}.
-It is then easy to define the fast-path and execution phases separately for each archetype, as the hardware would need to do.
+The emulator splits vector memory accesses into three phases: decoding, checking, and execution.
+A separate decoding stage may technically not be necessary in hardware (especially the parts checking for errors and reserved instruction encodings, which a hardware platform could simply assume won't happen), but it allows each memory access instruction to be classified into one of the five archetypes outlined in \cref{chap:bg:sec:rvvmemory}.
+It is then easy to define the checking and execution phases separately for each archetype, as the hardware would need to do.
 
-\subsubsection{Decoding phase}
+\subsubsection{Decoding phase}\label{chap:hardware:subsec:decoding}
 Decoding is split into two steps: finding the encoded \paramt{nf} and \paramt{eew} values, then interpreting them based on the encoded archetype.
 % Vector memory accesses are encoded under the F extension's Load and Store major opcodes, which already encodes an element width.
 Vector memory access instructions are encoded similarly to the F extension's floating-point load/store instructions, which include an ``element width''.
@@ -30,30 +30,27 @@ Once the archetype is found, supplemental calculations can be performed (e.g. co
 \todomark{diagram of floating point ld/st vs. vector ld/st}
 \todomark{Decision tree for operation decoding}
 
-\subsubsection{Fast-path check phase}
-% The emulator performs an initial \enquote{fast-path} capability check by calculating the \enquote{tight bounds} of the access: the minimum range of bytes that must be accessible for the vector memory access to complete successfully.
-
-
+\subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
 The initial motivation for this project was investigating the impact of capability checks on performance.
 One approach that we immediately hit upon was the concept of a \enquote{fast-path}, where certain instructions could check their whole access range against a capability immediately rather than check each individual element.
-\todoref{fast path section} describes methods for calculating the \enquote{tight bounds} for each access type, i.e. the minimum range of bytes that must be accessible, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
+\cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, i.e. the minimum range of bytes that must be accessible, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
 
 The emulator calculates tight bounds for all accesses.
 If this bounds doesn't pass the capability check, the emulator raises an imprecise trap and stops immediately.
 In the case of fault-only-first loads, where synchronous exceptions (e.g. capability checks) are explicitly handled, the access continues regardless and elements are checked individually.
 This is also the expected behaviour if a capability check for \emph{wider} bounds fails.
 The emulator deviates from the spec in that \code{vstart} is \emph{not} set when the tight bounds check fails, as it does not know exactly which element would have triggered the exception.
-As noted in \todoref{fast path section}, a fully compliant machine must check each access to find \code{vstart} in these cases.
+As noted in \cref{chap:hardware:sec:fastpath}, a fully compliant machine must check each access to find \code{vstart} in these cases.
 
-\subsubsection{Execution phase}
+\subsubsection{Execution phase}\label{chap:hardware:subsec:execution}
 If the fast-path check deems it appropriate, the emulator continues execution of the instruction in two phases.
 First, the mapping of vector elements to accessed memory addresses is found.
 The code for this step is independent of the access direction, and an effective description of how each type of access works.
 It and can be found in \todomark{appendix XYZ}.
 The previously computed tight bounds are sanity-checked against these accesses, and the accesses are actually performed.
 
-\subsubsection{Integer vs. capability mode}\label{chap:emu:rvv_int_mode}
-As noted in \todoref{chap:bg:sec:cheri:integer_capability_mode?} CHERI-RISC-V defines two execution modes that the program can switch between.
+\subsubsection{Integer vs. Capability encoding mode\label{chap:emu:rvv_int_mode}}
+As noted in \cref{chap:bg:subsec:cheriencodingmode} CHERI-RISC-V defines two execution modes that the program can switch between.
 In Integer mode \enquote{address operands to existing RISC-V load and store opcodes contain integer addresses} which are implicitly dereferenced relative to the default data capability, and in Capability mode those opcodes are modified to use capability operands.
 Integer mode was included in the interests of maintaining compatibility with legacy code that hasn't been adapted to capabilities.
 As similar vector code may also exist, CHERI-RVV treats vector memory access instructions as \enquote{existing RISC-V load and store opcodes} and requires that they respect integer/capability mode.

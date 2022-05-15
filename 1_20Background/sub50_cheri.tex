@@ -102,7 +102,7 @@ To maintain compatibility with legacy programs that haven't been compiled for CH
     \label{tab:legacy_cheri_instrs}
 \end{table}
 
-\subsection{Capability and Integer encoding mode}
+\subsection{Capability and Integer encoding mode\label{chap:bg:subsec:cheriencodingmode}}
 CHERI-RISC-V specifies two encoding modes, selected using a flag in the PCC \code{flags} field.
 \emph{Capability mode} modifies the behaviour of pre-existing instructions to take address operands as capabilities.
 This makes the basic load/store instruction behaviour exactly equivalent to newly introduced counterparts: e.g. \code{L[BWHD][U] == L[BWHD][U].CAP}.
@@ -123,7 +123,7 @@ This mode allows programs to be gradually ported to CHERI, \todomark{which is im
 This mode emits pre-existing RISC-V instructions that take integer operands, and uses capabilities through the new instructions.
 All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
 
-\subsection{Capability Relocations}
+\subsection{Capability relocations\label{chap:bg:subsec:cherirelocs}}
 \todomark{Summarizes TR-494 Section 4.4, Appx C}
 Binary applications compiled in pure-capability mode require some ``global'' capabilities to exist at startup, e.g. the capability which points to the \code{main()} function.
 It would be a security risk to synthesize these capabilities from thin air, or to allow the binary file itself to contain tag bits.

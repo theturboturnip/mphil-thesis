@@ -53,8 +53,8 @@ Integer addresses were changed to capabilities throughout,
 memory and register file types were changed as described above, and the PCC/DDC were added.
 
 % i.e. doing capability relocation
-The final hurdle was the capability relocations outlined in \todoref{capability relocations}.
+The final hurdle was the capability relocations outlined in \cref{chap:bg:subsec:cherirelocs}.
 Because we're emulating a bare-metal platform, there is no operating system to do this step for us.
 A bare-metal C function has been written to perform the relocations\todocite{https://github.com/CTSRD-CHERI/device-model/blob/master/src/crt_init_globals.c}, which could be compiled into the emulated program.
-However, I was skeptical of how to find the addresses of the generated relocations in C, so I performed the relocations in Rust by examining the compiled ELF file before starting emulation.
+However, I wasn't sure how to find the addresses of the generated relocations in C, so I performed the relocations in Rust by examining the compiled ELF file before starting emulation.
 In future research it should be doable to perform the relocations entirely in bare-metal C.

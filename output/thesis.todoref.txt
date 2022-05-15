@@ -1,31 +1,13 @@
 TODO Refs
-1 - 1_10Introduction/content.tex- Chapter X
-2 - 1_10Introduction/content.tex- Chapter X
-3 - 1_10Introduction/content.tex- Chapter X
-4 - 1_20Background/sub50_cheri.tex- diagram from TR-941?
-5 - 1_25EmulationInvestigation/content.tex- capinvec
-6 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- capability relocations
-7 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
-8 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
-9 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
-10 - 1_25EmulationInvestigation/sub20_emu_vec.tex- chap:bg:sec:rvv:memoryaccessinstrs
-11 - 1_25EmulationInvestigation/sub20_emu_vec.tex- fast path section
-12 - 1_25EmulationInvestigation/sub20_emu_vec.tex- fast path section
-13 - 1_25EmulationInvestigation/sub20_emu_vec.tex- chap:bg:sec:cheri:integer_capability_mode?
-14 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- 
-15 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- 
-16 - 1_25EmulationInvestigation/sub50_hyp.tex- fast-path
-17 - 1_30Software/content.tex- 4.1
-18 - 1_30Software/content.tex- 4.2
-19 - 1_30Software/content.tex- 4.3
-20 - 1_30Software/content.tex- 4.4
-21 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
-22 - 1_30Software/content.tex- Example
-23 - 1_30Software/content.tex- example
-24 - 1_30Software/content.tex- example
-25 - 1_30Software/content.tex- CHERI-agnostic inline assembly
-26 - 1_30Software/content.tex- evaluation
-27 - 1_30Software/content.tex- example
-28 - 1_30Software/content.tex- example of error message
-29 - 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
-30 - 1_30Software/sub50_hyp.tex- chapter hardware
+1 - 1_20Background/sub50_cheri.tex- diagram from TR-941?
+2 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - alignment requirements
+3 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
+4 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
+5 - 1_30Software/content.tex- Example
+6 - 1_30Software/content.tex- example
+7 - 1_30Software/content.tex- example
+8 - 1_30Software/content.tex- CHERI-agnostic inline assembly
+9 - 1_30Software/content.tex- evaluation
+10 - 1_30Software/content.tex- example
+11 - 1_30Software/content.tex- example of error message
+12 - 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
