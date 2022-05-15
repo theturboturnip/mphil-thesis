@@ -14,7 +14,7 @@ Implementations are allowed to handle vector accesses that are not aligned to th
 This support is independent of misaligned scalar access support, so if e.g. misaligned 64-bit scalar accesses are allowed, misaligned vector accesses of 64-bit elements do \emph{not} have to be allowed.
 
 Changing the emulator to allow misaligned accesses of integer data would not have any impact on CHERI correctness.
-Capability loads/stores must be aligned to \code{CLEN}\todocite[\$3.5.2]{TR-951}, and an implementation cannot change this.
+Capability loads/stores must be aligned to \code{CLEN}\cite[Section 3.5.2]{TR-951}, and an implementation cannot change this.
 Writing misaligned integer values across a \code{CLEN} boundary would need to make sure to zero the tag bit on both regions, but this applies to scalar implementations as much as vector ones.
 Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\todoref{capinvec - alignment requirements}).
 

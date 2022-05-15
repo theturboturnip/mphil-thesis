@@ -308,19 +308,6 @@
   file = {/home/samuel/Zotero/storage/3UDDAVJU/riscv-vector.html}
 }
 
-@report{richardsonCompleteSpatialSafety2020,
-  title = {Complete Spatial Safety for {{C}} and {{C}}++ Using {{CHERI}} Capabilities},
-  author = {Richardson, Alexander},
-  date = {2020-06},
-  number = {UCAM-CL-TR-949},
-  pages = {189},
-  institution = {{University of Cambridge, Computer Laboratory}},
-  url = {https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-949.pdf},
-  langid = {english},
-  keywords = {⛔ No DOI found},
-  file = {/home/samuel/Zotero/storage/EDKWFRUY/Richardson - Complete spatial safety for C and C++ using CHERI .pdf}
-}
-
 @misc{RISCVVectorExtension2021,
   title = {{{RISC-V}} "{{V}}" {{Vector Extension}}},
   date = {2021-09-20},
@@ -364,17 +351,32 @@
   file = {/home/samuel/Zotero/storage/2LFA4P6W/Stephens et al. - 2017 - The ARM Scalable Vector Extension.pdf}
 }
 
-@letter{wangLlvmdevLLVMRISCV2021,
-  type = {E-mail},
-  title = {[Llvm-Dev]  {{LLVM}} with {{RISC-V V-extension}} Intrinsic Support},
-  author = {Wang, Kai},
-  date = {2021-05-14},
-  url = {https://lists.llvm.org/pipermail/llvm-dev/2021-May/150592.html},
-  urldate = {2021-11-16},
-  file = {/home/samuel/Zotero/storage/YD5PIJYG/150592.html}
+@report{TR-941,
+  title = {An {{Introduction}} to {{CHERI}}},
+  author = {Watson, Robert N M and Moore, Simon W and Sewell, Peter and Neumann, Peter G},
+  date = {2019-09},
+  number = {UCAM-CL-TR-941},
+  pages = {43},
+  abstract = {CHERI (Capability Hardware Enhanced RISC Instructions) extends conventional processor Instruction-Set Architectures (ISAs) with architectural capabilities to enable fine-grained memory protection and highly scalable software compartmentalization. CHERI’s hybrid capability-system approach allows architectural capabilities to be integrated cleanly with contemporary RISC architectures and microarchitectures, as well as with MMU-based C/C++language software stacks.},
+  langid = {english},
+  keywords = {⛔ No DOI found},
+  file = {/home/samuel/Zotero/storage/6E5CXE26/Watson et al. - An Introduction to CHERI.pdf}
 }
 
-@report{watsonCapabilityHardwareEnhanced2020,
+@report{TR-949,
+  title = {Complete Spatial Safety for {{C}} and {{C}}++ Using {{CHERI}} Capabilities},
+  author = {Richardson, Alexander},
+  date = {2020-06},
+  number = {UCAM-CL-TR-949},
+  pages = {189},
+  institution = {{University of Cambridge, Computer Laboratory}},
+  url = {https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-949.pdf},
+  langid = {english},
+  keywords = {⛔ No DOI found},
+  file = {/home/samuel/Zotero/storage/EDKWFRUY/Richardson - Complete spatial safety for C and C++ using CHERI .pdf}
+}
+
+@report{TR-951,
   title = {Capability {{Hardware Enhanced RISC Instructions}}: {{CHERI Instruction-Set Architecture}} ({{Version}} 8)},
   shorttitle = {Capability {{Hardware Enhanced RISC Instructions}}},
   author = {Watson, Robert N. M. and Neumann, Peter G. and Woodruff, Jonathan and Roe, Michael and Almatary, Hesham and Anderson, Jonathan and Baldwin, John and Barnes, Graeme and Chisnall, David and Clarke, Jessica and Davis, Brooks and Eisen, Lee and Filardo, Nathaniel Wesley and Grisenthwaite, Richard and Joannou, Alexandre and Laurie, Ben and Markettos, A. Theodore and Moore, Simon W. and Murdoch, Steven J. and Nienhuis, Kyndylan and Norton, Robert and Richardson, Alexander and Rugg, Peter and Sewell, Peter and Son, Stacey and Xia, Hongyan},
@@ -387,6 +389,16 @@
   file = {/home/samuel/Zotero/storage/TM8T4CY3/Watson et al. - 2020 - Capability Hardware Enhanced RISC Instructions CH.pdf;/home/samuel/Zotero/storage/VQSYPAPN/UCAM-CL-TR-951.html}
 }
 
+@letter{wangLlvmdevLLVMRISCV2021,
+  type = {E-mail},
+  title = {[Llvm-Dev]  {{LLVM}} with {{RISC-V V-extension}} Intrinsic Support},
+  author = {Wang, Kai},
+  date = {2021-05-14},
+  url = {https://lists.llvm.org/pipermail/llvm-dev/2021-May/150592.html},
+  urldate = {2021-11-16},
+  file = {/home/samuel/Zotero/storage/YD5PIJYG/150592.html}
+}
+
 @article{watsonCHERIHybridCapabilitySystem,
   title = {{{CHERI}}: {{A Hybrid Capability-System Architecture}} for {{Scalable Software Compartmentalization}}},
   author = {Watson, Robert N M and Woodruff, Jonathan and Neumann, Peter G and Moore, Simon W and Anderson, Jonathan and Chisnall, David and Dave, Nirav and Davis, Brooks and Gudka, Khilan and Laurie, Ben and Murdoch, Steven J and Norton, Robert and Roe, Michael and Son, Stacey and Vadera, Munraj},
@@ -395,16 +407,6 @@
   abstract = {CHERI extends a conventional RISC InstructionSet Architecture, compiler, and operating system to support fine-grained, capability-based memory protection to mitigate memory-related vulnerabilities in C-language TCBs. We describe how CHERI capabilities can also underpin a hardware-software object-capability model for application compartmentalization that can mitigate broader classes of attack. Prototyped as an extension to the open-source 64-bit BERI RISC FPGA softcore processor, FreeBSD operating system, and LLVM compiler, we demonstrate multiple orders-of-magnitude improvement in scalability, simplified programmability, and resulting tangible security benefits as compared to compartmentalization based on pure Memory-Management Unit (MMU) designs. We evaluate incrementally deployable CHERI-based compartmentalization using several real-world UNIX libraries and applications.},
   langid = {english},
   file = {/home/samuel/Zotero/storage/24C8EBM9/Watson et al. - CHERI A Hybrid Capability-System Architecture for.pdf}
-}
-
-@article{watsonIntroductionCHERI,
-  title = {An {{Introduction}} to {{CHERI}}},
-  author = {Watson, Robert N M and Moore, Simon W and Sewell, Peter and Neumann, Peter G},
-  pages = {43},
-  abstract = {CHERI (Capability Hardware Enhanced RISC Instructions) extends conventional processor Instruction-Set Architectures (ISAs) with architectural capabilities to enable fine-grained memory protection and highly scalable software compartmentalization. CHERI’s hybrid capability-system approach allows architectural capabilities to be integrated cleanly with contemporary RISC architectures and microarchitectures, as well as with MMU-based C/C++language software stacks.},
-  langid = {english},
-  keywords = {⛔ No DOI found},
-  file = {/home/samuel/Zotero/storage/6E5CXE26/Watson et al. - An Introduction to CHERI.pdf}
 }
 
 @online{williamsSiFiveRemindsEveryone,

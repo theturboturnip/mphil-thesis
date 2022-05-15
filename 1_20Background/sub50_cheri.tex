@@ -11,11 +11,11 @@ A great deal of work has gone into compressing capabilities down into a reasonab
 For example, on 64-bit RISC-V a standard capability is 128-bits long.
 The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
 
-A CHERI implementation has to enforce three security properties about its capabilities\todocite[Section 1.2.1]{TR-951}:
+A CHERI implementation has to enforce three security properties about its capabilities\cite[Section 1.2.1]{TR-951}:
 \begin{itemize}
-    \item Provenance - Capabilities must always be derived from valid manipulations of other capabilities.
-    \item Integrity - Corrupted capabilities cannot be dereferenced.
-    \item Monotonicity - Capabilities cannot increase their rights.
+    \item Provenance --- Capabilities must always be derived from valid manipulations of other capabilities.
+    \item Integrity --- Corrupted capabilities cannot be dereferenced.
+    \item Monotonicity --- Capabilities cannot increase their rights.
 \end{itemize}
 
 Integrity is enforced by tagging registers and memory.
@@ -29,7 +29,7 @@ If an implementation detects a violation of either property, it will zero out th
 Some CHERI-enabled architectures, such as CHERI-RISC-V, also raise a synchronous exception when this occurs.
 
 \subsection{CHERI-RISC-V ISA}
-The Cambridge Computer Lab's TR-951 report\todocite{TR-951} describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V.
+The Cambridge Computer Lab's TR-951 report\cite{TR-951} describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V.
 CHERI-RISC-V is a mostly straightforward set of additions to basic RISC-V ISAs.
 It adds thirty-two general-purpose capability registers, thirty-two Special Capability Registers (SCRs), and many new instructions.
 
@@ -51,7 +51,7 @@ CHERI-RISC-V includes new instructions which use integer addressing, and allows 
 These instructions all use integer addresses relative to the DDC, and the DDC controls the permissions those instructions have.
 
 \subsection{Instruction changes}
-TR-951\todocite[Chapter 8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
+TR-951\cite[Chapter 8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
 Many of the new instructions are unrelated to pre-existing instructions, and implement capability-specific operations like accessing fields of capability registers.
 The most relevant new instructions for our case are the various loads/stores.
 
@@ -124,13 +124,14 @@ This mode emits pre-existing RISC-V instructions that take integer operands, and
 All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
 
 \subsection{Capability relocations\label{chap:bg:subsec:cherirelocs}}
-\todomark{Summarizes TR-494 Section 4.4, Appx C}
+\emph{Summarizes \cite[Section 4.4, Appendix C]{TR-949}}
+
 Binary applications compiled in pure-capability mode require some ``global'' capabilities to exist at startup, e.g. the capability which points to the \code{main()} function.
 It would be a security risk to synthesize these capabilities from thin air, or to allow the binary file itself to contain tag bits.
 
 Instead, CHERI ELF binaries contain a set of requested ``relocations'' (the \code{\_\_cap\_relocs} section) which instruct the runtime environment to create capabilities with specific permissions and bounds in specific places.
 This process uses the normal CHERI capability instructions, so any invalid requests will cause a program crash, maintaining security.
-Further complexity is introduced with dynamic linking, and in the future these relocations may change format, both described in \todocite{TR-494}, but the above description is sufficient to understand the rest of this paper.
+Further complexity is introduced with dynamic linking, and in the future these relocations may change format, both described in \cite{TR-949}, but the above description is sufficient to understand the rest of this paper.
 
 % \subsection{Instruction reference}
 % \todomark{TR-951 contains a complete reference of all added instructions in section blah, and notes legacy instructions modified by capability mode in section blah. Reproduce short list? Do so in appendix?}

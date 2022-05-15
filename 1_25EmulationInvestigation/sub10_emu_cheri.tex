@@ -29,7 +29,7 @@ While this can be resolved through careful examination\footnote{For example, on 
 \todomark{move markdown documentation into rust :)}
 
 The CHERI-RISC-V documentation contains formal specifications of all the new CHERI instructions, expressed in the Sail architecture definition  language\todocite{https://github.com/rems-project/sail}.
-These definitions are used in the CHERI-RISC-V formal model (\todocite{https://github.com/CTSRD-CHERI/sail-cheri-riscv}), and require a few helper functions (see \todocite{TR-951 Ch8.2}).
+These definitions are used in the CHERI-RISC-V formal model (\todocite{https://github.com/CTSRD-CHERI/sail-cheri-riscv}), and require a few helper functions (see \cite[Chapter 8.2]{TR-951}).
 To make it easier to port the formal definitions directly into the emulator the \code{rust-cheri-compressed-cap} library also provides those helper functions through a wrapper trait.
 
 \todomark{documentation is available on a github.io, not crates.io yet because I don't have access to CSTRD-CHERI and they'd likely want to host it}
