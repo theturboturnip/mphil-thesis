@@ -6,47 +6,55 @@ TODOs
 5 - 1_10Introduction/content.tex- fill out this para more, have an actual end sentence
 6 - 1_20Background/sub10_riscv.tex- example of a architecture/feature string
 7 - 1_20Background/sub30_rvv_model.tex- examples
-8 - 1_20Background/sub50_cheri.tex- diagram for split/merged register file?
-9 - 1_20Background/sub50_cheri.tex- is there rationale for that documented somewhere?
-10 - 1_20Background/sub50_cheri.tex- which is important in ways I am too tired to express
-11 - 1_20Background/sub50_cheri.tex- Summarizes TR-494 Section 4.4, Appx C
-12 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- table of relevant structures/functions?
-13 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- C code wasn't documented, Rust is
-14 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- move markdown documentation into rust :)
-15 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- documentation is available on a github.io, not crates.io yet because I don't have access to CSTRD-CHERI and they'd likely want to host it
-16 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
-17 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
-18 - 1_25EmulationInvestigation/sub20_emu_vec.tex- short definition of provenance
-19 - 1_25EmulationInvestigation/sub20_emu_vec.tex- diagram of floating point ld/st vs. vector ld/st
-20 - 1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
-21 - 1_25EmulationInvestigation/sub20_emu_vec.tex- appendix XYZ
-22 - 1_25EmulationInvestigation/sub30_fast_path.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
-23 - 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: Likely-Failure else: FAILURE
-24 - 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range isn't calculated: Unchecked
-25 - 1_25EmulationInvestigation/sub30_fast_path.tex- Put the above into an algorithm format
-26 - 1_25EmulationInvestigation/sub30_fast_path.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
-27 - 1_25EmulationInvestigation/sub30_fast_path.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
-28 - 1_25EmulationInvestigation/sub50_hyp.tex- In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is
-29 - 1_25EmulationInvestigation/sub50_hyp.tex- Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.
-30 - 1_25EmulationInvestigation/content.tex- where to note that capability checks count as a synchronous exception? centralized point for "here are the differences between RVV and CHERI-RVV?
-31 - 1_25EmulationInvestigation/content.tex- I wrote a type-safe wrapper for capabilities
-32 - 1_30Software/content.tex- is it called that?
-33 - 1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
-34 - 1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
-35 - 1_30Software/content.tex- Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V
-36 - 1_30Software/content.tex- the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory
-37 - 1_30Software/content.tex- Beautify this table
-38 - 1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
-39 - 1_30Software/content.tex- Appendix on how this was done?
-40 - 1_30Software/content.tex- Example
-41 - 1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
-42 - 1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
-43 - 1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
-44 - 1_50Evaluation/content.tex- Summarize hypotheses outcomes
-45 - 1_50Evaluation/content.tex- Summarize results
-46 - 1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
-47 - 2_1Appendix/building_riscv_v_gnu.tex- verify - do a fresh clone and see
-48 - 2_1Appendix/building_riscv_v_gnu.tex- Example
-49 - 2_1Appendix/building_riscv_v_gnu.tex- clone submodules (macOS guy turns off SSL for this?)
-50 - 2_1Appendix/building_riscv_v_gnu.tex- Configure with as many risc-v exts as possible
-51 - 2_1Appendix/building_riscv_v_gnu.tex- Does RISC-V GCC 10.2 support vector intrinsics if you compile with v?
+8 - 1_20Background/sub50_cheri.tex- add diagram from TR-941?
+9 - 1_20Background/sub50_cheri.tex- diagram for split/merged register file?
+10 - 1_20Background/sub50_cheri.tex- is there rationale for that documented somewhere?
+11 - 1_20Background/sub50_cheri.tex- which is important in ways I am too tired to express
+12 - 1_20Background/sub50_cheri.tex- Summarizes TR-494 Section 4.4, Appx C
+13 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- table of relevant structures/functions?
+14 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- C code wasn't documented, Rust is
+15 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- move markdown documentation into rust :)
+16 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- documentation is available on a github.io, not crates.io yet because I don't have access to CSTRD-CHERI and they'd likely want to host it
+17 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
+18 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
+19 - 1_25EmulationInvestigation/sub20_emu_vec.tex- short definition of provenance
+20 - 1_25EmulationInvestigation/sub20_emu_vec.tex- diagram of floating point ld/st vs. vector ld/st
+21 - 1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
+22 - 1_25EmulationInvestigation/sub20_emu_vec.tex- appendix XYZ
+23 - 1_25EmulationInvestigation/sub30_fast_path.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
+24 - 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: Likely-Failure else: FAILURE
+25 - 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range isn't calculated: Unchecked
+26 - 1_25EmulationInvestigation/sub30_fast_path.tex- Put the above into an algorithm format
+27 - 1_25EmulationInvestigation/sub30_fast_path.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
+28 - 1_25EmulationInvestigation/sub30_fast_path.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
+29 - 1_25EmulationInvestigation/sub50_hyp.tex- In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is
+30 - 1_25EmulationInvestigation/sub50_hyp.tex- Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.
+31 - 1_25EmulationInvestigation/content.tex- where to note that capability checks count as a synchronous exception? centralized point for "here are the differences between RVV and CHERI-RVV?
+32 - 1_25EmulationInvestigation/content.tex- I wrote a type-safe wrapper for capabilities
+33 - 1_30Software/content.tex- is it called that?
+34 - 1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
+35 - 1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
+36 - 1_30Software/content.tex- Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V
+37 - 1_30Software/content.tex- example
+38 - 1_30Software/content.tex- the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory
+39 - 1_30Software/content.tex- example
+40 - 1_30Software/content.tex- example
+41 - 1_30Software/content.tex- example of CHERI-agnostic inline assembly
+42 - 1_30Software/content.tex- Beautify this table
+43 - 1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
+44 - 1_30Software/content.tex- Appendix on how this was done?
+45 - 1_30Software/content.tex- Example
+46 - 1_30Software/content.tex- example
+47 - 1_30Software/content.tex- example of error message?
+48 - 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
+49 - 1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
+50 - 1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
+51 - 1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
+52 - 1_50Evaluation/content.tex- Summarize hypotheses outcomes
+53 - 1_50Evaluation/content.tex- Summarize results
+54 - 1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
+55 - 2_1Appendix/building_riscv_v_gnu.tex- verify - do a fresh clone and see
+56 - 2_1Appendix/building_riscv_v_gnu.tex- Example
+57 - 2_1Appendix/building_riscv_v_gnu.tex- clone submodules (macOS guy turns off SSL for this?)
+58 - 2_1Appendix/building_riscv_v_gnu.tex- Configure with as many risc-v exts as possible
+59 - 2_1Appendix/building_riscv_v_gnu.tex- Does RISC-V GCC 10.2 support vector intrinsics if you compile with v?

@@ -1,13 +1,4 @@
 TODO Refs
-1 - 1_20Background/sub50_cheri.tex- diagram from TR-941?
-2 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - alignment requirements
-3 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
-4 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
-5 - 1_30Software/content.tex- Example
-6 - 1_30Software/content.tex- example
-7 - 1_30Software/content.tex- example
-8 - 1_30Software/content.tex- CHERI-agnostic inline assembly
-9 - 1_30Software/content.tex- evaluation
-10 - 1_30Software/content.tex- example
-11 - 1_30Software/content.tex- example of error message
-12 - 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
+1 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - alignment requirements
+2 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
+3 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy

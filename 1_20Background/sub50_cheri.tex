@@ -7,7 +7,7 @@ The above statement is enough to understand what capabilities contain\footnote{T
     \item The \emph{cursor}, i.e. the address it currently points to
     \item The \emph{bounds}, i.e. the range of addresses this capability could point to
 \end{itemize}
-A great deal of work has gone into compressing capabilities down into a reasonable size (see \cite{woodruffCHERIConcentratePractical2019}, \todoref{diagram from TR-941?}), and using the magic of floating-point all of this data has been reduced to just 2x the architectural register size.
+A great deal of work has gone into compressing capabilities down into a reasonable size (see \cite{woodruffCHERIConcentratePractical2019}, \todomark{add diagram from TR-941?}), and using the magic of floating-point all of this data has been reduced to just 2x the architectural register size.
 For example, on 64-bit RISC-V a standard capability is 128-bits long.
 The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
 

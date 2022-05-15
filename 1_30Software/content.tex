@@ -74,7 +74,7 @@ The compiler still has to interpret the instruction and understand it correctly,
 Inline assembly can interact with C code and variables through a template syntax.
 The programmer inserts a placeholder in the assembly code with a corresponding expression, noting how the expression is stored using a \enquote{constraint}.
 For our purposes, constraints enforce that a value is either in a register or in memory (see \cref{tab:inline_asm_constraint}).
-As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todoref{Example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
+As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todomark{example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
 
 Using the constraint, the compiler determines how the expression's value is stored, and inserts a reference to it in the assembly string.
 Because this is done before the assembly string is parsed, and isn't immediately type-checked against the assembly instruction, it can lead to some difficult errors.
@@ -82,12 +82,12 @@ Because this is done before the assembly string is parsed, and isn't immediately
 Clang and GCC support inline assembly for RVV quite well, and even allows the intrinsic vector types to be referenced by assembly templates (thus making the compiler do register allocation instead of the programmer).
 The only caveat is that \emph{memory} constraints are not supported by RVV memory accesses.
 None of the vector memory access instructions support address offsets, unlike their scalar counterparts.
-Clang always treats the \emph{memory} constraint as an offset access, even when that offset is zero, so it adds an offset to the assembly string \todoref{example}, making it invalid.
-To get around this, one must use the pointer itself with a \emph{register} constraint - effectively saying \enquote{find the register this pointer is in, and use that as the base address for the memory access} \todoref{example}.
-On CHERI platforms, because pointers must be stored in capability registers, the \emph{capability register} constraint must be used instead (see \todoref{CHERI-agnostic inline assembly}).
+Clang always treats the \emph{memory} constraint as an offset access, even when that offset is zero, so it adds an offset to the assembly string \todomark{example}, making it invalid.
+To get around this, one must use the pointer itself with a \emph{register} constraint - effectively saying \enquote{find the register this pointer is in, and use that as the base address for the memory access} \todomark{example}.
+On CHERI platforms, because pointers must be stored in capability registers, the \emph{capability register} constraint must be used instead (see \todomark{example of CHERI-agnostic inline assembly}).
 
 Broadly speaking, inline assembly supports more RVV instructions than intrinsics do.
-It is used extensively in the testbench code for the evaluation (\todoref{evaluation}) alongside intrinsics where possible.
+It is used extensively in the testbench code for the evaluation (\cref{chap:eval}) alongside intrinsics where possible.
 
 % the compiler determines where the value of the expression is/should be stored, and inserts a reference to that location in the assembly string.
 % The programmer may also control where the expression is stored by setting a \enquote{constraint}.
@@ -193,15 +193,15 @@ As noted in \cref{chap:emu:rvv_int_mode} CHERI-RVV requires the vector memory ac
 \todomark{Appendix on how this was done?}
 With the above changes, inline assembly could be used to insert capability-enabled vector instructions\todomark{Example}.
 However, as this requires using a capability register constraint for the base address, inline assembly code written for CHERI-RVV is not inherently compatible with vanilla RVV.
-For un-annotated pointers (e.g. \code{int*}), which are only capabilities in pure-capability code and integers in legacy or hybrid code, a conditional macro can be used to insert the correct constraint: \todoref{example}.
+For un-annotated pointers (e.g. \code{int*}), which are only capabilities in pure-capability code and integers in legacy or hybrid code, a conditional macro can be used to insert the correct constraint: \todomark{example}.
 However, this falls apart in hybrid code for manually annotated pointers (e.g. \code{int* \_\_capability}) because the macro cannot detect the annotation.
 
 
 \subsection{Adapting vector intrinsics to CHERI}
 Vector intrinsics are another story entirely.
-When compiling for pure-capability libraries, all attempts to use vector intrinsics crash CHERI-Clang \todoref{example of error message}.
+When compiling for pure-capability libraries, all attempts to use vector intrinsics crash CHERI-Clang \todomark{example of error message?}.
 This is due to a similar issue to inline assembly: the intrinsics (both the Clang intrinsic functions and the underlying LLVM IR intrinsics) were designed to take regular pointers and cannot handle it when capabilities are used instead.
-\todoref{Appendix which covers what I know so far about this problem?}
+\todomark{Appendix which covers what I know so far about this problem?}
 Unfortunately the code for generating the intrinsics on both levels is spread across many files, and there's no simple way to change the associated pointer type (much less changing it for pure capability vs. hybrid mode).
 
 It seems that significant compiler development work is required to bring vector intrinsics up to scratch on CHERI-Clang.
