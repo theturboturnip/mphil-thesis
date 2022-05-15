@@ -6,8 +6,8 @@ TODO Citations
 5 - 1_10Introduction/content.tex- https://github.com/bminor/glibc/blob/master/sysdeps/x86_64/multiarch/ifunc-memmove.h
 6 - 1_10Introduction/content.tex- https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions
 7 - 1_10Introduction/content.tex- cheri risc-v page?
-8 - 1_20Background/content.tex- 
-9 - 1_20Background/content.tex- , Sections 1-9, 17
+8 - 1_20Background/content.tex- riscv spec
+9 - 1_20Background/content.tex- rvv spec, Sections 1--9, 17
 10 - 1_20Background/content.tex- TR-951, Chapters 5, 8
 11 - 1_20Background/content.tex- TR-949, Section 4.4, Appendix C
 12 - 1_20Background/sub30_rvv_model.tex- risc-v privileged spec, Section 3.1.21

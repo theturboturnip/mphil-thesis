@@ -13,7 +13,7 @@ RVV also adds some state that defines how the vector registers are used (see \cr
 These are stored in RISC-V Control and Status Registers (CSRs), which the program can read.
 \code{vtype} (\cref{chap:bg:subsec:vtype}) defines how the vector registers are split into elements.
 \code{vstart} and \code{vl} (\cref{chap:bg:subsec:vlvstart}) divides the elements into three disjoint subsets: \emph{prestart}, the \emph{body}, and the \emph{tail}.
-Masked accesses (\cref{chap:bg:sec:rvv:masking}) further divide the \emph{body} into \emph{active} and \emph{inactive} elements.
+Masked accesses (\cref{chap:bg:subsec:rvvmasking}) further divide the \emph{body} into \emph{active} and \emph{inactive} elements.
 This section also describes the vector exception model (\cref{chap:bg:subsec:vexceptions}).
 
 %---------------------------------
@@ -51,7 +51,7 @@ These are designed for a ``stripmining'' paradigm, where each iteration of a loo
 This value is saved in a register for the program to use, and also saved in the internal \code{vl} CSR.
 
 %---------------------------------
-\subsection{\code{vl} and \code{vstart}}\label{chap:bg:subsec:vlvstart}
+\subsection{\code{vl} and \code{vstart} --- Prestart, body, tail}\label{chap:bg:subsec:vlvstart}
 The first CSR is the Vector Length \code{vl}, which holds the number of elements that could be updated from a vector instruction.
 The program updates this value through fault-only-first loads (\cref{chap:bg:sec:rvv:fof}) and more commonly \code{vsetvl} instructions.
 
@@ -74,7 +74,7 @@ The specification gives an example where a vector implementation never takes int
 
 \figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
 %---------------------------------
-\subsection{Masking - Active/inactive elements}\label{chap:bg:subsec:masking}
+\subsection{Masking --- Active/inactive elements}\label{chap:bg:subsec:rvvmasking}
 Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV_mask_example}).
 When masking is enabled, register \code{v0} acts as the `mask register', where each bit corresponds to an element in the vector\footnote{A single vector register will always have enough bits for all elements. The maximum element count is found when SEW is minimized (8 bits) and LMUL is maximized (8 registers), and is equal to \code{VLEN * LMUL / SEW = VLEN * 8 / 8 = VLEN}.}.
 If the mask bit is 0, that element is \emph{active} and will be used as normal.

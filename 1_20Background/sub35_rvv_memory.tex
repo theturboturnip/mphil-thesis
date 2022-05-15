@@ -249,7 +249,7 @@ Ordering and exception handling are identical to unit-stride accesses (\cref{cha
 Moves the contents of a mask register to/from a contiguous range of memory.
 This instruction transfers at least \code{vl} bits,
 one bit for each element that could be used in subsequent vector instructions.
-This will always fit in a single vector register (see \cref{chap:bg:sec:rvv:masking}), hence \code{EMUL = 1} in all cases.
+This will always fit in a single vector register (see \cref{chap:bg:subsec:rvvmasking}), hence \code{EMUL = 1} in all cases.
 \begin{itemize}
     \item This instruction always operates as if the tail-agnostic setting of \code{vtype} is true.
     \item This instruction doesn't support segmented access.

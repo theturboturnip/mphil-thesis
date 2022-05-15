@@ -73,7 +73,7 @@ The compiler still has to interpret the instruction and understand it correctly,
 
 Inline assembly can interact with C code and variables through a template syntax.
 The programmer inserts a placeholder in the assembly code with a corresponding expression, noting how the expression is stored using a \enquote{constraint}.
-For our purposes, constraints enforce that a value is either in a register or in memory (see \cref{tab:inline_asm_constraint}).
+For our purposes, constraints enforce that a value is either in a register or in memory (see \cref{tab:inline_asm_constraints}).
 As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todomark{example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
 
 Using the constraint, the compiler determines how the expression's value is stored, and inserts a reference to it in the assembly string.
