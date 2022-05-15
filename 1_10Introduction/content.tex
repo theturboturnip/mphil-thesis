@@ -31,7 +31,7 @@ However, before computing arithmetic, the vectors must be populated with data.
 % \todomark{vectorized memory accesses required for vectorized arithmetic}
 Modern vector implementations all provide vector load/store instructions to access a whole vector's worth of memory.
 These range from simple contiguous accesses (where all elements are next to each other), to complex indexed accesses (where each element loads from a different location based on another vector).
-They can also have per-element semantics, e.g. ``elements must be loaded in order, so if one element fails the preceding elements are still valid''\todocite{RISC-V V fault-only-first}.
+They can also have per-element semantics, e.g. ``elements must be loaded in order, so if one element fails the preceding elements are still valid''\cite[Section 7.7]{specification-RVV-v1.0}.
 % \todomark{Necessary for CHERI support in order for CHERI performance to be competitive}
 If CHERI CPUs want to benefit from vector processing's increased performance and throughput, they must support those instructions at some level.
 But adding CHERI's bounds-checking to the mix may affect these semantics, and could impact performance (e.g. checking each element's access in turn may be slow).
@@ -59,7 +59,7 @@ This may require more guarantees than otherwise necessary - for example, each ve
 To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \cite{specification-RVV-v1.0}).
 As of November 2021 this has been ratified by RISC-V International\footnote{\url{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}}, and will be RISC-V's standard vector instruction set moving forward.
 Choosing it has two key benefits.
-Firstly, the CHERI project maintains three open-source cores (Piccolo, Flute, and Tooba\todocite{cheri risc-v page?}) implementing CHERI-RISC-V, none of which support vector processing.
+Firstly, the CHERI project maintains three open-source cores implementing CHERI-RISC-V\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}, none of which support vector processing.
 Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for these cores.
 Secondly, RVV is a \emph{scalable} vector model.
 This has more potential roadblocks than a fixed-length vector model, and investigating them here will make life easier if Arm wish to integrate their Scalable Vector Extension with CHERI later down the road.
@@ -96,7 +96,7 @@ The goal of this project is to investigate the impact of, and the roadblocks for
 In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
 
 The investigation was carried out by designing and testing a CHERI-RVV emulator written in Rust, but that is only a single implementation.
-To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to prove \todomark{five} hypotheses (\cref{tab:hypotheses}).
+To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to prove \todomark{nine} hypotheses (\cref{tab:hypotheses}).
 \cref{hyp:hw_cap_as_vec_mem_ref,hyp:hw_cap_bounds_checks_amortized} take the point of view of the hardware, considering basic feasibility and potential performance issues.
 \cref{hyp:sw_vec_legacy,hyp:sw_pure_compat,hyp:sw_stack_vectors,hyp:sw_multiproc} examine the current CHERI-RVV software stack, checking if adding CHERI to vector programs causes compatibility problems.
 \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} considers capabilities-in-vectors: the conditions under which vector registers can hold capabilities, and the conditions under which vectorized memory accesses and other instructions can manipulate them.

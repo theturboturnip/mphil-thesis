@@ -22,7 +22,8 @@ For example, the 64-bit capability structure holds a 32-bit address value, and t
 128-bit capabilities can cover a 64-bit address range, and thus can have a length of $2^{64}$.
 Storing this length requires 65-bits, so all math in \code{cheri\_compressed\_cap\_common.h} uses 128-bit length values.
 C doesn't have any standardized 128-bit types, but GCC and LLVM provide so-called ``extension types'' which are used instead.
-However, the x86-64 ABI doesn't define any rules for how 128-bit values must be stored or passed as arguments\todocite{x86-64 ABI rules}, which causes great pain to anyone who needs to pass them across a language boundary.
+Although the x86-64 ABI does specify how 128-bit values should be stored and passed as arguments\cite{specification-x86-psABI-v1.0}, these rules do not seem consistently applied\footnote{See \url{https://godbolt.org/z/qj43jssr6} for an example.}.
+This causes great pain to anyone who needs to pass them across a language boundary.
 
 Rust explicitly warns against passing 128-bit values across FFI, and the Clang User's Manual even states that passing \code{i128} by value is incompatible with the Microsoft x64 calling convention\footnote{\gitfile[release/13.x]{clang/docs/UsersManual.rst:3384}{llvm/llvm-project}{https://github.com/llvm/llvm-project/blob/release/13.x/clang/docs/UsersManual.rst\#x86}}.
 This could be resolved through careful examination: for example, on LLVM 128-bit values are passed to functions in two 64-bit registers\footnote{\gitfile[release/13.x]{clang/lib/CodeGen/TargetInfo.cpp:2811}{llvm/llvm-project}{https://github.com/llvm/llvm-project/blob/75e33f71c2dae584b13a7d1186ae0a038ba98838/clang/lib/CodeGen/TargetInfo.cpp\#L2811}}, which could be replicated in Rust by passing two 64-bit values.

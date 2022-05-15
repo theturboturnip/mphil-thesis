@@ -114,7 +114,7 @@ This makes the basic load/store instruction behaviour exactly equivalent to newl
 The new instructions may still be used to dereference and inspect capability registers, but all other instructions access registers in an integer context i.e. ignoring the upper bits and tag from merged register files.
 
 \subsection{Pure-capability and Hybrid compilation modes}
-CHERI's de facto compiler, CHERI-Clang\todocite{}, supports two ways to compile CHERI-RISC-V which map to the different encoding modes.
+CHERI-Clang\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-llvm.html}}, the main CHERI-enabled compiler, supports two ways to compile CHERI-RISC-V which map to the different encoding modes.
 
 \emph{Pure-capability} mode treats all pointers as capabilities, and emits pre-existing RISC-V instructions that expect to be run in capability mode\footnote{This wasn't derived from documentation, but instead from manual inspection of emitted code.}.
 

@@ -2,28 +2,6 @@ TODO Citations
 1
 1_10Introduction/content.tex- something something heartbleed?
 2
-1_10Introduction/content.tex- RISC-V V fault-only-first
-3
-1_10Introduction/content.tex- cheri risc-v page?
-4
-1_20Background/sub50_cheri.tex- 
-5
-1_25EmulationInvestigation/sub10_emu_cheri.tex- x86-64 ABI rules
-6
-1_25EmulationInvestigation/sub50_hyp.tex- There's definitely an Arm CHERI v8 document somewhere
-7
-1_25EmulationInvestigation/sub50_hyp.tex- https://developer.arm.com/documentation/100891/0612/coding-considerations/using-sve-intrinsics-directly-in-your-c-code
-8
-1_30Software/content.tex- https://gcc.gnu.org/projects/tree-ssa/vectorization.html
-9
-1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
-10
-1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
-11
-1_30Software/content.tex- \url {https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}
-12
-1_30Software/content.tex- LLVM IR pass investigated in TR-949 \$3.8.2, couldn't find earlier reference to it
-13
 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscv-collab/riscv-gcc/issues/323
-14
-2_1Appendix/building_riscv_v_gnu.tex- maxOS GCC instructions
+3
+2_1Appendix/building_riscv_v_gnu.tex- macOS GCC instructions

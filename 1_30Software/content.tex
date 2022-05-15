@@ -40,7 +40,7 @@ See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and b
 \todomark{Figure page showing generated ASM for increment loop - see godbolt links MD}
 Compilers with auto-vectorization can automatically create vectorized code from a scalar program.
 For example, a scalar loop over an array that increments each element could be converted to a vectorized loop that increments multiple elements at once.
-Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007 \todocite{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}).
+Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007\footnote{\url{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}}).
 Currently there is no support for RVV auto-vectorization in Clang or GCC.
 Both compilers have support for Arm SVE auto-vectorization, explored further in \cref{chap:soft:compiling:armsve}.
 
@@ -97,7 +97,7 @@ It is used extensively in the testbench code for the evaluation (\cref{chap:eval
         "C" & Store in a capability register (CHERI-Clang only) \\
         "m" & Store in memory \\
     \end{tabular}
-    \caption{Inline assembly constraints \todocite{\url{https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}}}
+    \caption{Inline assembly constraints\cite[Section 6.47.2]{UsingGNUCompiler2022}}
     \label{tab:inline_asm_constraints}
     \todomark{Beautify this table}
 \end{table}
@@ -106,8 +106,8 @@ It is used extensively in the testbench code for the evaluation (\cref{chap:eval
 \emph{Summarizes \cite{armltdArmCompilerScalable2019}}
 
 Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\cite{stephensARMScalableVector2017}.
-Arm have released a C language extension to support SVE development (\cite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\todocite{\url{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
-It supports all of the previously examined vectorization types.
+Arm have released a C language extension to support SVE development (\cite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
+They support all of the previously examined vectorization types.
 
 Auto-vectorization is supported, and the main focus of the user guide is helping the compiler decide whether to auto-vectorize \cite{armltdArmCompilerScalable2019}.
 Intrinsics are also supported, and seem to cover all of the SVE instructions, but take a slightly different approach to RVV.
@@ -224,7 +224,7 @@ These possibilities are investigated further in the next section.
 
 \todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
 
-\todocite{LLVM IR pass investigated in TR-949 \$3.8.2, couldn't find earlier reference to it}
+\todomark{LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere}
 
 \pagebreak
 \input{1_30Software/sub50_hyp}

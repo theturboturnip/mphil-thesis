@@ -6,7 +6,7 @@ thesis.tex- My acknowledgements ...
 3
 1_10Introduction/content.tex- explain Scalable vectors
 4
-1_10Introduction/content.tex- five
+1_10Introduction/content.tex- nine
 5
 1_10Introduction/content.tex- fill out this para more, have an actual end sentence
 6
@@ -100,18 +100,20 @@ thesis.tex- My acknowledgements ...
 50
 1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
 51
-1_50Evaluation/content.tex- Summarize hypotheses outcomes
+1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
 52
-1_50Evaluation/content.tex- Summarize results
+1_50Evaluation/content.tex- Summarize hypotheses outcomes
 53
-1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
+1_50Evaluation/content.tex- Summarize results
 54
-2_1Appendix/building_riscv_v_gnu.tex- verify - do a fresh clone and see
+1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
 55
-2_1Appendix/building_riscv_v_gnu.tex- Example
+2_1Appendix/building_riscv_v_gnu.tex- verify - do a fresh clone and see
 56
-2_1Appendix/building_riscv_v_gnu.tex- clone submodules (macOS guy turns off SSL for this?)
+2_1Appendix/building_riscv_v_gnu.tex- Example
 57
-2_1Appendix/building_riscv_v_gnu.tex- Configure with as many risc-v exts as possible
+2_1Appendix/building_riscv_v_gnu.tex- clone submodules (macOS guy turns off SSL for this?)
 58
+2_1Appendix/building_riscv_v_gnu.tex- Configure with as many risc-v exts as possible
+59
 2_1Appendix/building_riscv_v_gnu.tex- Does RISC-V GCC 10.2 support vector intrinsics if you compile with v?
