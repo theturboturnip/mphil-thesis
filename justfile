@@ -3,6 +3,9 @@ build-thesis:
     @# Run latexmk on just this thesis
     latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
+count:
+    texcount -1 -sum -merge -q chapters.tex
+
 clean:
     latexmk -lualatex ./thesis.tex -outdir=./output/ -c
 
