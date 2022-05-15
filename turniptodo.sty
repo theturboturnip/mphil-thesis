@@ -1,4 +1,4 @@
-\ProvidesPackage{turniptodo}[2022/01/16]
+\ProvidesPackage{turniptodo}[2022/05/15]
 
 % For macro help
 \RequirePackage{etoolbox}
@@ -114,24 +114,28 @@
     
     \@maketodostream{todopending}{Future TODOs}
     \apptocmd{\todopending}{%
-        \addtostream{@todopending}{\arabic{todopendingi} - \currfilepath - \unexpanded{#1}}%
+        \addtostream{@todopending}{\arabic{todopendingi}}%
+        \addtostream{@todopending}{\currfilepath - \unexpanded{#1}}%
     }{}{}
     
     \@maketodostream{todomark}{TODOs}
     \apptocmd{\todomark}{%
-        \addtostream{@todomark}{\arabic{todomarki} - \currfilepath - \unexpanded{#1}}%
+        \addtostream{@todomark}{\arabic{todomarki}}%
+        \addtostream{@todomark}{\currfilepath - \unexpanded{#1}}%
     }{}{}
     
     \@maketodostream{todocite}{TODO Citations}
     \xapptocmd{\todocite}{%
-        \addtostream{@todocite}{\arabic{todocitei} - \currfilepath - \unexpanded{#2}%
+        \addtostream{@todocite}{\arabic{todocitei}}%
+        \addtostream{@todocite}{\currfilepath - \unexpanded{#2}%
         \ifstrempty{#1}{}{, \unexpanded{#1}}%
         }%
     }{}{}
     
     \@maketodostream{todoref}{TODO Refs}
     \apptocmd{\todoref}{%
-        \addtostream{@todoref}{\arabic{todorefi} - \currfilepath - \unexpanded{#1}}%
+        \addtostream{@todoref}{\arabic{todorefi}}
+        \addtostream{@todoref}{\currfilepath - \unexpanded{#1}}%
     }{}{}
 \fi
 

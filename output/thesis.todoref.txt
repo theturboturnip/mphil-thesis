@@ -1,4 +1,7 @@
 TODO Refs
-1 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - alignment requirements
-2 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
-3 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
+1
+1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - alignment requirements
+2
+1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
+3
+1_30Software/content.tex- bit from testing where we talk about GCC being iffy
