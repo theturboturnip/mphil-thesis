@@ -227,3 +227,16 @@ end
 \RequirePackage{booktabs}
 
 \usepackage{parnotes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% git file ref
+
+% Arg 1: file:line
+% Arg 2: repository
+% Arg 3: permalink
+\newcommand{\gitfile}[3]{\href{#3}{\texttt{#1} in \texttt{#2} on GitHub}}
+
+% Arg 1 [optional]: branch
+% Arg 2: repository
+% Arg 3: link
+\newcommand{\gitrepo}[3][]{\href{#3}{\texttt{#2}\ifstrempty{#1}{}{ (branch \texttt{#1})} on Github}}

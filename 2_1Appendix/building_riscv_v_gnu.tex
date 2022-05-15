@@ -1,6 +1,6 @@
 \chapter{Building the \code{riscv-gnu-toolchain} with vector support}\label{appx:building_rvv_gcc_toolchain}
 
-As of May 2022, the RISC-V GNU toolchain (currently located at \url{https://github.com/riscv-collab/riscv-gnu-toolchain/}) does not support the vector extension or it's intrinsics.
+As of May 2022, the RISC-V GNU toolchain (hosted as \gitrepo{riscv-collab/riscv-gnu-toolchain}{https://github.com/riscv-collab/riscv-gnu-toolchain/}) does not support the vector extension or it's intrinsics.
 \todomark{verify - do a fresh clone and see}
 The \code{rvv-intrinsic} branch of this repository claims to support vector intrinsics, but is slightly outdated.
 It references a repository for \code{glibc} that no longer exists as a submodule, which makes compilation impossible.
@@ -8,7 +8,7 @@ It references a repository for \code{glibc} that no longer exists as a submodule
 To build the full toolchain with intrinsic support, perform the following steps (derived by the author independently, then amended based on macOS instructions from \todocite{https://github.com/riscv-collab/riscv-gcc/issues/323}):
 \begin{enumerate}
     \item Clone the repository as usual, \emph{without} cloning any submodules.
-    \item Change the \code{.gitmodules} file to point the \code{"riscv-glibc"} submodule at the upstream \code{glibc} repository \url{https://sourceware.org/git/?p=glibc.git}, which hosts the RISC-V version as of 19 March 2021\todocite{https://github.com/riscvarchive/riscv-glibc/tree/archive-notify}.
+    \item Change the \code{.gitmodules} file to point the \code{riscv-glibc} submodule at the upstream \code{glibc} repository \url{https://sourceware.org/git/?p=glibc.git}, which hosts the RISC-V version as of 19 March 2021\footnote{\gitrepo[archive-notify]{riscvarchive/riscv-glibc}{https://github.com/riscvarchive/riscv-glibc/tree/archive-notify}}.
     
     \todomark{Example}
     \begin{itemize}
