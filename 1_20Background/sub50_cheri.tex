@@ -58,6 +58,7 @@ The most relevant new instructions for our case are the various loads/stores.
 CHERI-RISC-V adds new instructions for loading integer and capability data, either via capabilities or using integer addressing through the DDC (\cref{tab:new_cheri_instrs}).
 These instructions are slightly more limited than the pre-existing counterparts, because they do not support immediate offsets. \todomark{is there rationale for that documented somewhere?}
 To maintain compatibility with legacy programs that haven't been compiled for CHERI-RISC-V, the behaviour of basic RISC-V load/store opcodes changes to either use capabilities as memory references or use integer addressing via the DDC, depending on the encoding mode.
+If any instruction tries to dereference an invalid capability, it raises a synchronous exception.
 
 \begin{table}[h]
     \centering
@@ -119,9 +120,11 @@ CHERI-Clang\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri
 \emph{Pure-capability} mode treats all pointers as capabilities, and emits pre-existing RISC-V instructions that expect to be run in capability mode\footnote{This wasn't derived from documentation, but instead from manual inspection of emitted code.}.
 
 \emph{Hybrid} mode treats pointers as integer addresses, dereferenced relative to the DDC, unless they are annotated with \code{\_\_capability}.
-This mode allows programs to be gradually ported to CHERI, \todomark{which is important in ways I am too tired to express}
 This mode emits pre-existing RISC-V instructions that take integer operands, and uses capabilities through the new instructions.
 All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
+
+Hybrid mode allows programs to be gradually ported to CHERI, making it very easy to adopt on legacy/large codebases.
+Any extensions to the model (e.g. CHERI-RVV) should try and retain this property.
 
 \subsection{Capability relocations\label{chap:bg:subsec:cherirelocs}}
 \emph{Summarizes \cite[Section 4.4, Appendix C]{TR-949}}
