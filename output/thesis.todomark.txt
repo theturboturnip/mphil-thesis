@@ -22,17 +22,17 @@ thesis.tex- My acknowledgements ...
 11
 1_25EmulationInvestigation/sub10_emu_cheri.tex- table of relevant structures/functions?
 12
-1_25EmulationInvestigation/sub10_emu_cheri.tex- C code wasn't documented, Rust is
+1_25EmulationInvestigation/sub10_emu_cheri.tex- C code wasn't documented, Rust will be
 13
 1_25EmulationInvestigation/sub10_emu_cheri.tex- move markdown documentation into rust :)
 14
-1_25EmulationInvestigation/sub10_emu_cheri.tex- documentation is available on a github.io, not crates.io yet because I don't have access to CSTRD-CHERI and they'd likely want to host it
+1_25EmulationInvestigation/sub10_emu_cheri.tex- documentation should be made available somewhere
 15
 1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
 16
 1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
 17
-1_25EmulationInvestigation/content.tex- I wrote a type-safe wrapper for capabilities, that should go somewhere
+1_25EmulationInvestigation/content.tex- I wrote a type-safe wrapper class for capabilities, which either represented a valid capability or raw data, unlike the C library which represents a tagged/untagged capability. I should mention that here
 18
 1_25EmulationInvestigation/sub20_emu_vec.tex- short definition of provenance
 19
@@ -56,7 +56,7 @@ thesis.tex- My acknowledgements ...
 28
 1_25EmulationInvestigation/sub50_hyp.tex- Rewrite this as an energy equation? e.g. proportion of success * energy consumed by fast path etc.
 29
-1_25EmulationInvestigation/sub50_hyp.tex- This probably needs a summary
+1_25EmulationInvestigation/sub50_hyp.tex- This hypothesis probably needs a summary
 30
 1_30Software/content.tex- is it called that?
 31
