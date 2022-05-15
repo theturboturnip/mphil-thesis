@@ -231,10 +231,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% git file ref
 
-% Arg 1: file:line
-% Arg 2: repository
-% Arg 3: permalink
-\newcommand{\gitfile}[3]{\href{#3}{\texttt{#1} in \texttt{#2} on GitHub}}
+% Arg 1: branch
+% Arg 2: file:line
+% Arg 3: repository
+% Arg 4: permalink
+\newcommand{\gitfile}[4][]{\href{#4}{\texttt{#2} in \texttt{#3}\ifstrempty{#1}{}{ (branch \texttt{#1})} on GitHub}}
 
 % Arg 1 [optional]: branch
 % Arg 2: repository
