@@ -57,7 +57,7 @@ The compiler then handles low-level decisions like register allocation under the
 
 RVV has a comprehensive set of vector intrinsics\todocite{RISCVVectorIntrinsicsv0.1}, implemented in the aforementioned special version of GCC and Clang~13+.
 With these, the general strip-mining loop is easy to construct:
-\todomark{example based on \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
+\todomark{example based on \eurl{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
 \begin{enumerate}
     \item Use a \code{vsetvl} intrinsic to get the vector length for this iteration.
     \item Allocate vector registers by declaring variables with vector types (e.g. \code{vuint32m8_t} represents 8 registers worth of 32-bit unsigned integers).
@@ -103,29 +103,29 @@ It is used extensively in the testbench code for the evaluation (\cref{chap:eval
         "C" & Store in a capability register (CHERI-Clang only) \\
         "m" & Store in memory \\
     \end{tabular}
-    \caption{Inline assembly constraints \todocite{\url{https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}}}
+    \caption{Inline assembly constraints \todocite{\eurl{https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}}}
     \label{tab:inline_asm_constraints}
     \todomark{Beautify this table}
 \end{table}
 
 \subsection{vs. Arm SVE}\label{chap:soft:compiling:armsve}
-\emph{Summarizes \todocite{armltdArmCompilerScalable2019}}
+\emph{Summarizes \cite{armltdArmCompilerScalable2019}}
 
-Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\todocite{stephensARMScalableVector2017}.
-Arm have released a C language extension to support SVE development (\todocite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\todocite{\url{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
+Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\cite{stephensARMScalableVector2017}.
+Arm have released a C language extension to support SVE development (\cite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\todocite{\eurl{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
 It supports all of the previously examined vectorization types.
 
-Auto-vectorization is supported, and the main focus of the user guide is helping the compiler decide whether to auto-vectorize \todocite{armltdArmCompilerScalable2019}.
+Auto-vectorization is supported, and the main focus of the user guide is helping the compiler decide whether to auto-vectorize \cite{armltdArmCompilerScalable2019}.
 Intrinsics are also supported, and seem to cover all of the SVE instructions, but take a slightly different approach to RVV.
 Arm SVE intrinsics do not directly map to available instructions, but aim to \enquote{provide a regular interface and leave the compiler to pick the best mapping to SVE instructions}, while RVV intrinsics (at least for memory) tend to map 1:1 to existing instructions.
 Arm's approach gives more flexibility for future extensions, as the same intrinsics could be compiled to new instructions with newer compilers.
 
 Arm SVE also supports inline assembly, but the experience is notably worse than for RVV.
 The two standout issues are a lack of register allocation and the use of condition code flags for branching.
-Unlike RVV, the intrinsic types for vector values cannot be referenced in inline assembly\todocite{stephensARMScalableVector2017}, so all vector registers must be allocated and tracked by the programmer.
-Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\todocite{armltdARMLanguageExtensions2020}, do not return the number of updated elements, and instead set the condition flags based on how many elements are updated.
-Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label (see \url{https://godbolt.org/z/zoWh9jq3o}), which is more error prone than the RVV method.
-Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can be found in \todomark{appendix based on \url{https://godbolt.org/z/zoWh9jq3o}}.
+Unlike RVV, the intrinsic types for vector values cannot be referenced in inline assembly\cite{stephensARMScalableVector2017}, so all vector registers must be allocated and tracked by the programmer.
+Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\cite{armltdARMLanguageExtensions2020}, do not return the number of updated elements, and instead set the condition flags based on how many elements are updated.
+Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label (see \eurl{https://godbolt.org/z/zoWh9jq3o}), which is more error prone than the RVV method.
+Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can be found in \todomark{appendix based on \eurl{https://godbolt.org/z/zoWh9jq3o}}.
 
 
 \pagebreak
@@ -156,7 +156,7 @@ The documentation on enabling capabilities is unfortunately sparse and outdated.
 In particular, the CHERI-Clang help menu states that \code{--cheri} will \enquote{Enable CHERI support with the default capability size}, but this has no effect (at least on RISC-V).
 To find up-to-date answers, the CHERIbuild (\todocite{https://github.com/CTSRD-CHERI/cheribuild}) build tool was consulted.
 
-CHERIbuild's code\footnote{\url{https://github.com/CTSRD-CHERI/cheribuild/blob/ba3a0b6388436224968c906192c61d2ccbdd7616/pycheribuild/config/compilation_targets.py\#L176}} revealed three requirements:
+CHERIbuild's code\footnote{\eurl{https://github.com/CTSRD-CHERI/cheribuild/blob/ba3a0b6388436224968c906192c61d2ccbdd7616/pycheribuild/config/compilation_targets.py\#L176}} revealed three requirements:
 \begin{itemize}
     \item The architecture string must contain \code{xcheri}
     \item The capability length must be set using the ABI string

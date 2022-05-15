@@ -66,7 +66,7 @@ thesis.tex- My acknowledgements ...
 33
 1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
 34
-1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
+1_30Software/content.tex- example based on \eurl {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
 35
 1_30Software/content.tex- Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V
 36
@@ -82,7 +82,7 @@ thesis.tex- My acknowledgements ...
 41
 1_30Software/content.tex- Beautify this table
 42
-1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
+1_30Software/content.tex- appendix based on \eurl {https://godbolt.org/z/zoWh9jq3o}
 43
 1_30Software/content.tex- Appendix on how this was done?
 44

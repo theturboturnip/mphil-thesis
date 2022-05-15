@@ -18,7 +18,7 @@ TODO Citations
 9
 1_20Background/sub30_rvv_model.tex- risc-v privileged spec, Section 3.1.21
 10
-1_20Background/sub39_rvv_impls.tex- \url {https://www.sifive.com/cores/intelligence-x280}
+1_20Background/sub39_rvv_impls.tex- \eurl {https://www.sifive.com/cores/intelligence-x280}
 11
 1_20Background/sub39_rvv_impls.tex- chenXuantie910CommercialMultiCore2020
 12
@@ -48,32 +48,20 @@ TODO Citations
 24
 1_30Software/content.tex- RISCVVectorIntrinsicsv0.1
 25
-1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
+1_30Software/content.tex- \eurl {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
 26
-1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
+1_30Software/content.tex- \eurl {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
 27
-1_30Software/content.tex- armltdArmCompilerScalable2019
+1_30Software/content.tex- \eurl {https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}
 28
-1_30Software/content.tex- stephensARMScalableVector2017
-29
-1_30Software/content.tex- armltdARMLanguageExtensions2020
-30
-1_30Software/content.tex- \url {https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}
-31
-1_30Software/content.tex- armltdArmCompilerScalable2019
-32
-1_30Software/content.tex- stephensARMScalableVector2017
-33
-1_30Software/content.tex- armltdARMLanguageExtensions2020
-34
 1_30Software/content.tex- https://github.com/CTSRD-CHERI/cheribuild
-35
+29
 1_30Software/content.tex- RISCV-ABI
-36
+30
 1_30Software/content.tex- LLVM IR pass investigated in TR-949 \$3.8.2, couldn't find earlier reference to it
-37
+31
 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscv-collab/riscv-gcc/issues/323
-38
+32
 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscvarchive/riscv-glibc/tree/archive-notify
-39
+33
 2_1Appendix/building_riscv_v_gnu.tex- maxOS GCC instructions
