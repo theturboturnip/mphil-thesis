@@ -308,22 +308,6 @@
   file = {/home/samuel/Zotero/storage/3UDDAVJU/riscv-vector.html}
 }
 
-@misc{RISCVVectorExtension2021,
-  title = {{{RISC-V}} "{{V}}" {{Vector Extension}}},
-  date = {2021-09-20},
-  url = {https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spec-1.0.pdf},
-  annotation = {v1.0}
-}
-
-@software{RISCVVectorIntrinsicsv0.1,
-  title = {{{RISC-V Vector Extension Intrinsics}} (v0.1)},
-  date = {2021-11-16T07:43:42Z},
-  origdate = {2020-01-31T08:48:24Z},
-  url = {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/00882f19a84ab354dc8cf6a10c100b8daa2654e4/rvv-intrinsic-api.md},
-  urldate = {2021-11-16},
-  organization = {{RISC-V Non-ISA Specifications}}
-}
-
 @software{semidynamicsSemidynamicsOpenVectorInterface2022,
   title = {Semidynamics/{{OpenVectorInterface}}},
   author = {{semidynamics}},
@@ -332,6 +316,58 @@
   url = {https://github.com/semidynamics/OpenVectorInterface},
   urldate = {2022-05-13},
   abstract = {Home of the specification to connect SemiDynamic's RISC-V cores to your own RISC-V Vector Unit}
+}
+
+@online{SiFiveIntelligenceX280,
+  title = {{{SiFive Intelligence X280}} - {{SiFive}}},
+  url = {https://www.sifive.com/cores/intelligence-x280},
+  urldate = {2022-05-15},
+  abstract = {null},
+  langid = {american},
+  organization = {{sifive.com}},
+  file = {/home/samuel/Zotero/storage/NEEFX4GV/intelligence-x280.html}
+}
+
+@misc{specification-RISCV-ABI-v1.0rc2,
+  title = {{{RISC-V ABIs Specification}} v1.0rc2},
+  date = {2022-04-06},
+  url = {https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/download/v1.0-rc2/riscv-abi.pdf},
+  langid = {english},
+  file = {/home/samuel/Zotero/storage/ZZ8F5VXX/RISC-V ABIs Specification.pdf}
+}
+
+@misc{specification-RISCV-vol1-20191213,
+  title = {The {{RISC-V Instruction Set Manual Volume I}}: {{Unprivileged ISA}}},
+  editor = {Waterman, Andrew and Asanović, Krste},
+  date = {2019-12-13},
+  url = {https://github.com/riscv/riscv-isa-manual/releases/download/Ratified-IMAFDQC/riscv-spec-20191213.pdf},
+  file = {/home/samuel/Zotero/storage/EJ5XHN74/The RISC-V Instruction Set Manual Volume I Unpriv.pdf}
+}
+
+@misc{specification-RISCV-vol2-20211203,
+  title = {The {{RISC-V Instruction Set Manual Volume II}}: {{Privileged Architecture}}},
+  editor = {Waterman, Andrew and Asanovic, Krste and Hauser, John},
+  date = {2021-12-04},
+  url = {https://github.com/riscv/riscv-isa-manual/releases/download/Priv-v1.12/riscv-privileged-20211203.pdf},
+  langid = {english},
+  keywords = {⛔ No DOI found},
+  file = {/home/samuel/Zotero/storage/PTZY298M/Waterman et al. - Volume II Privileged Architecture.pdf}
+}
+
+@software{specification-RVV-intrinsics,
+  title = {{{RISC-V Vector Extension Intrinsics}} (v1.0)},
+  date = {2021-11-16},
+  origdate = {2020-01-31T08:48:24Z},
+  url = {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/00882f19a84ab354dc8cf6a10c100b8daa2654e4/rvv-intrinsic-api.md},
+  urldate = {2021-11-16},
+  organization = {{RISC-V Non-ISA Specifications}}
+}
+
+@misc{specification-RVV-v1.0,
+  title = {{{RISC-V}} "{{V}}" {{Vector Extension}}},
+  date = {2021-09-20},
+  url = {https://github.com/riscv/riscv-v-spec/releases/download/v1.0/riscv-v-spec-1.0.pdf},
+  annotation = {v1.0}
 }
 
 @article{stephensARMScalableVector2017,
@@ -399,14 +435,23 @@
   file = {/home/samuel/Zotero/storage/YD5PIJYG/150592.html}
 }
 
-@article{watsonCHERIHybridCapabilitySystem,
+@inproceedings{watsonCHERIHybridCapabilitySystem2015,
   title = {{{CHERI}}: {{A Hybrid Capability-System Architecture}} for {{Scalable Software Compartmentalization}}},
-  author = {Watson, Robert N M and Woodruff, Jonathan and Neumann, Peter G and Moore, Simon W and Anderson, Jonathan and Chisnall, David and Dave, Nirav and Davis, Brooks and Gudka, Khilan and Laurie, Ben and Murdoch, Steven J and Norton, Robert and Roe, Michael and Son, Stacey and Vadera, Munraj},
-  pages = {18},
+  shorttitle = {{{CHERI}}},
+  booktitle = {2015 {{IEEE Symposium}} on {{Security}} and {{Privacy}}},
+  author = {Watson, Robert N.M. and Woodruff, Jonathan and Neumann, Peter G. and Moore, Simon W. and Anderson, Jonathan and Chisnall, David and Dave, Nirav and Davis, Brooks and Gudka, Khilan and Laurie, Ben and Murdoch, Steven J. and Norton, Robert and Roe, Michael and Son, Stacey and Vadera, Munraj},
+  date = {2015-05},
+  pages = {20--37},
+  publisher = {{IEEE}},
+  location = {{San Jose, CA}},
   doi = {10/gfpgzz},
+  url = {https://ieeexplore.ieee.org/document/7163016/},
+  urldate = {2021-12-30},
   abstract = {CHERI extends a conventional RISC InstructionSet Architecture, compiler, and operating system to support fine-grained, capability-based memory protection to mitigate memory-related vulnerabilities in C-language TCBs. We describe how CHERI capabilities can also underpin a hardware-software object-capability model for application compartmentalization that can mitigate broader classes of attack. Prototyped as an extension to the open-source 64-bit BERI RISC FPGA softcore processor, FreeBSD operating system, and LLVM compiler, we demonstrate multiple orders-of-magnitude improvement in scalability, simplified programmability, and resulting tangible security benefits as compared to compartmentalization based on pure Memory-Management Unit (MMU) designs. We evaluate incrementally deployable CHERI-based compartmentalization using several real-world UNIX libraries and applications.},
+  eventtitle = {2015 {{IEEE Symposium}} on {{Security}} and {{Privacy}} ({{SP}})},
+  isbn = {978-1-4673-6949-7},
   langid = {english},
-  file = {/home/samuel/Zotero/storage/24C8EBM9/Watson et al. - CHERI A Hybrid Capability-System Architecture for.pdf}
+  file = {/home/samuel/Zotero/storage/BHP7ZJGW/Watson et al. - 2015 - CHERI A Hybrid Capability-System Architecture for.pdf}
 }
 
 @online{williamsSiFiveRemindsEveryone,

@@ -19,8 +19,8 @@ Writing misaligned integer values across a \code{CLEN} boundary would need to ma
 Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\todoref{capinvec - alignment requirements}).
 
 \subsection{Atomicity of accesses/General memory model}
-Vector memory instructions are specified to follow the RISC-V Weak Memory Ordering model\todocite{RVV}\footnote{Behaviour under the Total Store Ordering extension hasn't been defined.}, although this model hasn't been fully explained in terms of vectors yet.
-RVWMO defines a global order of \enquote{memory operations}: atomic operations that are either loads, stores, or both\todocite[Chapter 14]{RISCV spec}.
+Vector memory instructions are specified to follow the RISC-V Weak Memory Ordering model\cite{specification-RVV-v1.0}\footnote{Behaviour under the Total Store Ordering extension hasn't been defined.}, although this model hasn't been fully explained in terms of vectors yet.
+RVWMO defines a global order of \enquote{memory operations}: atomic operations that are either loads, stores, or both\cite[Chapter 14]{specification-RISCV-vol1-20191213}.
 The RVWMO spec assumes all memory instructions create exactly one memory operation but calls out that once the vector model is formalized, vector accesses may be defined to create multiple operations.
 
 The RVV spec states \enquote{vector misaligned memory accesses follow the same rules for atomicity as scalar misaligned memory accesses}, i.e. that misaligned accesses may be decomposed into multiple memory operations of any granularity\footnote{e.g. each byte could be written in a separate access.}.

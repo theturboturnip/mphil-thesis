@@ -1,5 +1,5 @@
 \section{The RVV vector model}\label{chap:bg:sec:rvv:vector_model}
-\emph{Summarizes \cite[Sections 1-6, 17]{RISCVVectorExtension2021}}
+\emph{Summarizes \cite[Sections 1-6, 17]{specification-RVV-v1.0}}
 
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
@@ -22,7 +22,7 @@ This section also describes the vector exception model (\cref{chap:bg:subsec:vex
 The \code{vtype} CSR contains two key fields that describe how vector instructions interpret the contents of vector registers.
 The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
 It can be 8, 16, 32, or 64.
-128-bit elements are referenced a few times throughout but haven't been formally specified (see \cite[p32]{RISCVVectorExtension2021}).
+128-bit elements are referenced a few times throughout but haven't been formally specified (see \cite[p32]{specification-RVV-v1.0}).
 % Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
 
 The second field is the Vector Register Group Multiplier (\code{LMUL}).
@@ -86,7 +86,7 @@ When masking is disabled, all elements are \emph{active}.
 %---------------------------------
 %---------------------------------
 \subsection{Exception handling}\label{chap:bg:subsec:vexceptions}
-\emph{Summarizes \cite[Section 17]{RISCVVectorExtension2021}}
+\emph{Summarizes \cite[Section 17]{specification-RVV-v1.0}}
 
 During the execution of a vector instruction, two events can prevent an instruction from fully completing: a synchronous exception in the instruction itself, or an asynchronous interrupt from another part of the system.
 Implementations may choose to wait until an instruction fully completes before handling asynchronous interrupts, making it unnecessary to pause the instruction halfway through, but synchronous exceptions cannot be avoided in this way (particularly for those performing memory accesses).
@@ -134,7 +134,7 @@ For example, reading or writing a memory-mapped I/O region may not be idempotent
 
 Another memory-specific issue is that of \emph{demand-paging}, where the OS needs to step in and move virtual memory pages into physical memory for an instruction to use.
 This use-case is specifically called out by the specification for precise traps.
-Usually, this is triggered by some element of a vector memory access raising a synchronous exception, invoking a precise trap, and writing the ``Machine Trap Value'' scalar register with the offending address\todocite[Section 3.1.21]{risc-v privileged spec}.
+Usually, this is triggered by some element of a vector memory access raising a synchronous exception, invoking a precise trap, and writing the ``Machine Trap Value'' scalar register with the offending address\cite[Section 3.1.21]{specification-RISCV-vol2-20211203}.
 \code{vstart} must be set to an element at (or before\footnote{If the memory region is idempotent, then \code{vstart} could any value where all preceding elements had completed. It could even be zero, in which case all accesses would be retried on resume, as long as it could guarantee forward progress.}) the one that demanded the page, because that element must perform the access after reloading.
 If an implementation sets \code{vstart} to the offending element, because operations preceding \code{vstart} must have completed, any elements that could potentially trigger demand-paging \emph{must} wait for the preceding elements to complete.
 

@@ -48,14 +48,8 @@ Both compilers have support for Arm SVE auto-vectorization, explored further in 
 \enquote{Intrinsics} are functions built in to a compiler that can invoke low-level functionality and instructions directly for a specific architecture.
 When automatic vectorization is not available, intrinsics are the next best thing - they present a familiar high-level interface (function calls), that gives the programmer fine-grained control over which instructions to execute, typically providing an intrinsic for each vector instruction.
 The compiler then handles low-level decisions like register allocation under the hood, and sometimes may provide extra functionality for ease of use.
-%the compiler still allocates registers 
 
-% A prime example is RVV's vector intrinsics\todocite{RISCVVectorIntrinsicsv0.1}, implemented in GCC~?\todocite{} and Clang~13+\todocite{}.
-% All instructions that rely on the current vector length \code{vl} take it as an argument for their respective intrinsics.
-% The programmer is strongly encouraged to use a \code{vsetvl} intrinsic to generate the length first, but could also pass the 
-% which allow (and strongly suggest) the programmer to get the vector length with a \code{vsetvl} function, then pass it to an 
-
-RVV has a comprehensive set of vector intrinsics\todocite{RISCVVectorIntrinsicsv0.1}, implemented in the aforementioned special version of GCC and Clang~13+.
+RVV has a comprehensive set of vector intrinsics\cite{specification-RVV-intrinsics}, implemented in the aforementioned special version of GCC and Clang~13+.
 With these, the general strip-mining loop is easy to construct:
 \todomark{example based on \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
 \begin{enumerate}
@@ -212,7 +206,7 @@ Unfortunately the code for generating the intrinsics on both levels is spread ac
 It seems that significant compiler development work is required to bring vector intrinsics up to scratch on CHERI-Clang.
 We did experiment with creating replacement wrapper functions, where each function tried to mimic an intrinsic using inline asssembly.
 These were rejected for two reasons: the increased overhead of a function call on every vector instruction\footnote{This could have been eliminated by using preprocessor macros instead of real functions, but they are difficult to program and do not easily support returning values like intrinsics do.}, and the lack of support for passing vector types as arguments or return values.
-The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\todocite{RISCV-ABI}, and CHERI has its own issues with saving vector registers on the stack.
+The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\cite{specification-RISCV-ABI-v1.0rc2}, and CHERI has its own issues with saving vector registers on the stack.
 
 \todomark{segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to}
 

@@ -8,8 +8,7 @@ The core impact of CHERI, on a hardware level, is that memory can no longer be a
 Capabilities are unforgeable tokens that grant fine-grained access to ranges of memory.
 Instead of generating them from scratch, capabilities must be \emph{derived} from another capability with greater permissions.
 For example, a capability giving read-write access to an array of structures can be used to create a sub-capability granting read-only access to a single element.
-This vastly reduces the scope of memory-related security issues, such as buffer overflows\todocite{something something heartbleed?}, and creates interesting opportunities for software compartmentalization\todocite{CHERI: A Hybrid Capability-System Architecture for
-Scalable Software Compartmentalization}.
+This vastly reduces the scope of memory-related security issues, such as buffer overflows\todocite{something something heartbleed?}, and creates interesting opportunities for software compartmentalization\cite{watsonCHERIHybridCapabilitySystem2015}.
 
 Industry leaders have recognized the value CHERI provides.
 Arm Inc have manufactured the Morello System-on-Chip, based on their Neoverse N1 CPU, which incorporates CHERI capabilities into the Armv8.2 ISA.
@@ -57,8 +56,8 @@ This may require more guarantees than otherwise necessary - for example, each ve
 % \todomark{CHERI has a RISC-V ISA + various implementations, wants to support vectors}
 % \todomark{scalable vector support useful for future Arm support}
 % \todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
-To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \cite{RISCVVectorExtension2021}).
-As of November 2021 this has been ratified by RISC-V International\todocite{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}, and will be RISC-V's standard vector instruction set moving forward.
+To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \cite{specification-RVV-v1.0}).
+As of November 2021 this has been ratified by RISC-V International\footnote{\url{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}}, and will be RISC-V's standard vector instruction set moving forward.
 Choosing it has two key benefits.
 Firstly, the CHERI project maintains three open-source cores (Piccolo, Flute, and Tooba\todocite{cheri risc-v page?}) implementing CHERI-RISC-V, none of which support vector processing.
 Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for these cores.
