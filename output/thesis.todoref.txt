@@ -1,0 +1,34 @@
+TODO Refs
+1 - 1_10Introduction/content.tex- H-A,H-B
+2 - 1_10Introduction/content.tex- H-C,H-D
+3 - 1_10Introduction/content.tex- H-E,H-F,H-G
+4 - 1_10Introduction/content.tex- Chapter X
+5 - 1_10Introduction/content.tex- Chapter X
+6 - 1_10Introduction/content.tex- Chapter X
+7 - 1_20Background/sub50_cheri.tex- diagram from TR-941?
+8 - 1_25EmulationInvestigation/content.tex- capinvec
+9 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- capability relocations
+10 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
+11 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
+12 - 1_25EmulationInvestigation/sub20_emu_vec.tex- 
+13 - 1_25EmulationInvestigation/sub20_emu_vec.tex- chap:bg:sec:rvv:memoryaccessinstrs
+14 - 1_25EmulationInvestigation/sub20_emu_vec.tex- fast path section
+15 - 1_25EmulationInvestigation/sub20_emu_vec.tex- fast path section
+16 - 1_25EmulationInvestigation/sub20_emu_vec.tex- chap:bg:sec:cheri:integer_capability_mode?
+17 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- 
+18 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- 
+19 - 1_25EmulationInvestigation/sub50_hyp.tex- fast-path
+20 - 1_30Software/content.tex- 4.1
+21 - 1_30Software/content.tex- 4.2
+22 - 1_30Software/content.tex- 4.3
+23 - 1_30Software/content.tex- 4.4
+24 - 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
+25 - 1_30Software/content.tex- Example
+26 - 1_30Software/content.tex- example
+27 - 1_30Software/content.tex- example
+28 - 1_30Software/content.tex- CHERI-agnostic inline assembly
+29 - 1_30Software/content.tex- evaluation
+30 - 1_30Software/content.tex- example
+31 - 1_30Software/content.tex- example of error message
+32 - 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
+33 - 1_30Software/sub50_hyp.tex- chapter hardware

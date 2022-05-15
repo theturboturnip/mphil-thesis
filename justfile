@@ -1,7 +1,7 @@
 alias b := build-thesis
 build-thesis:
     @# Run latexmk on just this thesis
-    latexmk -shell-escape -lualatex ./thesis.tex -outdir=./output/
+    latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
 clean:
     latexmk -lualatex ./thesis.tex -outdir=./output/ -c

@@ -1,0 +1,49 @@
+TODO Citations
+1 - 1_10Introduction/content.tex- TR-951?
+2 - 1_10Introduction/content.tex- something something heartbleed?
+3 - 1_10Introduction/content.tex- CHERI: A Hybrid Capability-System Architecture for Scalable Software Compartmentalization
+4 - 1_10Introduction/content.tex- RISC-V V fault-only-first
+5 - 1_10Introduction/content.tex- https://github.com/bminor/glibc/blob/master/sysdeps/x86_64/multiarch/ifunc-memmove.h
+6 - 1_10Introduction/content.tex- https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions
+7 - 1_10Introduction/content.tex- cheri risc-v page?
+8 - 1_20Background/content.tex- 
+9 - 1_20Background/content.tex- , Sections 1-9, 17
+10 - 1_20Background/content.tex- TR-951, Chapters 5, 8
+11 - 1_20Background/content.tex- TR-949, Section 4.4, Appendix C
+12 - 1_20Background/sub30_rvv_model.tex- risc-v privileged spec, Section 3.1.21
+13 - 1_20Background/sub39_rvv_impls.tex- \url {https://www.sifive.com/cores/intelligence-x280}
+14 - 1_20Background/sub39_rvv_impls.tex- chenXuantie910CommercialMultiCore2020
+15 - 1_20Background/sub50_cheri.tex- TR-951, Section 1.2.1
+16 - 1_20Background/sub50_cheri.tex- TR-951
+17 - 1_20Background/sub50_cheri.tex- TR-951, Chapter 8
+18 - 1_20Background/sub50_cheri.tex- 
+19 - 1_20Background/sub50_cheri.tex- TR-494
+20 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- x86-64 ABI rules
+21 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- clang/docs/UsersManual.rst:3384
+22 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- LLVM 13 clang/lib/CodeGen/TargetInfo.cpp:2941
+23 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- https://github.com/rems-project/sail
+24 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- https://github.com/CTSRD-CHERI/sail-cheri-riscv
+25 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- TR-951 Ch8.2
+26 - 1_25EmulationInvestigation/sub10_emu_cheri.tex- https://github.com/CTSRD-CHERI/device-model/blob/master/src/crt_init_globals.c
+27 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- TR-951, \$3.5.2
+28 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- RVV
+29 - 1_25EmulationInvestigation/sub40_beyond_emu.tex- RISCV spec, Chapter 14
+30 - 1_25EmulationInvestigation/sub50_hyp.tex- There's definitely an Arm CHERI v8 document somewhere
+31 - 1_25EmulationInvestigation/sub50_hyp.tex- https://developer.arm.com/documentation/100891/0612/coding-considerations/using-sve-intrinsics-directly-in-your-c-code
+32 - 1_30Software/content.tex- https://gcc.gnu.org/projects/tree-ssa/vectorization.html
+33 - 1_30Software/content.tex- RISCVVectorIntrinsicsv0.1
+34 - 1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
+35 - 1_30Software/content.tex- \url {https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html}
+36 - 1_30Software/content.tex- armltdArmCompilerScalable2019
+37 - 1_30Software/content.tex- stephensARMScalableVector2017
+38 - 1_30Software/content.tex- armltdARMLanguageExtensions2020
+39 - 1_30Software/content.tex- \url {https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}
+40 - 1_30Software/content.tex- armltdArmCompilerScalable2019
+41 - 1_30Software/content.tex- stephensARMScalableVector2017
+42 - 1_30Software/content.tex- armltdARMLanguageExtensions2020
+43 - 1_30Software/content.tex- https://github.com/CTSRD-CHERI/cheribuild
+44 - 1_30Software/content.tex- RISCV-ABI
+45 - 1_30Software/content.tex- LLVM IR pass investigated in TR-949 \$3.8.2, couldn't find earlier reference to it
+46 - 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscv-collab/riscv-gcc/issues/323
+47 - 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscvarchive/riscv-glibc/tree/archive-notify
+48 - 2_1Appendix/building_riscv_v_gnu.tex- maxOS GCC instructions
