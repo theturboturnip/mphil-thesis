@@ -1,7 +1,6 @@
 \section{The RVV vector model}\label{chap:bg:sec:rvv:vector_model}
 \emph{Summarizes \cite[Sections 1-6, 17]{specification-RVV-v1.0}}
 
-\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
 \figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
 
 RVV defines thirty-two vector registers, each of an implementation-defined constant width \code{VLEN}.
@@ -15,6 +14,8 @@ These are stored in RISC-V Control and Status Registers (CSRs), which the progra
 \code{vstart} and \code{vl} (\cref{chap:bg:subsec:vlvstart}) divides the elements into three disjoint subsets: \emph{prestart}, the \emph{body}, and the \emph{tail}.
 Masked accesses (\cref{chap:bg:subsec:rvvmasking}) further divide the \emph{body} into \emph{active} and \emph{inactive} elements.
 This section also describes the vector exception model (\cref{chap:bg:subsec:vexceptions}).
+
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
 
 %---------------------------------
 \subsection{\code{vtype}}\label{chap:bg:subsec:vtype}
@@ -89,7 +90,7 @@ When masking is disabled, all elements are \emph{active}.
 \emph{Summarizes \cite[Section 17]{specification-RVV-v1.0}}
 
 During the execution of a vector instruction, two events can prevent an instruction from fully completing: a synchronous exception in the instruction itself, or an asynchronous interrupt from another part of the system.
-Implementations may choose to wait until an instruction fully completes before handling asynchronous interrupts, making it unnecessary to pause the instruction halfway through, but synchronous exceptions cannot be avoided in this way (particularly for those performing memory accesses).
+Implementations may choose to wait until an instruction fully completes before handling asynchronous interrupts, making it unnecessary to pause the instruction halfway through, but synchronous exceptions cannot be avoided in this way (particularly where page fault exceptions must be handled transparently).
 
 The RVV specification defines two modes for `trapping' these events, which implementations may choose between depending on the context (e.g. the offending instruction), and notes two further modes which may be used in further extensions.
 All modes start by saving the PC of the trapping instruction to a CSR \code{*epc}.
@@ -153,7 +154,7 @@ The second mode is \enquote{Swappable traps}, where a trap handler could use spe
 The intent seems to be to support context switching with imprecise traps, which could also require the \emph{opaque} state (i.e. internal state not visible to the program) to be saved and restored.
 Right now, it seems that context switching always requires a precise trap.
 
-Neither of these modes are actually defined, but they are simply noted as possibilities for the future.
+Neither of these modes are fully specified, but they are simply noted as possibilities for the future.
 
 %---------------------------------
 \subsection{Summary}\label{chap:bg:subsec:rvvsummary}

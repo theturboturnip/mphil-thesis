@@ -5,7 +5,7 @@ Other academic examples include Ara\cite{cavalcanteAra1GHzScalable2020}, Arrow\c
 % \todomark{Planned to do a survey of existing implementations here - might be too many words?}
 
 This is only going to continue: multiple implementations were just recently presented at RISC-V Week in Paris (May 2022).
-Vitruvius\cite{minerviniVitruviusAreaEfficientRISCV2022} uses extremely long vectors \code{VLEN=256*64=16384}, is implemented as a decoupled processor, and is the first RISC-V processor to support the Open Vector Interface (OVI)\footnote{\gitrepo{semidynamics/OpenVectorInterface}{https://github.com/semidynamics/OpenVectorInterface}}.
+Vitruvius\cite{minerviniVitruviusAreaEfficientRISCV2022} uses extremely long vectors \code{VLEN=256*64=16384}, is implemented as a decoupled processor, and is the first RISC-V processor to support the Open Vector Interface (OVI)\footnote{\gitrepo{semidynamics/OpenVectorInterface}{https://github.com/semidynamics/OpenVectorInterface}} for communicating with the scalar core.
 VecProM\cite{mahaleRISCVVPUVery2021} splits its approach into two, where vectors beyond a certain length are strip-mined and processed in hardware using a scratch memory, using OVI to connect multiple heterogeneous vector processors to a scalar core.
 Both were produced from the Barcelona Supercomputing Center under the European Processor Initiative.
 

@@ -10,9 +10,9 @@ thesis.tex- My acknowledgements ...
 5
 1_10Introduction/content.tex- fill out this para more, have an actual end sentence
 6
-1_20Background/sub10_riscv.tex- example of a architecture/feature string
-7
 1_20Background/sub30_rvv_model.tex- examples
+7
+1_20Background/sub35_rvv_memory.tex- Make thinner
 8
 1_20Background/sub50_cheri.tex- add diagram from TR-941?
 9

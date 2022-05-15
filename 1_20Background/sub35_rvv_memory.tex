@@ -29,7 +29,7 @@ For the most part, memory access instructions handle their operands as described
 \code{EEW} and \code{EMUL} are usually derived from the instruction encoding, rather than reading the \code{vtype} CSR.
 In a few cases the Effective Vector Length \code{EVL} is different from the \code{vl} CSR, so for simplicity all instructions are described in terms of \code{EVL}.
 
-\subsection{Segmented accesses}
+\subsection*{Segmented accesses}
 Three of the five archetypes (unit/strided, fault-only-first, and indexed) support \emph{segmented} access.
 This is used for unpacking contiguous structures of $1 \le \code{nf} \le 8$ \emph{fields} and placing each field in a separate vector.
 In these instructions, the values of \code{vl}, \code{vstart}, and the mask register are interpreted in terms of segments.
@@ -54,30 +54,35 @@ This principle extends to \code{LMUL > 1} (\cref{fig:RVV_mem_lmul_3seg}).
 
 \begin{figure}[h]
     \centering
-    \begin{subfigure}{\textwidth}
+    \begin{subtable}{\textwidth}
         \centering
-        \large (Unit) \code{vlseg\param{<nf>}e\param{<eew>}.v vd, (rs1), vm} \\
-(Strided) \code{vlsseg\param{<nf>}e\param{<eew>}.v vd, (rs1), rs2, vm}
+        \begin{tabular}{llcccc}
+            \toprule
+        & Mnmemonic & Data & Address & Stride & Masked \\
+        \midrule
+        Unit & \large\code{vlseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \textit{\small implicit} & \large\code{vm} \\
+        Strided & \large\code{vlsseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \large\code{rs2,} & \large\code{vm} \\ 
+        \bottomrule
+        \end{tabular}
         \caption{Instruction}
-    \end{subfigure}
+    \end{subtable}
     \vspace{1em}
-    
-    \begin{subtable}[b]{0.5\textwidth}
-    \begin{tabular}{ll}
+
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
+    \begin{tabular}[b]{ll}
     \toprule
     Masked? & \code{vm == 0} \\
-        \code{stride} & (Unit) \code{\param{<eew>} * \param{<nf>}} \\
-                    & (Strided) From \code{rs2} \\
         \code{EEW} & \paramt{<eew>} \\
         \code{EVL} & \code{vl} \\
         \code{EMUL} & \code{VLEN * \param{<eew>} / EVL} \\
         \code{NFIELDS} & \paramt{<nf>} \\
         \bottomrule
     \end{tabular}
-    \caption{How fields are interpreted}
+    \caption{Parameters}
     \label{tab:RVV_mem_strided}
     \end{subtable}\hfill
-    \begin{subfigure}[b]{0.5\textwidth}
+    \begin{subfigure}[t]{0.5\textwidth}
         \includegraphics[width=\textwidth]{Figures/RVV_mem_strided_3seg.pdf}
         \caption{Example of a segmented strided access\\\code{EEW=8-bits}, \code{nf=3}, \code{stride=4},\code{EVL=4}}
         \label{fig:RVV_mem_strided_3seg}
@@ -86,22 +91,23 @@ This principle extends to \code{LMUL > 1} (\cref{fig:RVV_mem_lmul_3seg}).
 \end{figure}
 
 \noindent
-Moves active elements of \paramt{nf} vector register groups to/from contiguous segments of memory,
-where each segment is separated by \code{stride} bytes.
+This archetype moves active elements of \paramt{nf} vector register groups to/from contiguous segments of memory,
+where the start of each segment is separated by \code{stride} bytes.
 
 \begin{itemize}
-    \item The start of each segment is separated by \code{stride} bytes.
+    \item Unit-stride instructions tightly pack segments, i.e. \code{stride = \param{nf} * \param{eew} / 8}.
+    \item Strided instructions read \code{stride} from register \code{rs2}.
     \begin{itemize}
-        \item The Unit version (short for Unit-stride) tightly packs segments, equivalent to selecting \code{stride = \param{nf} * \param{eew} / 8}.
-        \item \code{stride} may be negative or zero.
-        \item If \code{rs2} is register \code{x0}, implementations may perform fewer than \code{EVL} memory accesses. Otherwise, they must appear to perform all memory accesses, even if the value of \code{rs2} is zero.
+        \item \code{stride} may be positive, negative, or zero.
     \end{itemize}
     % These two are described by the diagram
     % \item Each segment is \code{\param{nf} * \param{eew}} bits long, i.e. \paramt{nf} elements long.
     % \item Each element in the $i$-th segment maps to the $i$-th element of a vector register group.
-    \item This instruction doesn't do anything if the \code{vstart >= EVL}.
+    \item These instructions don't do anything if \code{vstart >= EVL}.
 \end{itemize}
 
+Strided accesses where \code{rs2} is register \code{x0} may perform fewer than \code{EVL} memory accesses.
+Otherwise, even if \code{stride = 0}, implementations must appear to perform all accesses.
 
 % ORDERING
 \subsubsection*{Ordering}
@@ -115,26 +121,47 @@ Upon entering a trap, it is implementation-defined how much of the faulting segm
 
 \subsection{Unit fault-only-first loads}\label{chap:bg:sec:rvv:fof}
 
-\begin{table}[h]
+\begin{figure}[h]
     \centering
-\begin{tabular}{ll}
-\multicolumn{2}{c}{\large \code{vlseg\param{<nf>}e\param{<eew>}ff.v vd, (rs1), vm}} \\
-    \toprule
-    Masked? & \code{vm == 0} \\
-        \code{EEW} & \paramt{<eew>} \\
-        \code{EVL} & \code{vl} \\
-        \code{EMUL} &  \code{VLEN * \param{<eew>} / EVL} \\
-        \code{NFIELDS} & \paramt{<nf>} \\
-    \bottomrule
-\end{tabular}
+    \begin{subtable}{\textwidth}
+        \centering
+        \begin{tabular}{lccc}
+            \toprule
+            Mnemonic & Data & Address & Masked \\
+            \midrule
+            \large\code{vlseg\param{<nf>}e\param{<eew>}ff.v} & \large\code{vd,} & \large\code{(rs1),} & \large\code{vm} \\
+            \bottomrule
+        \end{tabular}
+        \caption{Instruction}
+    \end{subtable}
+
+
+    \begin{subtable}{\textwidth}
+        \centering
+        \begin{tabular}{ll}
+                \toprule
+                Masked? & \code{vm == 0} \\
+                    \code{EEW} & \paramt{<eew>} \\
+                    \code{EVL} & \code{vl} \\
+                    \code{EMUL} &  \code{VLEN * \param{<eew>} / EVL} \\
+                    \code{NFIELDS} & \paramt{<nf>} \\
+                \bottomrule
+            \end{tabular}
+            \caption{Parameters}
+    \end{subtable}
+
     \caption{Unit Fault-only-First Information}
     \label{tab:RVV_mem_fof}
-\end{table}
+\end{figure}
 
-This is equivalent to a unit load in all respects but exception handling.
+
+This archetype is equivalent to a unit load in all respects but exception handling.
 If any access in segment 0 raises an exception\footnote{Segment 0 may be masked out, in which case this is impossible.}, \code{vl} is not modified and the trap is taken as usual.
 If any access in any active segment $> 0$ raises an exception, the trap is not taken, \code{vl} is reduced to the index of the offending segment, and the instruction finishes.
 If an asynchronous interrupt is encountered at any point, the trap is taken and \code{vstart} is set as usual.
+
+This archetype is intended for \enquote{loops with data-dependent exit conditions}, and is commonly used for string operations.
+The specification uses it in a \code{strcmp} example~(\cite[Section~A.9]{specification-RVV-v1.0}).
 
 Similar to plain loads, if an exception is encountered the instruction is allowed to update segments past the offender (but not past the original \code{vl}).
 If any synchronous exception or asynchronous interrupt occurs, regardless of the segment index, it is implementation-defined how much of the faulting segment's accesses are performed.
@@ -144,15 +171,22 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
 \subsection{Indexed accesses}
 \begin{figure}[h]
     \centering
-    \begin{subfigure}{\textwidth}
+    \begin{subtable}{\textwidth}
         \centering
-        \large \code{vl\param{<u|o>}xseg\param{<nf>}e\param{<eew>}.v vd, (rs1), vs2, vm}
+        \begin{tabular}{lcccc}
+            \toprule
+        Mnmemonic & Data & Address & Indices & Masked \\
+        \midrule 
+        \large\code{vl\param{<u|o>}xseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \large\code{vs2,} & \large\code{vm} \\
+        \bottomrule
+        \end{tabular}
         \caption{Instruction}
-    \end{subfigure}
+    \end{subtable}
     \vspace{1em}
     
-    \begin{subtable}[b]{0.5\textwidth}
-    \begin{tabular}{ll}
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
+        \begin{tabular}[b]{ll}
     \toprule
         Masked? & \code{vm == 0} \\
     \midrule
@@ -168,10 +202,10 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
         \code{EVL} & \code{vl} \\
         \bottomrule
     \end{tabular}
-    \caption{How fields are interpreted}
+    \caption{Parameters}
     \label{tab:RVV_mem_index}
     \end{subtable}\hfill
-    \begin{subfigure}[b]{0.5\textwidth}
+    \begin{subfigure}[t]{0.5\textwidth}
         \includegraphics[width=\textwidth]{Figures/RVV_mem_index_3seg.pdf}
         \caption{Example of a segmented indexed access\\\code{EEW=8-bits}, \code{nf=3}}
         \label{fig:RVV_mem_index_3seg}
@@ -179,18 +213,18 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
     \caption{Segmented Indexed Access Information}
 \end{figure}
 
-Moves elements of \paramt{nf} vector register groups to/from contiguous segments of memory,
+This archetype moves elements of \paramt{nf} vector register groups to/from contiguous segments of memory,
 where each segment is offset by an index (in bytes) taken from another vector.
 
 \begin{itemize}
-\item The start of each segment is defined by \code{base address + index\_vector[i]}.
-\item This instruction doesn't do anything if \code{vstart >= EVL}.
+\item The start of each segment is defined by \code{address + index\_vector[i]}.
+\item These instructions don't do anything if \code{vstart >= EVL}.
 \end{itemize}
 
 % ORDERING
 \subsubsection*{Ordering}
 Accesses within each segment are not ordered relative to each other.
-If the ordered variant of this instruction is used, then the segments must be accessed in order (i.e. 19, 54, 8, 44 for \cref{fig:RVV_mem_index_3seg}).
+If the ordered variant of this instruction is used, then the segments must be accessed in order (i.e. 17, 53, 8, 44 for \cref{fig:RVV_mem_index_3seg}).
 Otherwise, segment ordering is not guaranteed.
 
 
@@ -203,10 +237,23 @@ Upon entering a trap, it is implementation-defined how much of the faulting segm
 \pagebreak
 \subsection{Unit whole-register accesses}
 
-\begin{table}[h]
+\begin{figure}[h]
     \centering
+
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
+        \begin{tabular}{lcc}
+            \toprule
+            Mnemonic & Data & Address \\
+            \midrule
+            \large\code{vl\param{<nreg>}re\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1)} \\
+            \bottomrule
+        \end{tabular}
+        \caption{Instruction}
+    \end{subtable}\hfill
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
 \begin{tabular}{ll}
-    \multicolumn{2}{c}{\large \code{vl\param{<nreg>}re\param{<eew>}.v vd, (rs1)}} \\
 \toprule
         Masked? & False \\
         Number of Registers & \paramt{<nreg>} \\
@@ -215,25 +262,40 @@ Upon entering a trap, it is implementation-defined how much of the faulting segm
         \code{EMUL} & 1 \\
     \bottomrule
 \end{tabular}
+\todomark{Make thinner}
+\caption{Parameters}
+\end{subtable}
     \caption{Unit Whole Register Information}
     \label{tab:RVV_mem_wholereg}
-\end{table}
+\end{figure}
 
-Moves the contents of \paramt{nreg} vector registers to/from a contiguous range in memory.
+This archetype moves the contents of \paramt{nreg} vector registers to/from a contiguous range in memory.
 Equivalent to a unit-stride access where \code{EVL} equals the total number of elements in \paramt{nreg} registers.
 \begin{itemize}
     \item \code{nreg} must be a power of two.
-    \item Doesn't support segmented access.
-    \item This instruction doesn't do anything if \code{vstart >= EVL}.
+    \item These instructions don't support segmented access.
+    \item These instructions don't do anything if \code{vstart >= EVL}.
 \end{itemize}
 
 Ordering and exception handling are identical to unit-stride accesses (\cref{chap:bg:sec:rvv:unitstrideaccess}).
 
 \subsection{Unit bytemask accesses}
-\begin{table}[h]
+\begin{figure}[h]
     \centering
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
+        \begin{tabular}{lcc}
+            \toprule
+            Mnemonic & Data & Address \\
+            \midrule
+            \large\code{vlm.v} & \large\code{vd,} & \large\code{(rs1)} \\
+            \bottomrule
+        \end{tabular}
+        \caption{Instruction}
+    \end{subtable}\hfill
+    \begin{subtable}[t]{0.5\textwidth}
+        \centering
 \begin{tabular}{ll}
-\multicolumn{2}{c}{\large \code{vlm.v vd, (rs1)}} \\
     \toprule
         Masked? & False \\
         \code{EEW} & 8-bits \\
@@ -241,18 +303,19 @@ Ordering and exception handling are identical to unit-stride accesses (\cref{cha
         \code{EMUL} & 1 \\
     \bottomrule
 \end{tabular}
+\caption{Parameters}
+\end{subtable}
     \caption{Unit Bytemask Information}
     \label{tab:RVV_mem_bytemask}
     % \end{subtable}\hfill
-\end{table}
+\end{figure}
 
-Moves the contents of a mask register to/from a contiguous range of memory.
-This instruction transfers at least \code{vl} bits,
-one bit for each element that could be used in subsequent vector instructions.
+This archetype moves the contents of a mask register to/from a contiguous range of memory.
+It transfers at least \code{vl} bits, one bit for each element that could be used in subsequent vector instructions.
 This will always fit in a single vector register (see \cref{chap:bg:subsec:rvvmasking}), hence \code{EMUL = 1} in all cases.
 \begin{itemize}
-    \item This instruction always operates as if the tail-agnostic setting of \code{vtype} is true.
-    \item This instruction doesn't support segmented access.
-    \item This instruction doesn't do anything if \code{vstart >= EVL}.
+    \item These instructions operate as if the tail-agnostic setting of \code{vtype} is true.
+    \item These instructions don't support segmented access.
+    \item These instructions don't do anything if \code{vstart >= EVL}.
 \end{itemize}
 Ordering and exception handling are identical to unit-stride accesses (\cref{chap:bg:sec:rvv:unitstrideaccess}).
