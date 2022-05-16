@@ -13,10 +13,10 @@ This section examines support across the Clang and GCC compilers for various vec
 
 \subsection{Required command-line options}
 Before you can compile vector code, the compiler must be told to use a vector ISA.
-This is fortunately quite easy, only requiring an addition to the architecture feature string \todomark{is it called that?} in most cases.
-On Clang 13 and other LLVM-13-based compilers, version 0.1 of the vector specification is supported as an experimental extension, so an extra command.
+This is fortunately quite easy, only requiring an addition to the architecture feature string in most cases.
+On Clang 13 and other LLVM-13-based compilers, version 0.1 of the vector specification is supported as an experimental extension\footnote{It is difficult to verify the actual corresponding version, because there is no readily available specification for v0.1, and the extension supports instructions only present from v0.8 such as whole register accesses. See \todomark{evaluation} for more information.}.
 Clang/LLVM~14 and up support RVV v1.0.
-GCC is an interesting case - there is a branch of \code{riscv-gcc-toolchain} that supports RVV v0.1, based on RISC-V GCC 10.1, but it hasn't been touched for more than a year.
+GCC is an interesting case --- there is a branch of \code{riscv-gcc-toolchain} that supports RVV v0.1, based on RISC-V GCC 10.1, but it hasn't been touched for more than a year.
 See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and building this version.
 
 \begin{table}[]

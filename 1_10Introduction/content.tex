@@ -19,7 +19,6 @@ Supporting this and other scalable vector ISAs in CHERI is essential to CHERI's 
 % \todomark{para on what vectors are}
 In the context of modern computer architecture, vector processing is the practice of dividing a large hardware register into a \emph{vector} of multiple \emph{elements} and executing the same operation on each element in a single instruction\footnote{This is a SIMD (Single Instruction Multiple Data) paradigm.}.
 This data-level parallelism can drastically increase throughput, particularly for arithmetic-heavy programs.
-\todomark{explain Scalable vectors}
 However, before computing arithmetic, the vectors must be populated with data.
 % This is typically done using specialized vector memory accesses, which access a whole vector's worth of memory in a single instruction.
 
@@ -61,7 +60,7 @@ As of November 2021 this has been ratified by RISC-V International\footnote{\url
 Choosing it has two key benefits.
 Firstly, the CHERI project maintains three open-source cores implementing CHERI-RISC-V\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}, none of which support vector processing.
 Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for these cores.
-Secondly, RVV is a \emph{scalable} vector model.
+Secondly, RVV is a \emph{scalable} vector model, where the length of each vector is implementation-dependent.
 This has more potential roadblocks than a fixed-length vector model, and investigating them here will make life easier if Arm wish to integrate their Scalable Vector Extension with CHERI later down the road.
 
 % \section{Aims}
