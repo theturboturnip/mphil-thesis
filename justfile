@@ -1,13 +1,23 @@
 alias b := build-thesis
+alias c := count 
+alias rb := rebuild-thesis
+
+clean:
+    latexmk -lualatex ./thesis.tex -outdir=./output/ -c
+
 build-thesis:
     @# Run latexmk on just this thesis
     latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
-count:
-    texcount -1 -sum -merge -q chapters.tex
+rebuild-thesis: clean build-thesis
 
-clean:
-    latexmk -lualatex ./thesis.tex -outdir=./output/ -c
+count:
+    #!/usr/bin/env sh
+    # for each content file in the main body
+    # run "texcount -1 -sum -merge -q $FILE"
+    # and print each command before you run it
+    echo 1_*/content.tex chapters.tex | xargs -n1 -t texcount -1 -sum -merge -q
+
 
 open: build-thesis
     xdg-open ./output/thesis.pdf
