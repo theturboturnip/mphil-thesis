@@ -1,4 +1,4 @@
-\chapter{Full test results}
+\chapter{Full \code{vector_memcpy} results}
 
 % \CatchFileDef{\tablevecmemcpy}{1_50Evaluation/data/vector_memcpy_rows}{}
 % \begin{longtable}{rcccccc}
@@ -7,20 +7,3 @@
 % \end{longtable}
 \input{1_50Evaluation/data/vector_memcpy_full}
 
-\begin{table}[h]
-    \centering
-    \caption{Results --- Vectorized memcpy of pointers}\label{tab:fullresults:vectormemcpyptrs}
-    \CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
-    \begin{tabular}{rcccccc}
-    \tablevecmemcpypointers
-    \end{tabular}
-\end{table}
-
-\begin{table}[h]
-    \centering
-    \caption{Results --- Basic program tests}\label{tab:fullresults:helloworld}
-    \CatchFileDef{\tablehelloworld}{1_50Evaluation/data/hello_world_rows.tex}{}
-    \begin{tabular}{rcccccc}
-    \tablehelloworld
-    \end{tabular}
-\end{table}

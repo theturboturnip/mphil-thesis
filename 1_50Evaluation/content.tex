@@ -1,18 +1,54 @@
 \chapter{Evaluation\label{chap:eval}}
 
+\section{Testing the emulator}
+In order to verify the correct behaviour of the emulator, a set of self-checking integration test programs were constructed.
+All the programs follow the same pattern: each test program contains multiple tests, which each initialize an environment, perform the action under test, and check the impact on the environment was correct.
+The individual test results are combined into a 64-bit bit vector and written to a special I/O memory location.
+A bit vector noting which tests were run is also written to I/O memory, because some compilers or architectures do not support all tests.
 
-\section{Vectorized memcpy test and results}
+Four compilers are tested, described in detail in \todoref{software stack chaper}.
+They include a build of GCC with support for vector intrinsics (\todoref{GCC appendix}), a binary distribution of Clang/LLVM-13, a custom build of Clang/LLVM-15, and a custom build of CHERI-Clang with changes to support RVV.
+32-bit and 64-bit non-CHERI architectures are tested, along with 64-bit CHERI in Capability and Integer modes (\todoref{CHERI background capability vs. integer}).
+This section describes the tests in more detail, and notes any limitations in the software stack that prevent testing under some compilers/architectures.
+
+\subsection{\code{hello\_world}}
+\code{hello\_world} runs three small functions which calculate Fibonacci numbers and factorials, testing that the emulator can handle basic programming constructs like recursive functions.
+Fibonacci is calculated in two ways: once with a simple recursive function, and once with \emph{memoization} where previous outputs are cached in a static array.
+The tests compile on all compilers, and output the correct results on all architectures.
+\begin{table}[h]
+    \centering
+    \caption{Results --- Basic program tests}\label{tab:fullresults:helloworld}
+    \CatchFileDef{\tablehelloworld}{1_50Evaluation/data/hello_world_rows.tex}{}
+    \begin{tabular}{rcccccc}
+    \tablehelloworld
+    \end{tabular}
+\end{table}
 
 
-\section{Capabilities-in-vector test and results}
+\subsection{\code{vector\_memcpy}}
+\code{vector\_memcpy} is generated in Python and consists of fifty-seven tests of different vector memory access archetypes under various configurations.
+\todomark{Eight test schemes, under four shared test harnesses, plus a standalone test for fault-only-first}
+\todomark{explain test schemes?}
+\todomark{explain test harnesses?}
 
-\section{Conclusion}
-\todomark{Summarize hypotheses outcomes}
-\todomark{Summarize results}
-% \todomark{List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc}
-
-% \subsection{Artifacts}
-All code and documentation built for this project is publicly available (see \cref{tab:artifacts})
+\subsubsection{Compiler differences}
+\todomark{remark on compiler differences}
 
 
-\section{Future work}
+\subsection{\code{vector\_memcpy\_pointers}}
+\code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
+On CHERI platforms, even in Integer mode, capability pointers are used and copied.
+The first test simply copies the data and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
+The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers.
+The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
+
+\begin{table}[h]
+    \centering
+    \caption{Results --- Vectorized memcpy of pointers}\label{tab:fullresults:vectormemcpyptrs}
+    \CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
+    \begin{tabular}{rcccccc}
+    \tablevecmemcpypointers
+    \end{tabular}
+\end{table}
+
+\todomark{vector\_memcpy results need updating}
