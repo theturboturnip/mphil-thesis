@@ -1,0 +1,71 @@
+\begin{longtable}{rcccccc}
+\caption{Results --- Vectorized memcpy}\label{tab:fullresults:vectormemcpy}\\
+\toprule
+& RV32 & \multicolumn{5}{c}{RV-64} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-7}
+& \code{llvm-13} & \code{llvm-13} & \code{llvm-15} & \code{gcc} & CHERI & CHERI (Int) \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\endlastfoot
+Unit Stride e8m1 & Y & Y & Y & Y & Y & Y\\
+Unit Stride e16m2 & Y & Y & Y & Y & Y & Y\\
+Unit Stride e32m4 & Y & Y & Y & Y & Y & Y\\
+Unit Stride e64m8 & Y & Y & Y & Y & Y & Y\\
+Unit Stride e32mf2 & Y & Y & Y & - & Y & Y\\
+Unit Stride e16mf4 & Y & Y & Y & - & Y & Y\\
+Unit Stride e8mf8 & Y & Y & Y & - & Y & Y\\
+Strided e8m1 & Y & Y & Y & Y & Y & Y\\
+Strided e16m2 & Y & Y & Y & Y & Y & Y\\
+Strided e32m4 & Y & Y & Y & Y & Y & Y\\
+Strided e64m8 & Y & Y & Y & Y & Y & Y\\
+Strided e32mf2 & Y & Y & Y & - & Y & Y\\
+Strided e16mf4 & Y & Y & Y & - & Y & Y\\
+Strided e8mf8 & Y & Y & Y & - & Y & Y\\
+Indexed e8m1 & Y & Y & Y & Y & Y & Y\\
+Indexed e16m2 & Y & Y & Y & Y & Y & Y\\
+Indexed e32m4 & Y & Y & Y & Y & Y & Y\\
+Indexed e64m8 & Y & Y & Y & Y & Y & Y\\
+Indexed e32mf2 & Y & Y & Y & - & Y & Y\\
+Indexed e16mf4 & Y & Y & Y & - & Y & Y\\
+Indexed e8mf8 & Y & Y & Y & - & Y & Y\\
+Unit Stride Masked e8m1 & Y & Y & Y & Y & Y & Y\\
+Unit Stride Masked e16m2 & Y & Y & Y & Y & Y & Y\\
+Unit Stride Masked e32m4 & Y & Y & Y & Y & Y & Y\\
+Unit Stride Masked e64m8 & Y & Y & Y & Y & Y & Y\\
+Unit Stride Masked e32mf2 & Y & Y & Y & - & Y & Y\\
+Unit Stride Masked e16mf4 & Y & Y & Y & - & Y & Y\\
+Unit Stride Masked e8mf8 & Y & Y & Y & - & Y & Y\\
+Bytemask Load e8m1 & - & - & Y & - & - & -\\
+Bytemask Load e16m2 & - & - & Y & - & - & -\\
+Bytemask Load e32m4 & - & - & Y & - & - & -\\
+Bytemask Load e64m8 & - & - & Y & - & - & -\\
+Bytemask Load e32mf2 & - & - & Y & - & - & -\\
+Bytemask Load e16mf4 & - & - & Y & - & - & -\\
+Bytemask Load e8mf8 & - & - & Y & - & - & -\\
+Unit Stride Segmented e8m2 & - & Y & Y & Y & Y & Y\\
+Unit Stride Segmented e16m2 & - & Y & Y & Y & Y & Y\\
+Unit Stride Segmented e32m2 & - & Y & Y & Y & Y & Y\\
+Unit Stride Segmented e64m2 & - & Y & Y & Y & Y & Y\\
+Unit Stride Segmented e32mf2 & - & Y & Y & - & Y & Y\\
+Whole-Register e64m1 & - & Y & Y & Y & Y & Y\\
+Whole-Register e64m2 & - & Y & Y & Y & Y & Y\\
+Whole-Register e64m4 & - & Y & Y & Y & Y & Y\\
+Whole-Register e64m8 & - & Y & Y & Y & Y & Y\\
+FoF Memcpy e8m1 & - & Y & Y & Y & Y & Y\\
+FoF Memcpy e16m2 & - & Y & Y & Y & Y & Y\\
+FoF Memcpy e32m4 & - & Y & Y & Y & Y & Y\\
+FoF Memcpy e64m8 & - & Y & Y & Y & Y & Y\\
+FoF Memcpy e32mf2 & - & Y & Y & - & Y & Y\\
+FoF Memcpy e16mf4 & - & Y & Y & - & Y & Y\\
+FoF Memcpy e8mf8 & - & Y & Y & - & Y & Y\\
+FoF Boundary e8m1 & - & Y & Y & Y & Y & Y\\
+FoF Boundary e16m2 & - & Y & Y & Y & Y & Y\\
+FoF Boundary e32m4 & - & Y & Y & Y & Y & Y\\
+FoF Boundary e64m8 & - & Y & Y & Y & Y & Y\\
+FoF Boundary e32mf2 & - & Y & Y & - & Y & Y\\
+FoF Boundary e16mf4 & - & Y & Y & - & Y & Y\\
+FoF Boundary e8mf8 & - & Y & Y & - & Y & Y\\
+\bottomrule
+\end{longtable}

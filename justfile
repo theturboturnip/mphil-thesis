@@ -1,15 +1,22 @@
 alias b := build-thesis
 alias c := count 
-alias rb := rebuild-thesis
+alias rb := rebuild
+alias ba := build-all
 
 clean:
     latexmk -lualatex ./thesis.tex -outdir=./output/ -c
+
+build-results:
+    #!/usr/bin/env sh
+    (cd ./1_50Evaluation/data && python3 ./generate_latex.py)
 
 build-thesis:
     @# Run latexmk on just this thesis
     latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
-rebuild-thesis: clean build-thesis
+build-all: build-results build-thesis
+
+rebuild: clean build-all
 
 count:
     #!/usr/bin/env sh

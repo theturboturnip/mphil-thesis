@@ -1,0 +1,8 @@
+\toprule
+& RV32 & \multicolumn{5}{c}{RV-64} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-7}
+& \code{llvm-13} & \code{llvm-13} & \code{llvm-15} & \code{gcc} & CHERI & CHERI (Int) \\
+\midrule
+Copy & Y & Y & Y & Y & Y & Y\\
+Copy + Invalidate & - & - & - & - & Y & Y\\
+\bottomrule
