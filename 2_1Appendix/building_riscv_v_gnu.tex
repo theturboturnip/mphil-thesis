@@ -8,7 +8,8 @@ It references a repository for \code{glibc} that no longer exists as a submodule
 To build the full toolchain with intrinsic support, perform the following steps (derived by the author independently, then amended based on macOS instructions from \todocite{https://github.com/riscv-collab/riscv-gcc/issues/323}):
 \begin{enumerate}
     \item Clone the repository as usual, \emph{without} cloning any submodules.
-    \item Change the \code{.gitmodules} file to point the \code{riscv-glibc} submodule at the upstream \code{glibc} repository \url{https://sourceware.org/git/?p=glibc.git}, which hosts the RISC-V version as of 19 March 2021\footnote{\gitrepo[archive-notify]{riscvarchive/riscv-glibc}{https://github.com/riscvarchive/riscv-glibc/tree/archive-notify}}.
+    \item Switch to the \code{rvv-intrinsic} branch.
+    \item Change the \code{.gitmodules} file to point the \code{riscv-glibc} submodule at the upstream \code{glibc} repository \url{git://sourceware.org/git/?p=glibc.git}, which hosts the RISC-V version as of 19 March 2021\footnote{Stated in \gitrepo[archive-notify]{riscvarchive/riscv-glibc}{https://github.com/riscvarchive/riscv-glibc/tree/archive-notify}}.
     
     \todomark{Example}
     \begin{itemize}
