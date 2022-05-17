@@ -97,7 +97,7 @@ def generate_table(test_program: str, df: pd.DataFrame, file, longtable=False):
 
 
 def main():
-    df = pd.read_csv("results-20220517-125339.tsv", sep="\t", names=["Compiler", "Architecture", "Test Program", "Test", "Ran", "Successful"])
+    df = pd.read_csv("results-20220517-193435.tsv", sep="\t", names=["Compiler", "Architecture", "Test Program", "Test", "Ran", "Successful"])
     df["status"] = df.apply(get_status, axis=1)
     print(df)
 

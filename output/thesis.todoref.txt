@@ -5,3 +5,9 @@ TODO Refs
 1_25EmulationInvestigation/sub40_beyond_emu.tex- capinvec - atomicity
 3
 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
+4
+1_50Evaluation/content.tex- software stack chaper
+5
+1_50Evaluation/content.tex- GCC appendix
+6
+1_50Evaluation/content.tex- CHERI background capability vs. integer

@@ -96,8 +96,12 @@ thesis.tex- My acknowledgements ...
 48
 1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
 49
-1_50Evaluation/content.tex- Summarize hypotheses outcomes
+1_50Evaluation/content.tex- Eight test schemes, under four shared test harnesses, plus a standalone test for fault-only-first
 50
-1_50Evaluation/content.tex- Summarize results
+1_50Evaluation/content.tex- explain test schemes?
 51
-1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
+1_50Evaluation/content.tex- explain test harnesses?
+52
+1_50Evaluation/content.tex- remark on compiler differences
+53
+1_50Evaluation/content.tex- vector\_memcpy results need updating
