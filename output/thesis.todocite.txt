@@ -3,5 +3,3 @@ TODO Citations
 1_10Introduction/content.tex- something something heartbleed?
 2
 2_1Appendix/building_riscv_v_gnu.tex- https://github.com/riscv-collab/riscv-gcc/issues/323
-3
-2_1Appendix/building_riscv_v_gnu.tex- macOS GCC instructions

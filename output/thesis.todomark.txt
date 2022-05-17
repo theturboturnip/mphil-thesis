@@ -101,13 +101,3 @@ thesis.tex- My acknowledgements ...
 1_50Evaluation/content.tex- Summarize results
 51
 1_50Evaluation/content.tex- List artifacts - github repositories, where to get the rust-cheri-compressed-cap crate etc
-52
-2_1Appendix/building_riscv_v_gnu.tex- verify - do a fresh clone and see
-53
-2_1Appendix/building_riscv_v_gnu.tex- Example
-54
-2_1Appendix/building_riscv_v_gnu.tex- clone submodules (macOS guy turns off SSL for this?)
-55
-2_1Appendix/building_riscv_v_gnu.tex- Configure with as many risc-v exts as possible
-56
-2_1Appendix/building_riscv_v_gnu.tex- Does RISC-V GCC 10.2 support vector intrinsics if you compile with v?
