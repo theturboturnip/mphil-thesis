@@ -35,7 +35,7 @@ It adds thirty-two general-purpose capability registers, thirty-two Special Capa
 
 The new general-purpose capability registers are each of size \code{CLEN = 2 * XLEN} plus a tag bit.
 These registers store compressed capabilities.
-While there is always a logical distinction between the pre-existing \emph{integer} registers \code{x0-x31} and the \emph{capability} registers \code{cx0-cx31}, the architecture may store them in a Split or Merged register file.
+While there is always a logical distinction between the pre-existing \emph{integer} registers \code{x0-x31} and the \emph{capability} registers \code{cx0-cx31}, the architecture may store them in a Split or Merged register file.\label{chap:bg:subsec:cherimergedreg}
 A Split register file stores the integer registers separately from capability registers, so programs can manipulate them independently.
 A Merged register file stores thirty-two registers of length \code{CLEN}, using the full width for the capability registers, and aliases the integer registers to the bottom \code{XLEN} bits.
 Under a merged register file, writing to an integer register makes the capability counterpart invalid, so programs have to be more careful with register usage.

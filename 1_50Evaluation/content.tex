@@ -12,6 +12,8 @@ They include a build of GCC with support for vector intrinsics (\todoref{GCC app
 32-bit and 64-bit non-CHERI architectures are tested, along with 64-bit CHERI in Capability and Integer modes (\todoref{CHERI background capability vs. integer}).
 This section describes the tests in more detail, and notes any limitations in the software stack that prevent testing under some compilers/architectures.
 
+\todomark{Note somewhere that GCC support isn't a priority as of Dec 2021 https://github.com/riscv-collab/riscv-gcc/issues/320}
+
 \subsection{\code{hello\_world}}
 \code{hello\_world} runs three small functions which calculate Fibonacci numbers and factorials, testing that the emulator can handle basic programming constructs like recursive functions.
 Fibonacci is calculated in two ways: once with a simple recursive function, and once with \emph{memoization} where previous outputs are cached in a static array.

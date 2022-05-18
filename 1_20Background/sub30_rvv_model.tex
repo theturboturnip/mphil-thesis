@@ -23,7 +23,7 @@ This section also describes the vector exception model (\cref{chap:bg:subsec:vex
 The \code{vtype} CSR contains two key fields that describe how vector instructions interpret the contents of vector registers.
 The first is the Selected Element Width (\code{SEW}), which is self-explanatory.
 It can be 8, 16, 32, or 64.
-128-bit elements are referenced a few times throughout but haven't been formally specified (see \cite[p32]{specification-RVV-v1.0}).
+128-bit elements are referenced a few times throughout but haven't been formally specified (see \cite[p10, p32]{specification-RVV-v1.0}).
 % Most instructions\footnote{Except where the width is encoded in the instruction, like bytemask loads.} will split vector registers into elements of this width.
 
 The second field is the Vector Register Group Multiplier (\code{LMUL}).

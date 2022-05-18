@@ -1,10 +1,73 @@
 \chapter{Capabilities-in-vectors\label{chap:capinvec}}
+Implementing \code{memcpy} correctly for CHERI systems requires copying the tag bits as well as the data.
+As it stands, any vectorized \code{memcpy} compiled and executed on the systems described in \cref{chap:software,chap:hardware} will not copy the tag bits, because the vector registers cannot store the tag bits and indeed cannot store valid capabilities.
+This chapter examines the changes made to the emulator to support storing capabilities-in-vectors, and determines the conditions required for the related hypotheses to be true.
+\cref{appx:emucapinvec} lists all the relevant properties of the emulator that allow storing capabilities in vectors.
 
 \section{Changing the emulator}
+This part of the project aimed to investigate \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip}, which led to the following goals:
+\begin{itemize}
+    \item (\cref{hyp:cap_in_vec_storage}) Vector registers should be able to hold capabilities 
+    \item (\cref{hyp:cap_in_vec_load_store}) At least one vector memory operation should be able to load/store capabilities from vectors
+    \begin{itemize}
+        \item Because \code{memcpy} should copy both integer and capability data, the vector memory operations should be able to handle both
+    \end{itemize}
+    \item (\cref{hyp:cap_in_vec_manip}) Vector instructions should be able to affect capabilities in some way
+    \begin{itemize}
+        \item Clearing the tag bit on a vector register counts as manipulation
+    \end{itemize}
+\end{itemize}
+
+First, we had to consider the impact of vectors on the theoretical vector model.
+We decided that any operation with element widths less than \code{CLEN} cannot output valid capabilities under any circumstances\footnote{This avoids edge cases with masking, where one part of a capability could be modified while the other parts are left alone.}.
+This, of course, means a new element width equal to \code{CLEN} must be introduced.
+We set \code{ELEN = VLEN = CLEN = 128}\footnote{The tag bits are implicitly instead of explicitly included here because \code{VLEN,ELEN} must be powers of two.} for our vector unit.
+
+Two new memory access instructions were created to take advantage of this new element width, and the \code{vsetvl} family were adjusted to support 128-bit values.
+Similar to the CHERI-RISC-V \code{LC/SC} instructions, we implemented 128-bit unit-stride vector loads and stores, which took over officially-reserved encodings\footnote{The RVV spec mentions, but does not specify, potential encodings for 128-bit element widths and instructions (\cite[p10, p32]{specification-RVV-v1.0}, \cref{tab:capinvec:accesswidth}).} we expected official versions to use.
+The memory instructions had to be added to CHERI-Clang manually, and Clang already has support for setting \code{SEW=128} in the \code{vsetvl} family (\cref{tab:capinvec:vtypewidth}).
+These instruction changes affected inline assembly only, rather than adding vector intrinsics, because CHERI-Clang only supports inline assembly anyway.
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{l|ccc}
+        \multicolumn{1}{c}{SEW} & \multicolumn{3}{c}{\code{vsew[2:0]}} \\
+        8 & 0 & 0 & 0 \\
+        16 & 0 & 0 & 1 \\
+        32 & 0 & 1 & 0 \\
+        64 & 0 & 1 & 1 \\
+        128$^{\text{new}}$ & 1 & 0 & 0 \\
+    \end{tabular}
+    \caption{Selected element width encoding}
+    \label{tab:capinvec:vtypewidth}
+\end{table}
+\begin{table}[]
+    \centering
+    \begin{tabular}{l|cccc}
+        & \code{mew} & \multicolumn{3}{c}{\code{width[2:0]}} \\
+        Vector 8b element & 0 & 0 & 0 & 0 \\
+        Vector 16b element & 0 & 1 & 0 & 1 \\
+        Vector 32b element & 0 & 1 & 1 & 0 \\
+        Vector 64b element & 0 & 1 & 1 & 1 \\
+        Vector 128b element & 1 & 0 & 0 & 0 \\
+    \end{tabular}
+    \caption{Width encoding for vector loads and stores}
+    \todomark{tabularx for evenly spacing columns here}
+    \label{tab:capinvec:accesswidth}
+\end{table}
+
+The next step was to add capability support to the vector register file.
+Our approach to capabilities-in-vectors is similar in concept to the Merged scalar register file for CHERI-RISC-V (\cref{chap:bg:subsec:cherimergedreg}), in that the same bits of a register can be accessed in two contexts: an integer context, zeroing the tag, or a capability context which maintains the current tag.
+The only instructions which can access data in a capability context are the aforementioned 128-bit memory accesses\footnote{The encoding mode (\cref{chap:bg:subsec:cheriencodingmode}) does not affect register usage: when using the Integer encoding mode, instructions can still access the vector register in a capability context. This is just like how scalar capability registers are still accessible in Integer encoding mode.}.
+All other instructions will read out untagged integer data, and clear tag bits when writing data.
+A new CHERI-specific vector register file was created, where each register is a \code{SafeTaggedCap} \todoref{place in software chapter where I discuss that :D} i.e. either zero-tagged integer data or a valid tagged capability.
+
+Using \code{SafeTaggedCap} had a few major consequences.
+Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit as described in \todoref{}.
+Secondly, it reuses the code path for accessing scalar capabilities in memory, so all related security properties are maintained (e.g. accesses must be 128-bit aligned, and are atomic).
 
 \subsection{Testing}
-\todomark{Tell reader to see evaluation}
-
-\todomark{Put big list of overall emulator conditions for valid cap-in-vec in the appendix}
+The above emulator changes allowed a minimal \code{memcpy} example to be constructed, which could copy both capabilities and integer data mixed together.
+This, along with another test to ensure arithmetic accesses the register file in an integer context, is described in the evaluation (\cref{chap:eval}).
 
 \input{1_40CapInVec/sub50_hyp}

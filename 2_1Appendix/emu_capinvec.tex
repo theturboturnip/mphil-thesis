@@ -1,0 +1,67 @@
+\chapter{Emulator properties for capabilities-in-vectors\label{appx:emucapinvec}}
+
+This appendix summarizes the properties of the emulator described in \cref{chap:capinvec} than enable capabilities-in-vectors.
+These properties are not absolute requirements for all capability-in-vector implementations fulfilling \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip}, but can be used as a starting point.
+
+% \begin{table}[]
+%     \centering
+%     \begin{tabular}{p{0.5cm}p{0.9\textwidth}}
+%         \toprule
+        
+%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_storage}} \\
+%         \midrule
+%         & \code{VLEN = 128(+1)} i.e. the length of a capability. If the length were 
+%         & \code{VLEN}
+%         \midrule
+        
+%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_load_store}} \\
+%         \midrule
+%         \midrule
+        
+%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_manip}} \\
+%         \midrule
+%         \midrule
+        
+%         \bottomrule
+%     \end{tabular}
+%     \caption{Caption}
+%     \label{tab:my_label}
+% \end{table}
+
+\begin{itemize}
+    \item \code{ELEN} = 128(+1) i.e. the length of a capability.
+    \begin{itemize}
+        \item For a program to manipulate, load, and store capability values securely and atomically, it must be able to operate on appropriately sized logical elements.
+    \end{itemize}
+    \item \code{VLEN} = 128(+1) i.e. the length of a capability.
+    \begin{itemize}
+        \item $\code{VLEN} \ge \code{ELEN}$ (\cite[Chapter 2]{specification-RVV-v1.0})
+        \item Larger \code{VLEN} could be supported, which must be a power-of-two\cite[Chapter 2]{specification-RVV-v1.0} and therefore will be a multiple of the capability length.
+    \end{itemize}
+    \item The memory interface is identical to that used by the scalar processor, where each vector access is split into a set of sequential accesses less than 128 bits.
+    \begin{itemize}
+        \item Therefore the safety properties for the scalar code still hold.
+        \item Example: capabilities can only be stored through a capability with the \code{STORE\_CAP} permission.
+    \end{itemize}
+    \item Capability memory accesses use \code{SafeTaggedCap} as a unit.
+    \begin{itemize}
+        \item This means it is impossible to set the tag bit on invalid capabilities.
+        \item It also means all capability accesses are 128-bit aligned, and atomic.
+    \end{itemize}
+    \item The only instruction that can place capabilities in a vector register is 128-bit element loads.
+    \begin{itemize}
+        \item There are no vectorized capability-to-capability or integer-to-capability instructions, such as \code{CSetBounds} or \code{CFromPtr}.
+        \item All other instructions that write to registers (e.g. arithmetic, 64-bit loads, etc.) unset the tag bit.
+        \item The only way to place a valid capability in a vector register is to copy a valid capability from memory.
+        \item Therefore the Provenance and Monotonicity properties are always upheld.
+    \end{itemize}
+    \item The only 128-bit element vector load instruction is unit-stride.
+    \begin{itemize}
+        \item Strided and Indexed accesses could be supported as long as they enforced alignment and atomicity correctly.
+        \item Whole-register accesses would need to be updated to always use 128-bit elements, in case capabilities are being accessed.
+    \end{itemize}
+    \item Capabilities-in-vectors cannot be dereferenced directly.
+    \begin{itemize}
+        \item Therefore Integrity cannot be violated by vector operations.
+    \end{itemize}
+\end{itemize}
