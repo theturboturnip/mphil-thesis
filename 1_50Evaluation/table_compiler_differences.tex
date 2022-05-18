@@ -1,0 +1,24 @@
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccccccc}
+    \toprule
+         & \multicolumn{2}{c}{\code{gcc}} & \multicolumn{2}{c}{\code{llvm-13}} & \multicolumn{2}{c}{CHERI-Clang\parnote{Based on LLVM 13}} & \multicolumn{2}{c}{\code{llvm-15}} \\
+         \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+         & ASM & Intr. & ASM & Intr. & ASM & Intr. & ASM & Intr. \\
+         \midrule
+        Fractional LMUL & N & N & Y & Y & Y & Y & Y & Y \\  
+        \midrule
+        Unit             & Y & Y & Y & Y & Y & N & Y & Y \\  
+        Strided          & Y & Y & Y & Y & Y & N & Y & Y \\  
+        Indexed          & Y & Y & Y & Y & Y & N & Y & Y \\  
+        Masked           & Y & Y & Y & Y & Y & N & Y & Y \\  
+        Segmented        & Y & Y\parnote{Intrinsic names are different} & Y & Y & Y & N & Y & Y \\  
+        Bytemask         & N & N & N & N & N & N & Y & Y \\  
+        Whole Register   & Y & -\parnote{Whole-register intrinsics are not defined\cite{specification-RVV-intrinsics}} & Y & - & Y & - & Y & - \\  
+        Fault-only-First & Y & N\parnote{Intrinsics emit the wrong instruction} & Y & Y & Y & N & Y & Y \\  
+         \bottomrule
+    \end{tabular}
+    \parnotes
+    \caption{Compiler support for various vector instructions}
+    \label{tab:vectormemcpycompiler}
+\end{table}

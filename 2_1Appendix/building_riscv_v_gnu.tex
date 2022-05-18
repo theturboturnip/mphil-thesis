@@ -12,6 +12,8 @@ To build the full toolchain with intrinsic support, perform the following steps 
     % \begin{itemize}
     %     \item Alternatively, this can be pointed at \url{https://github.com/riscvarchive/riscv-glibc.git}, the archived version of the old repository\todocite{macOS GCC instructions}.
     % \end{itemize}
+    \item Clone the repository itself:
+    \item[\code{\$}] \code{git clone https://github.com/theturboturnip/riscv-gnu-toolchain}
     \item Clone the \code{riscv-gcc} submodule:
     \item[\code{\$}] \code{git submodule update --init --recursive --progress --force ./riscv-gcc}
     \begin{itemize}
@@ -19,7 +21,6 @@ To build the full toolchain with intrinsic support, perform the following steps 
         \item[\code{\$}] \code{git -c http.sslVerify=false submodule ...}
     \end{itemize}
     \item Configure the compiler so it supports all General extensions, Compressed instructions, and Vector extension:
-    \item[\code{\$}] \code{./configure --prefix=<output directory> --with-arch=rv64gcv --with-abi=lp64d}
     \item Build the \code{newlib} version to compile for bare-metal platforms:
     \item[\code{\$}] \code{make newlib -j\$(nproc)}
 \end{enumerate}
