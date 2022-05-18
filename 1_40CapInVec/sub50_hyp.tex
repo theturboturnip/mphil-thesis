@@ -1,5 +1,55 @@
 \section{Testing hypotheses}
 
 \hypsubsection{hyp:cap_in_vec_storage}{Holding capabilities in vectors}
+It is possible for a single vector register to hold a capability (and differentiate a capability from integer data) as long as \code{VLEN = CLEN}.
+\code{VLEN} could also be larger, and a compliant implementation must then have \code{VLEN} be an integer multiple of \code{CLEN}.
+In theory, one could also describe a scheme where capabilities must be held by multiple registers together (e.g. \code{VLEN = CLEN/2} with one tag bit for every two registers), but this would complicate matters.
+
+If an implementation decides, as we did, that elements of width \code{CLEN} are required to produce capabilities, then $\code{VLEN} \ge \code{ELEN}$ therefore $\code{VLEN} \ge \code{CLEN}$.
+If a short \code{VLEN} is absolutely essential, one could place precise guarantees on a specific set of instructions to enable it (e.g. \code{SEW=64, LMUL=2} unit-stride unmasked loads could guarantee atomic capability transfers) but the emulator does not consider this.
+The CHERI security properties also impose some conditions.
+
+\subsubsection*{Provenance \& Monotonicity}
+The tag bit must be protected such that capabilities cannot be forged from integer data.
+The emulator's integer/capability context approach, where the tag bit may only be set on copying a valid capability from memory, and the output tag bit is zeroed on all other accesses, enforces this correctly.
+
+\subsubsection*{Integrity}
+Integrity is not affected by how a capability is stored, as long as the other properties are maintained.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}
+For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements.
+They must require all accesses be \code{CLEN}-aligned, or at least only load valid caps from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
+TR-951 states that capability memory accesses must be atomic\cite[Section 11.3]{TR-951}.
+This applies to vectors, even in ways that don't apply to scalar accesses.
+
+Individual element accesses for a vector access must be atomic relative to each other.
+This is relevant for e.g. a strided store uses a zero or unaligned stride, such that one element writes a valid capability and another element overwrites part of that address range.
+In that case, either the second element should ``win'' and clear the tag bit, or the first element should ``win'' and write the full capability atomically.
+For the emulator this condition is easily met.
+
+\subsubsection*{Provenance}
+Provenance requires the accesses be atomic as described above, and require that tag bits are copied correctly: the output tag bit must only be set if the input had a valid tag bit.
+These conditions also apply to scalar accesses.
+
+\subsubsection*{Monotonicity}
+These loads/stores do not attempt to manipulate capabilities, so have no relevance to monotonicity.
+
+\subsubsection*{Integrity}
+The same conditions for scalar and other vector accesses apply to maintain Integrity: namely that the base capability for each access should be checked to ensure it is valid.
+The emulator doesn't allow capabilities-in-vectors to be dereferenced directly, but if an implementation allows it those capabilities would also need to be checked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \hypsubsection{hyp:cap_in_vec_manip}{Manipulating capabilities in vectors}
+The emulator limits all manipulation to clearing the tag bit, achieved by writing data to the register in an integer context.
+In theory, it's possible to do more complex transformations, which can be proven by implementing each vector manipulation on vector elements as sequential scalar manipulations on scalar elements.
+With this method, all pre-existing scalar capability manipulations can become vector manipulations, but the utility seems limited.
+For example, instructions for creating capabilities or manipulating bounds en masse don't have an obvious use case.
+If more transformations are added they should be considered carefully, rather than creating vector equivalents for all scalar manipulations.
+
+\subsubsection*{Provenance \& Monotonicity}
+Because the only possible manipulations clear the tag bit, it's impossible to create or change capabilities, so Provenance and Monotonicity cannot be violated.
+Any manipulations that create capabilities, or potentially any manipulations that transfer capabilities from vector registers directly to scalar registers, would require more scrutiny.
+
+\subsubsection*{Integrity}
+As stated before, capabilities-in-vectors cannot be dereferenced directly, so there is no impact on Integrity.

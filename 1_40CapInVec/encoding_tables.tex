@@ -1,0 +1,27 @@
+\begin{table}[]
+    \centering
+    \begin{tabular}{l|ccc}
+        \multicolumn{1}{c}{SEW} & \multicolumn{3}{c}{\code{vsew[2:0]}} \\
+        8 & 0 & 0 & 0 \\
+        16 & 0 & 0 & 1 \\
+        32 & 0 & 1 & 0 \\
+        64 & 0 & 1 & 1 \\
+        128$^{\text{new}}$ & 1 & 0 & 0 \\
+    \end{tabular}
+    \caption{Selected element width encoding}
+    \label{tab:capinvec:vtypewidth}
+\end{table}
+\begin{table}[]
+    \centering
+    \begin{tabular}{l|cccc}
+        & \code{mew} & \multicolumn{3}{c}{\code{width[2:0]}} \\
+        Vector 8b element & 0 & 0 & 0 & 0 \\
+        Vector 16b element & 0 & 1 & 0 & 1 \\
+        Vector 32b element & 0 & 1 & 1 & 0 \\
+        Vector 64b element & 0 & 1 & 1 & 1 \\
+        Vector 128b element & 1 & 0 & 0 & 0 \\
+    \end{tabular}
+    \caption{Width encoding for vector loads and stores}
+    \todomark{tabularx for evenly spacing columns here}
+    \label{tab:capinvec:accesswidth}
+\end{table}
