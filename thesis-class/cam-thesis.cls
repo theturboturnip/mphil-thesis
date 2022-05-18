@@ -98,15 +98,23 @@
 \newif\ifcam@backrefs\cam@backrefsfalse
 \DeclareOption{backrefs}{\cam@backrefstrue}
 
+% oneside
+%
+\newif\ifcam@oneside\cam@onesidefalse
+\DeclareOption{oneside}{\cam@onesidetrue}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Using report class as base.
 %%
 %%%%%
-\PassOptionsToClass{a4paper,12pt,twoside,openright}{report}
+\PassOptionsToClass{a4paper,12pt}{report}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
 \ProcessOptions\relax
+\ifcam@oneside
+\else
+    \PassOptionsToClass{twoside,openright}{report}
+\fi
 \LoadClass{report}
 
 

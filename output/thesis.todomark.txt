@@ -96,12 +96,16 @@ thesis.tex- My acknowledgements ...
 48
 1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
 49
-1_50Evaluation/content.tex- Eight test schemes, under four shared test harnesses, plus a standalone test for fault-only-first
+1_50Evaluation/content.tex- Introduction
 50
-1_50Evaluation/content.tex- explain test schemes?
+1_50Evaluation/content.tex- Note somewhere that GCC support isn't a priority as of Dec 2021 https://github.com/riscv-collab/riscv-gcc/issues/320
 51
-1_50Evaluation/content.tex- explain test harnesses?
+1_50Evaluation/content.tex- Cap-in-vec
 52
-1_50Evaluation/content.tex- remark on compiler differences
+1_50Evaluation/content.tex- 
 53
-1_50Evaluation/content.tex- vector\_memcpy results need updating
+1_50Evaluation/content.tex- 
+54
+1_50Evaluation/content.tex- 
+55
+1_50Evaluation/content.tex- a conclusion

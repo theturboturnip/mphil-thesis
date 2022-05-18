@@ -6,8 +6,14 @@ TODO Refs
 3
 1_30Software/content.tex- bit from testing where we talk about GCC being iffy
 4
-1_50Evaluation/content.tex- software stack chaper
+1_40CapInVec/content.tex- place in software chapter where I discuss that :D
 5
-1_50Evaluation/content.tex- GCC appendix
+1_40CapInVec/content.tex- 
 6
+1_50Evaluation/content.tex- software stack chaper
+7
+1_50Evaluation/content.tex- GCC appendix
+8
 1_50Evaluation/content.tex- CHERI background capability vs. integer
+9
+1_50Evaluation/content.tex- hardware hyp, software hyp, cap-in-vec hyp
