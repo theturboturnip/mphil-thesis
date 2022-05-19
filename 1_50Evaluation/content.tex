@@ -1,5 +1,6 @@
 \chapter{Evaluation\label{chap:eval}}
-\todomark{Introduction}
+This project has two main research outcomes: an implementation for a potential CHERI-RVV specification, and a set of hypotheses/conclusions that can inform future work on combining scalable vector models with CHERI.
+This chapter describes the testing process for the emulator \todoref{}, and concludes by summarizing the conclusions from previous chapters \todoref{}.
 
 \section{Testing the emulator}
 In order to verify the correct behaviour of the emulator, a set of self-checking integration test C programs were constructed.
@@ -12,7 +13,7 @@ They include a build of GCC with support for vector intrinsics (\todoref{GCC app
 32-bit and 64-bit non-CHERI architectures are tested, along with 64-bit CHERI in Capability and Integer modes (\todoref{CHERI background capability vs. integer}).
 This section describes the tests in more detail, and notes any limitations in the software stack that prevent testing under some compilers/architectures.
 
-\todomark{Note somewhere that GCC support isn't a priority as of Dec 2021 https://github.com/riscv-collab/riscv-gcc/issues/320}
+% \todomark{Note somewhere that GCC support isn't a priority as of Dec 2021 https://github.com/riscv-collab/riscv-gcc/issues/320}
 
 \subsection{\code{hello\_world}}
 \code{hello\_world} runs three small functions which calculate Fibonacci numbers and factorials, testing that the emulator can handle basic programming constructs like recursive functions.
@@ -35,8 +36,7 @@ These tests are run under \emph{harnesses}, which provide setup and self-checkin
 The Vanilla harness tests a simple \code{memcpy} between two arrays;
 Masked tests that every other element is copied, not all of them;
 Segmented tests a \code{memcpy} into four separate output arrays, each a different field of a four-field structure.
-There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test verifies that out-of-bounds exceptions are swallowed and \code{vl} is set accordingly.
-% \todomark{Eight test schemes, under four shared test harnesses, plus a standalone test for fault-only-first}
+There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test verifies that out-of-bounds exceptions are swallowed and \code{vl} is reduced accordingly.
 
 All tests were successful when they ran, showing the emulator is correctly emulating the instructions, but in some cases testbenches weren't available.
 The full set of test results is available in \cref{chap:fullresults:vectormemcpy}.
@@ -69,6 +69,7 @@ The full set of test results is available in \cref{chap:fullresults:vectormemcpy
 \subsubsection{Compiler differences}
 While most compilers support all memory access archetypes, there are a few notable exceptions.
 GCC has the most: there is no support for fractional LMUL or bytemask accesses, the intrinsics for segmented accesses are named differently, and fault-only-first intrinsics emit incorrect instructions\footnote{On GCC, fault-only-first intrinsics seem to emit \code{vsetvli}.}.
+GCC RVV support has been deprioritized in favor of LLVM\footnote{\url{https://github.com/riscv-collab/riscv-gcc/issues/320}}, so the rough edges make sense.
 LLVM-13-based compilers (including CHERI-Clang) support all specified archetypes except bytemask accesses.
 CHERI-Clang doesn't support intrinsics, but all inline assembly support is intact.
 Support for bytemask accesses is only available in LLVM-14 and up.
@@ -91,37 +92,55 @@ The copied pointers are examined to make sure their tag bits are all zeroed, and
 
 \subsection{Summary}
 All tests passed where available, and all tests were available on at least one compiler.
-This shows the emulator is correctly executing vector instructions, and that it is possible to correctly \code{memcpy} capabilties in vector registers (although further investigation is required to be confident in the security of this approach).
+This shows the emulator is correctly executing vector instructions, and that it is possible to correctly \code{memcpy} capabilties in vector registers.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Summarizing hypotheses}
-
-The hypotheses, reproduced in \cref{tab:hypothesis_outcome}, are evaluated in \todoref{hardware hyp, software hyp, cap-in-vec hyp}.
-They come to the broad conclusion that adapting RVV to a CHERI architecture is possible, and that other vector models like Arm SVE can be adapted in part\footnote{Further examination is required for some addressing modes.}, but the current software stack does not make writing CHERI-RVV programs easy.
-In particular RVV intrinsics can and should be ported to CHERI-Clang, and auto-vectorization for RVV and CHERI-RVV would simplify the situation further.
-\todomark{Cap-in-vec}
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lp{0.6\textwidth}cl}
-    \toprule
-        \multicolumn{2}{l}{Hypothesis} & In Theory & In Practice \\
-        \midrule
-        \ref*{hyp:hw_cap_as_vec_mem_ref} & \gethyptext{hyp:hw_cap_as_vec_mem_ref} & True  & True \\
-        \ref*{hyp:hw_cap_bounds_checks_amortized} & \gethyptext{hyp:hw_cap_bounds_checks_amortized} & True & Benefit Varies \\
-        \ref*{hyp:sw_vec_legacy} & \gethyptext{hyp:sw_vec_legacy} & True & True (ASM) \\
-        \ref*{hyp:sw_pure_compat} & \gethyptext{hyp:sw_pure_compat} & True & False \\
-        \ref*{hyp:sw_stack_vectors} & \gethyptext{hyp:sw_stack_vectors} & True & True \\
-        \ref*{hyp:sw_multiproc} & \gethyptext{hyp:sw_multiproc} & True & True \\
-        \ref*{hyp:cap_in_vec_storage} & \gethyptext{hyp:cap_in_vec_storage} & \todomark{} & \\
-        \ref*{hyp:cap_in_vec_load_store} & \gethyptext{hyp:cap_in_vec_load_store} & \todomark{} & \\
-        \ref*{hyp:cap_in_vec_manip} & \gethyptext{hyp:cap_in_vec_manip} & \todomark{} & \\
-        \bottomrule
-    \end{tabular}
-    \caption{Hypothesis summary table}
-    \label{tab:hypothesis_outcome}
-\end{table}
-
+\pagebreak
+% \section{Summarizing hypotheses}
 \section{Conclusion}
-\todomark{a conclusion}
-It is clear that scalable vector models should not be a barrier for CHERI.
+In this dissertation I have presented a possible fusion of CHERI and RVV implemented in an emulator (\cref{chap:hardware}), explored the impact on the software stack (\cref{chap:software}), and extended the RVV instruction set/vector model to store capabilities in vectors (\cref{chap:capinvec}).
+Throughout these chapters I have also presented conclusions to a set of hypotheses (\todoref{hyp table}), which prove the general viability of adding scalable vector models to CHERI processsors.
+
+\cref{hyp:hw_cap_as_vec_mem_ref} proved the most essential point, that a blanket replacement of all memory references with capabilities in all RVV instructions is valid.
+\cref{hyp:hw_cap_bounds_checks_amortized} then alleviated performance concerns by showing it was possible to combine the required capability checks for all vector accesses, amortizing the overall cost of checking, although with varying practical benefit.
+
+On the software side \cref{hyp:sw_vec_legacy,hyp:sw_pure_compat} showed that (in theory) non-CHERI vectorized code could be run on CHERI systems, and could also be recompiled for pure-capability execution with no source code changes, but that CHERI-Clang's current state adds some practical limitations.
+\cref{hyp:sw_stack_vectors,hyp:sw_multiproc} address the pausing and resuming of vector code, particularly saving and restoring variable-length architectural state, concluding that it is entirely possible but will require software adjustments.
+
+Through a limited investigation of capabilities-in-vectors, \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} showed that a highly constrained implementation could enable a fully-functional vectorized \code{memcpy} without violating CHERI security principles.
+It should be possible to extend the CHERI-RVV ISA with vector equivalents of existing CHERI scalar instructions, but I did not investigate this further.
+
+Overall, it is clear that scalable vector models can be adapted to CHERI without significant loss of functionality.
+While most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, any differences from RVV's model will require careful examination.
+Given the importance of vector processing to modern computing, and thus its importance to CHERI, I hope that this research and the software artifacts of this project (see \todoref{appendix of artifacts}) pave the way for future vector-enabled CHERI processor implementations.
+
+% The hypotheses, reproduced in \cref{tab:hypothesis_outcome}, are evaluated in \todoref{hardware hyp, software hyp, cap-in-vec hyp}.
+% They come to the broad conclusion that adapting RVV to a CHERI architecture is possible, and that other vector models like Arm SVE can be adapted in part\footnote{Further examination is required for some addressing modes.}, but the current software stack does not make writing CHERI-RVV programs easy.
+% In particular RVV intrinsics can and should be ported to CHERI-Clang, and auto-vectorization for RVV and CHERI-RVV would simplify the situation further.
+% The limited investigation of capabilities-in-vectors shows that minimal implementations designed to enable \code{memcpy} can avoid violating CHERI security principles, but adding more advanced capability manipulations requires careful consideration.
+
+% \begin{table}[h]
+%     \centering
+%     \begin{tabular}{lp{0.6\textwidth}cl}
+%     \toprule
+%         \multicolumn{2}{l}{Hypothesis} & In Theory & In Practice \\
+%         \midrule
+%         \ref*{hyp:hw_cap_as_vec_mem_ref} & \gethyptext{hyp:hw_cap_as_vec_mem_ref} & True  & True \\
+%         \ref*{hyp:hw_cap_bounds_checks_amortized} & \gethyptext{hyp:hw_cap_bounds_checks_amortized} & True & Benefit Varies \\
+%         \ref*{hyp:sw_vec_legacy} & \gethyptext{hyp:sw_vec_legacy} & True & True (ASM) \\
+%         \ref*{hyp:sw_pure_compat} & \gethyptext{hyp:sw_pure_compat} & True & False \\
+%         \ref*{hyp:sw_stack_vectors} & \gethyptext{hyp:sw_stack_vectors} & True & True \\
+%         \ref*{hyp:sw_multiproc} & \gethyptext{hyp:sw_multiproc} & True & True \\
+%         \ref*{hyp:cap_in_vec_storage} & \gethyptext{hyp:cap_in_vec_storage} & True & True \\
+%         \ref*{hyp:cap_in_vec_load_store} & \gethyptext{hyp:cap_in_vec_load_store} & True & True \\
+%         \ref*{hyp:cap_in_vec_manip} & \gethyptext{hyp:cap_in_vec_manip} & True & True \\
+%         \bottomrule
+%     \end{tabular}
+%     \caption{Hypothesis summary table}
+%     \label{tab:hypothesis_outcome}
+% \end{table}
+
+% \section{Conclusion}
+% \todomark{a conclusion}
+% It is clear that scalable vector models should not be a barrier for CHERI.
+% \todomark{The artifacts for this project are publicly available, see appendix blah}
