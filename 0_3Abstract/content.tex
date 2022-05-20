@@ -1,3 +1,29 @@
 \abstract{%
-  \todomark{My abstract ...}
+{
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+CHERI, a generic architecture extension which improves memory safety, has garnered attention from industry partners for its low overhead and compatibility with existing source code.
+CHERI has been adapted to multiple ISAs, including RISC-V and Arm, but not to any scalable vector processors.
+% While CHERI has been adapted to multiple ISAs, notably RISC-V and Armv8, it has not been adapted to scalable vector processing.
+
+Vector processing, where the same operation is performed on multiple elements of a ``vector'' in parallel, is used everywhere in modern computing from high-performance number-crunching to the humble \code{memcpy}.
+Arm SVE\cite{stephensARMScalableVector2017} and RISC-V ``V''\cite{specification-RVV-v1.0} are new flagship vector extensions for Arm and RISC-V, which use a ``vector-length agnostic programming model'' to allow hardware implementations to choose their vector lengths.
+These scalable vector models are intended to stay in use long into the future, and it is essential for CHERI to support them.
+
+This dissertation focuses on RISC-V V, presenting and evaluating a possible ``CHERI-RVV'' combination ISA by building and testing a reference implementation in Rust.
+% \todomark{Vector memory instructions are ported to CHERI by replacing integer pointers with capabilities, in a way that maintains binary compatibility with legacy code.}
+% \todomark{The current CHERI compiler stack is examined to ensure CHERI-RVV will maintain source-code compatibility with legacy vector programs, just like regular CHERI with legacy scalar programs.}
+% \todomark{The concept of storing capabilities in vectors is examined in a limited context, to allow implementing CHERI-agnostic functions such as \code{memcpy} with vector instructions.}
+We find that RVV is easily adaptable to CHERI with no issues, even maintaining binary compatibility with vanilla RVV programs, although other models like Arm SVE may require more investigation.
+We find a set of issues with the current CHERI compiler that make source-level compatibility difficult, and show they can be easily resolved with engineering effort.
+Finally, we explore storing capabilities-in-vectors in a limited context, to allow implementing \code{memcpy} with vector instructions, and show it does not violate security properties.
+
+
+% \todomark{merge the above paragraphs into one}
+
+% Scalable vector models define a software interface that allows hardware implementations to use different vector lengths, and have been chosen by RISC-V and Arm to adapt 
+
+We conclude that it is viable to combine RISC-V Vectors with CHERI to enable vectorized arithmetic and \code{memcpy} operations without sacrificing performance, source-level compatibility, or memory protection.
+}
 }
