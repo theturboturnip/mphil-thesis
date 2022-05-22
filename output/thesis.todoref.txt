@@ -10,10 +10,16 @@ TODO Refs
 5
 1_40CapInVec/content.tex- 
 6
-1_50Evaluation/content.tex- software stack chaper
+1_50Evaluation/content.tex- 
 7
-1_50Evaluation/content.tex- GCC appendix
+1_50Evaluation/content.tex- 
 8
-1_50Evaluation/content.tex- CHERI background capability vs. integer
+1_50Evaluation/content.tex- software stack chaper
 9
-1_50Evaluation/content.tex- hardware hyp, software hyp, cap-in-vec hyp
+1_50Evaluation/content.tex- GCC appendix
+10
+1_50Evaluation/content.tex- CHERI background capability vs. integer
+11
+1_50Evaluation/content.tex- hyp table
+12
+1_50Evaluation/content.tex- appendix of artifacts
