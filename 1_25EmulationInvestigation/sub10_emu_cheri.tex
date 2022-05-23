@@ -52,12 +52,12 @@ The actual Processor structure was left mostly unchanged.
 Integer addresses were changed to capabilities throughout,
 memory and register file types were changed as described above, and the PCC/DDC were added.
 
-The capability model presented by the C/Rust library has one flaw.
+The capability model presented by the C/Rust library has one flaw.\label{safetaggedcap}
 Each \code{CcxCap} instance stores capability metadata (e.g. the uncompressed bounds) as well as the compressed encoding.
 This makes it potentially error-prone to represent untagged integer data with \code{CcxCap}, as the compressed and uncompressed data may not be kept in sync and cause inconsistencies later down the line.
 \code{CcxCap} also provides a simple interface to set the tag bit, without checking whether that is valid.
 The emulator introduced the \code{SafeTaggedCap} to resolve this: a sum type which represents either a \code{CcxCap} with the tag bit set, or raw data with the tag bit unset.
-This adds type safety, as the Rust compiler forces every usage of \code{SafeTaggedCap} to consider both options, preventing raw data from being interpreted as a capability by accident.
+This adds type safety, as the Rust compiler forces every usage of \code{SafeTaggedCap} to consider both options, preventing raw data from being interpreted as a capability by accident and enforcing Provenance.
 
 % i.e. doing capability relocation
 The final hurdle was the capability relocations outlined in \cref{chap:bg:subsec:cherirelocs}.

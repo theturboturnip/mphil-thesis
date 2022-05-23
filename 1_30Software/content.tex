@@ -31,7 +31,7 @@ See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and b
     Clang-13 & \code{-march=rv64gv0p10}  & Supports intrinsics, inline assembly for RVV v0.1 \\
     & \code{-menable-experimental-extensions} & \\
     Clang-14+ & \code{-march=rv64gv} & Supports intrinsics, inline assembly for RVV v1.0 \\
-    GCC 10.1 & \code{-march=rv64g_v} & Requires special toolchain (see \cref{appx:building_rvv_gcc_toolchain}) and has incomplete support (see \todoref{bit from testing where we talk about GCC being iffy}) \\
+    GCC 10.1 & \code{-march=rv64g_v} & Requires special toolchain (see \cref{appx:building_rvv_gcc_toolchain}) and has incomplete support (see \cref{chap:eval:subsec:compilerdifferences}) \\
     \bottomrule
 \end{tabular}
     \caption{Command-line arguments for compiling RVV code on various compilers\\(assuming the base ISA is \code{rv64g})}

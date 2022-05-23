@@ -16,7 +16,7 @@ This support is independent of misaligned scalar access support, so if e.g. misa
 Changing the emulator to allow misaligned accesses of integer data would not have any impact on CHERI correctness.
 Capability loads/stores must be aligned to \code{CLEN}\cite[Section 3.5.2]{TR-951}, and an implementation cannot change this.
 Writing misaligned integer values across a \code{CLEN} boundary would need to make sure to zero the tag bit on both regions, but this applies to scalar implementations as much as vector ones.
-Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\todoref{capinvec - alignment requirements}).
+Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\cref{chap:capinvec:hyp_load_store}).
 
 \subsection{Atomicity of accesses/General memory model}
 Vector memory instructions are specified to follow the RISC-V Weak Memory Ordering model\cite{specification-RVV-v1.0}\footnote{Behaviour under the Total Store Ordering extension hasn't been defined.}, although this model hasn't been fully explained in terms of vectors yet.
@@ -27,7 +27,7 @@ The RVV spec states \enquote{vector misaligned memory accesses follow the same r
 This is the only mention of atomicity in that document.
 
 Again, atomicity of integer data doesn't really impact the fusion of CHERI and RVV, as long as tag bits are correctly zeroed on all integer writes.
-However, it does impact capabilities-in-vectors (\todoref{capinvec - atomicity}).
+However, it does impact capabilities-in-vectors (\cref{chap:capinvec:hyp_load_store}).
 
 \subsection{Relaxed access ordering and precise traps}
 Ordering is only enforced insofar as it is observable.

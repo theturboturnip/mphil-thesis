@@ -17,7 +17,7 @@ The emulator's integer/capability context approach, where the tag bit may only b
 Integrity is not affected by how a capability is stored, as long as the other properties are maintained.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}
+\hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}\label{chap:capinvec:hyp_load_store}
 For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements.
 They must require all accesses be \code{CLEN}-aligned, or at least only load valid caps from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
 TR-951 states that capability memory accesses must be atomic\cite[Section 11.3]{TR-951}.

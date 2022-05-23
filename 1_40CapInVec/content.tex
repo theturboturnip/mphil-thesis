@@ -5,7 +5,7 @@
 Implementing \code{memcpy} correctly for CHERI systems requires copying the tag bits as well as the data.
 As it stands, any vectorized \code{memcpy} compiled and executed on the systems described in \cref{chap:software,chap:hardware} will not copy the tag bits, because the vector registers cannot store the tag bits and indeed cannot store valid capabilities.
 This chapter examines the changes made to the emulator to support storing capabilities-in-vectors, and determines the conditions required for the related hypotheses to be true.
-\cref{appx:emucapinvec} lists all the relevant properties of the emulator that allow storing capabilities in vectors.
+\cref{appx:capinvec} lists the changes made and all the relevant properties of the emulator that allow storing capabilities in vectors.
 
 \section{Changing the emulator}
 This part of the project aimed to investigate \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip}, which led to the following goals:
@@ -37,10 +37,11 @@ The next step was to add capability support to the vector register file.
 Our approach to capabilities-in-vectors is similar in concept to the Merged scalar register file for CHERI-RISC-V (\cref{chap:bg:subsec:cherimergedreg}), in that the same bits of a register can be accessed in two contexts: an integer context, zeroing the tag, or a capability context which maintains the current tag.
 The only instructions which can access data in a capability context are the aforementioned 128-bit memory accesses\footnote{The encoding mode (\cref{chap:bg:subsec:cheriencodingmode}) does not affect register usage: when using the Integer encoding mode, instructions can still access the vector register in a capability context. This is just like how scalar capability registers are still accessible in Integer encoding mode.}.
 All other instructions will read out untagged integer data, and clear tag bits when writing data.
-A new CHERI-specific vector register file was created, where each register is a \code{SafeTaggedCap} \todoref{place in software chapter where I discuss that :D} i.e. either zero-tagged integer data or a valid tagged capability.
+A new CHERI-specific vector register file was created, where each register is a \code{SafeTaggedCap} (\cref{safetaggedcap}) i.e. either zero-tagged integer data or a valid tagged capability.
 
+\todomark{This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.}
 Using \code{SafeTaggedCap} had a few major consequences.
-Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit as described in \todoref{}.
+Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit.
 Secondly, it reuses the code path for accessing scalar capabilities in memory, so all related security properties are maintained (e.g. accesses must be 128-bit aligned, and are atomic).
 
 \subsection{Testing}

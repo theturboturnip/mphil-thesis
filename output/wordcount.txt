@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15911
-Words in text: 14722
+Sum count: 15941
+Words in text: 14752
 Words in headers: 265
 Words outside text (captions, etc.): 887
 Number of headers: 100
@@ -38,7 +38,7 @@ Subcounts:
   133+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
   82+3+13 (1/1/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   201+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
-  941+7+85 (3/0/1/0) Subsection: Emulating CHERI
+  944+7+85 (3/0/1/0) Subsection: Emulating CHERI
   814+14+32 (5/0/1/0) Subsection: Emulating vectors
   60+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
   246+3+47 (1/0/0/0) Subsection: Possible fast-path outcomes
@@ -47,8 +47,8 @@ Subcounts:
   69+2+0 (1/0/3/1) Subsection: Strided accesses
   109+2+0 (1/0/3/1) Subsection: Indexed accesses
   97+4+0 (1/0/0/0) Section: Going beyond the emulator
-  124+2+0 (1/0/0/0) Subsection: Misaligned accesses
-  149+6+20 (1/0/0/0) Subsection: Atomicity of accesses/General memory model
+  129+2+0 (1/0/0/0) Subsection: Misaligned accesses
+  154+6+20 (1/0/0/0) Subsection: Atomicity of accesses/General memory model
   110+6+25 (1/0/0/0) Subsection: Relaxed access ordering and precise traps
   792+14+17 (5/0/9/0) Section: Testing hypotheses
   89+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
@@ -65,15 +65,15 @@ Subcounts:
   206+6+4 (1/0/0/0) Subsection: Storing scalable vectors on the stack
   861+27+0 (8/0/0/0) Section: Testing hypotheses}\label{chap:software:sec:hypotheses
   42+4+1 (1/1/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
-  96+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
-  430+3+105 (1/0/0/0) Section: Changing the emulator
+  100+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
+  428+3+105 (1/0/0/0) Section: Changing the emulator
   45+1+0 (1/0/0/0) Subsection: Testing
   663+11+0 (8/0/2/0) Section: Testing hypotheses
   50+1+0 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
-  182+3+0 (1/0/0/0) Section: Testing the emulator
+  193+3+0 (1/0/0/0) Section: Testing the emulator
   63+2+6 (1/1/0/0) Subsection: \code{hello\_world}
   257+4+20 (2/1/0/0) Subsection: \code{vector\_memcpy}
   101+3+4 (1/1/0/0) Subsection: \code{vector\_memcpy\_pointers}
   36+1+0 (1/0/0/0) Subsection: Summary
-  356+1+0 (1/0/0/0) Section: Conclusion
+  360+1+0 (1/0/0/0) Section: Conclusion
 

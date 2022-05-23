@@ -1,32 +1,21 @@
-\chapter{Emulator properties for capabilities-in-vectors\label{appx:emucapinvec}}
+\chapter{CHERI-RVV changes from CHERI and RVV}
 
-This appendix summarizes the properties of the emulator described in \cref{chap:capinvec} than enable capabilities-in-vectors.
+\todomark{CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes}
+
+\todomark{CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.}
+\todomark{The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.}
+
+\todomark{CHERI-RVV doesn't change CHERI behaviour}
+
+\section{Capabilities-in-vectors}\label{appx:capinvec}
+\todomark{Adds unit load/store 128, element width 128}
+
+\input{1_40CapInVec/encoding_tables}
+
+\subsection{Relevant properties}\label{appx:capinvec:properties}
+
+This subsection summarizes the properties of the emulator described in \cref{chap:capinvec} than enable capabilities-in-vectors.
 These properties are not absolute requirements for all capability-in-vector implementations fulfilling \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip}, but can be used as a starting point.
-
-% \begin{table}[]
-%     \centering
-%     \begin{tabular}{p{0.5cm}p{0.9\textwidth}}
-%         \toprule
-        
-%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_storage}} \\
-%         \midrule
-%         & \code{VLEN = 128(+1)} i.e. the length of a capability. If the length were 
-%         & \code{VLEN}
-%         \midrule
-        
-%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_load_store}} \\
-%         \midrule
-%         \midrule
-        
-%         \multicolumn{2}{l}{\ref*{hyp:cap_in_vec_manip}} \\
-%         \midrule
-%         \midrule
-        
-%         \bottomrule
-%     \end{tabular}
-%     \caption{Caption}
-%     \label{tab:my_label}
-% \end{table}
 
 \begin{itemize}
     \item \code{ELEN} = 128(+1) i.e. the length of a capability.
