@@ -11,7 +11,7 @@ The core impact of CHERI, on a hardware level, is that memory can no longer be a
 Capabilities are unforgeable tokens that grant fine-grained access to ranges of memory.
 Instead of generating them from scratch, capabilities must be \emph{derived} from another capability with greater permissions.
 For example, a capability giving read-write access to an array of structures can be used to create a sub-capability granting read-only access to a single element.
-This vastly reduces the scope of memory-related security issues, such as buffer overflows\todocite{something something heartbleed?}, and creates interesting opportunities for software compartmentalization\cite{watsonCHERIHybridCapabilitySystem2015}.
+This vastly reduces the scope of security violations through spatial errors (e.g. buffer overflows\cite{szekeresSoKEternalWar2013}), and creates interesting opportunities for software compartmentalization\cite{watsonCHERIHybridCapabilitySystem2015}.
 
 Industry leaders have recognized the value CHERI provides.
 Arm Inc have manufactured the Morello System-on-Chip, based on their Neoverse N1 CPU, which incorporates CHERI capabilities into the Armv8.2 ISA.
@@ -58,11 +58,10 @@ This may require more guarantees than otherwise necessary - for example, each ve
 % \todomark{CHERI has a RISC-V ISA + various implementations, wants to support vectors}
 % \todomark{scalable vector support useful for future Arm support}
 % \todomark{Current Morello doesn't support Arm SVE/NEON (cite?) despite the base Neoverse N1 supporting it (cite??)}
-To explore this topic, we chose to focus on the RISC-V Vector extension (shortened to RVV throughout this dissertation, and specified in \cite{specification-RVV-v1.0}).
+To explore this topic, we chose to focus on the RISC-V Vector extension\cite{specification-RVV-v1.0} (shortened to RVV throughout).
 As of November 2021 this has been ratified by RISC-V International\footnote{\url{https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions}}, and will be RISC-V's standard vector instruction set moving forward.
-Choosing it has two key benefits.
-Firstly, the CHERI project maintains three open-source cores implementing CHERI-RISC-V\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}, none of which support vector processing.
-Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for these cores.
+This has two key benefits.
+Studying RVV will allow reference \enquote{CHERI-RVV} implementations to be built for the CHERI project's open-source RISC-V cores\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}, which don't currently support vector processing.
 Secondly, RVV is a \emph{scalable} vector model, where the length of each vector is implementation-dependent.
 This has more potential roadblocks than a fixed-length vector model, and investigating them here will make life easier if Arm wish to integrate their Scalable Vector Extension with CHERI later down the road.
 
@@ -99,22 +98,27 @@ In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the a
 
 The investigation was carried out by designing and testing a CHERI-RVV emulator written in Rust, but that is only a single implementation.
 To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to prove \todomark{nine} hypotheses (\cref{tab:hypotheses}).
-\cref{hyp:hw_cap_as_vec_mem_ref,hyp:hw_cap_bounds_checks_amortized} take the point of view of the hardware, considering basic feasibility and potential performance issues.
-\cref{hyp:sw_vec_legacy,hyp:sw_pure_compat,hyp:sw_stack_vectors,hyp:sw_multiproc} examine the current CHERI-RVV software stack, checking if adding CHERI to vector programs causes compatibility problems.
-\cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} considers capabilities-in-vectors: the conditions under which vector registers can hold capabilities, and the conditions under which vectorized memory accesses and other instructions can manipulate them.
+\cref{hyp:hw_cap_as_vec_mem_ref,hyp:hw_cap_bounds_checks_amortized} consider basic feasibility and potential hardware performance issues.
+\cref{hyp:sw_vec_legacy,hyp:sw_pure_compat,hyp:sw_stack_vectors,hyp:sw_multiproc} ensure that vector software is compatible with potential CHERI-RVV software stacks.
+\cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} considers capabilities-in-vectors: the conditions under which vector registers can hold capabilities, and vectorized instructions can manipulate them.
 
-Along with testing these hypotheses, this document serves as a practical explanation of the following:
-\begin{itemize}
-    \item The changes to RISC-V required by CHERI-RISC-V
-    \item The RISC-V-V vector model, and all memory-related instructions
-    \item How to compile CHERI-RVV code for a baremetal platform (with no operating system)
-    \item How to execute CHERI-RVV code compiled for a baremetal platform
-    \item The limitations of the current CHERI-RVV software stack
-\end{itemize}
-\todomark{fill out this para more, have an actual end sentence}
+This document also examines current practical realities, such as the limitations of the current CHERI-RVV software stack, and explains how to compile/execute CHERI-RVV code on baremetal platforms.
+The RVV and CHERI-RISC-V specifications are succinctly explained in \cref{chap:background}.
+
+% Along with testing these hypotheses, this document serves as a practical explanation of the following:
+% \begin{itemize}
+%     \item The changes to RISC-V required by CHERI-RISC-V
+%     \item The RISC-V-V vector model, and all memory-related instructions
+%     \item How to compile CHERI-RVV code for a baremetal platform (with no operating system)
+%     \item How to execute CHERI-RVV code compiled for a baremetal platform
+%     \item The limitations of the current CHERI-RVV software stack
+% \end{itemize}
+% \todomark{fill out this para more, have an actual end sentence}
+
+\vfill\null
 
 \newcommand{\definehyp}[2]{{\sethyptext{#1}{#2}}\newhyp{}\label{#1} & #2}
-\begin{table}[b]
+\begin{table}[h]
     \centering
     \begin{tabular}{lp{0.9\linewidth}}
     \toprule
@@ -123,14 +127,14 @@ Along with testing these hypotheses, this document serves as a practical explana
         \definehyp{hyp:hw_cap_as_vec_mem_ref}%
             {It is possible to use CHERI capabilities as memory references in all vector instructions.} \\
         \definehyp{hyp:hw_cap_bounds_checks_amortized}%
-            {The cost of capability bounds checks can be amortised over multiple per-vector-element accesses.} \\
+            {The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost.} \\
     \midrule
     \multicolumn{2}{l}{\emph{Software Hypotheses --- \cref{chap:software}}} \\
     \midrule
         \definehyp{hyp:sw_vec_legacy}%
-            {Vector code can be compiled in legacy forms (with integer addressing) and still function correctly on CHERI with no source code changes.} \\
+            {Vector code can be compiled in legacy forms (with integer addressing) and function correctly on CHERI with no source code changes.} \\
         \definehyp{hyp:sw_pure_compat}%
-            {Vector code can be compiled into a pure-capability form from a legacy form with no source code changes.} \\
+            {Legacy vector code can be compiled into a pure-capability form with no changes.} \\
         \definehyp{hyp:sw_stack_vectors}%
             {Vector code that saves/restores variable-length vectors to/from the stack can be compiled on CHERI-RVV with no source code changes.} \\
         \definehyp{hyp:sw_multiproc}%
@@ -139,11 +143,11 @@ Along with testing these hypotheses, this document serves as a practical explana
     \multicolumn{2}{l}{\emph{Capabilities-in-Vectors --- \cref{chap:capinvec}}} \\
     \midrule
         \definehyp{hyp:cap_in_vec_storage}%
-            {It is possible for vector registers to hold capabilities to enable copying without violating CHERI's security principles.} \\
+            {It is possible for vector registers to hold capabilities to enable copying without violating CHERI security principles.} \\
         \definehyp{hyp:cap_in_vec_load_store}%
-            {It is possible for vector memory accesses to load and store capabilities from vector registers without violating CHERI's security principles.} \\
+            {It is possible for vector memory accesses to load and store capabilities from vector registers without violating CHERI security principles.} \\
         \definehyp{hyp:cap_in_vec_manip}%
-            {It is possible for vector instructions to manipulate capabilities in vector registers without violating CHERI's security principles.} \\
+            {It is possible for vector instructions to manipulate capabilities in vector registers without violating CHERI security principles.} \\
     \bottomrule
     \end{tabular}
     \caption{Project Hypotheses}%

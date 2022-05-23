@@ -10,7 +10,7 @@ build-results:
     #!/usr/bin/env sh
     (cd ./1_50Evaluation/data && python3 ./generate_latex.py)
 
-build-thesis:
+build-thesis: savecount
     @# Run latexmk on just this thesis
     latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
@@ -25,6 +25,10 @@ count:
     # and print each command before you run it
     echo 1_*/content.tex chapters.tex | xargs -n1 -t texcount -1 -sum -merge -q
 
+savecount:
+    #!/usr/bin/env sh
+    mkdir -p ./output/
+    texcount -sum -merge chapters.tex > ./output/wordcount.txt
 
 open: build-thesis
     xdg-open ./output/thesis.pdf

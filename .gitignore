@@ -5,6 +5,7 @@
 output/*
 !output/thesis.pdf
 !output/thesis.todo*.txt
+!output/wordcount.txt
 
 # thesis-class is cloned as a git repository
 # We only want to include important files - these will be pulled in to Overleaf

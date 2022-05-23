@@ -25,7 +25,7 @@
 
 %% Word count
 \begin{luacode*}
-wordcount_cmd = "texcount -1 -sum -merge -q thesis.tex"
+wordcount_cmd = "texcount -1 -sum -merge -q chapters.tex"
 
 local pip=io.popen(wordcount_cmd)
 wordcount=pip:read()
