@@ -16,78 +16,72 @@ thesis.tex- My acknowledgements ...
 8
 1_25EmulationInvestigation/sub10_emu_cheri.tex- table of relevant structures/functions?
 9
-1_25EmulationInvestigation/sub10_emu_cheri.tex- C code wasn't documented, Rust will be
-10
-1_25EmulationInvestigation/sub10_emu_cheri.tex- move markdown documentation into rust :)
-11
-1_25EmulationInvestigation/sub10_emu_cheri.tex- documentation should be made available somewhere
-12
 1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
-13
+10
 1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
-14
+11
 1_25EmulationInvestigation/content.tex- I wrote a type-safe wrapper class for capabilities, which either represented a valid capability or raw data, unlike the C library which represents a tagged/untagged capability. I should mention that here
-15
+12
 1_25EmulationInvestigation/sub20_emu_vec.tex- short definition of provenance
-16
+13
 1_25EmulationInvestigation/sub20_emu_vec.tex- diagram of floating point ld/st vs. vector ld/st
-17
+14
 1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
-18
+15
 1_25EmulationInvestigation/sub20_emu_vec.tex- appendix XYZ
-19
+16
 1_25EmulationInvestigation/sub30_fast_path.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
-20
+17
 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: Likely-Failure else: FAILURE
-21
+18
 1_25EmulationInvestigation/sub30_fast_path.tex- if an address range isn't calculated: Unchecked
-22
+19
 1_25EmulationInvestigation/sub30_fast_path.tex- Put the above into an algorithm format
-23
+20
 1_25EmulationInvestigation/sub30_fast_path.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
-24
+21
 1_25EmulationInvestigation/sub30_fast_path.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
-25
+22
 1_25EmulationInvestigation/sub50_hyp.tex- Rewrite this as an energy equation? e.g. proportion of success * energy consumed by fast path etc.
-26
+23
 1_25EmulationInvestigation/sub50_hyp.tex- This hypothesis probably needs a summary
-27
+24
 1_30Software/content.tex- evaluation
-28
+25
 1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
-29
+26
 1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
-30
+27
 1_30Software/content.tex- Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V
+28
+1_30Software/content.tex- example
+29
+1_30Software/content.tex- the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory
+30
+1_30Software/content.tex- example
 31
 1_30Software/content.tex- example
 32
-1_30Software/content.tex- the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory
-33
-1_30Software/content.tex- example
-34
-1_30Software/content.tex- example
-35
 1_30Software/content.tex- example of CHERI-agnostic inline assembly
-36
+33
 1_30Software/content.tex- Beautify this table
-37
+34
 1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
-38
+35
 1_30Software/content.tex- Appendix on how this was done?
-39
+36
 1_30Software/content.tex- Example
-40
+37
 1_30Software/content.tex- example
-41
+38
 1_30Software/content.tex- example of error message?
-42
+39
 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
-43
+40
 1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
-44
+41
 1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
-45
+42
 1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
-46
+43
 1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
