@@ -11,8 +11,6 @@ The latter then defines every relevant structure or function based on those prep
 For example, a function \code{compute_base_top} is generated twice, once as  \code{cc64\_decompress\_mem} returning \code{cc64\_cap\_t} and another time as \code{cc128\_decompress\_mem} returning \code{cc128\_cap\_t}.
 Elegantly capturing both sets was the main challenge for the Rust wrapper.
 
-\todomark{table of relevant structures/functions?}
-
 One of Rust's core language elements is the Trait - a set of functions and \enquote{associated types} that can be \emph{implemented} for any type.
 This gives a simple way to define a consistent interface: define a trait \code{CompressedCapability} with all of the functions from \code{cheri\_compressed\_cap\_common.h}, and implement it for two empty structures \code{Cc64} and \code{Cc128}.
 In the future, this would allow the Morello versions of capabilities to be added easily.

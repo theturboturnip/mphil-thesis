@@ -2,11 +2,14 @@
 % i.e. using addr, provenance split to write agnostic code?
 
 Vector instructions are executed by a Vector ISA module, which stores all registers and other state.
-\code{VLEN} is hardcoded as 128-bits, and the maximum \code{ELEN} is 128-bits\footnote{This is not technically supported by the specification, but is used by capabilities-in-vectors (\cref{chap:capinvec}).}.
-To support both CHERI and non-CHERI execution pointers are separated into an address and a \emph{provenance} - \todomark{short definition of provenance}.
+\code{VLEN} is hardcoded as 128-bits, chosen because it's the largest integer primitive provided by Rust that's large enough to hold a capability.
+\code{ELEN} is also 128-bits, which isn't supported by the specification, but is required for capabilities-in-vectors (\cref{chap:capinvec}).
+Scaling \code{VLEN} and \code{ELEN} any higher would require the creation and integration of new types that were more than 128-bits long.
+
+To support both CHERI and non-CHERI execution pointers are separated into an address and a \emph{provenance}\footnote{The ``original allocation the pointer is derived from''\cite{memarianExploringSemanticsPointer2019}, or in CHERI terms the bounds within which the pointer is valid.}.
 The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory.
-When using capabilities, provenance is defined in terms of the base register e.g. \enquote{the provenance is provided by capability register X}.
-On non-CHERI platforms, or when emulating a CHERI processor in integer mode\footnote{See \cref{chap:emu:rvv_int_mode} for the reasoning behind this decision.}, the vector unit doesn't check provenance.
+When using capabilities, provenance is defined in terms of the base register e.g. \enquote{the provenance is provided by capability register X}, or defined by the DDC in integer mode\footnote{See \cref{chap:emu:rvv_int_mode} for the reasoning behind this decision.}.
+On non-CHERI platforms the vector unit doesn't check provenance.
 
 Arithmetic and configuration instructions are generally simple to implement, so aren't covered here.
 The emulator splits vector memory accesses into three phases: decoding, checking, and execution.
