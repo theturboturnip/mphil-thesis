@@ -1,24 +1,47 @@
 \section{Fast-path calculations\label{chap:hardware:sec:fastpath}}
-Because CHERI, and indeed the vector extension, target all levels of computer architecture from embedded systems to cloud servers, it's important for fast-paths to be scalable and adjust to the implementation complexity.
-To that end, we propose a method of generating the address range for accesses of each archetype, noting where architectural complexity can be traded off for tighter coverage.
-
-\todomark{fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once}
+A fast-path check can be performed over various sets of elements.
+The emulator chooses to perform a single fast-path check for each vector access, calculating the tight bounds before starting the actual access, but in hardware this may introduce prohibitive latency.
+This section describes the general principles surrounding fast-paths for CHERI-RVV, notes the areas where whole-access fast-paths are difficult to calculate, and describes possible approaches for hardware.
 
 \subsection{Possible fast-path outcomes}
 In some cases, a failed address range check may not mean the access fails.
 The obvious case is fault-only-first loads, where capability exceptions may be handled without triggering a trap.
-Implementations may also choose to calculate wider bounds for the sake of simplicity, or even forego a fast-path check altogether.
-Thus, a fast-path check can have three outcomes depending on the circumstances:
-\begin{itemize}
-    \item Success - All accesses will succeed
-    \item Likely-Failure - At least one access \emph{may} raise an exception
-    \item Failure - At least one access \emph{must} raise an exception
-    \item Unchecked
-\end{itemize}
+Implementations may also choose to calculate wider bounds than accessed for the sake of simplicity, or even forego a fast-path check altogether.
+Thus, a fast-path check can have four outcomes depending on the circumstances.
 
-\todomark{if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: Likely-Failure else: FAILURE}
-\todomark{if an address range isn't calculated: Unchecked}
-\todomark{Put the above into an algorithm format}
+\begin{figure}
+\begin{subtable}{0.5\textwidth}
+    \begin{tabular}{p{0.4\textwidth}p{0.5\textwidth}}
+        \toprule
+        Success & All accesses will succeed \\
+        Likely-Failure & At least one access \emph{may} raise an exception \\
+        Failure & At least one access \emph{will} raise an exception \\
+        Unchecked & \multicolumn{1}{c}{---} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Possible fast-path outcomes}
+\end{subtable}%
+\hfill%
+\begin{subfigure}{0.45\textwidth}
+    \begin{algorithmic}
+        \If{can calculate range}
+            \If{range is within capability}
+                \State Success
+            \ElsIf{range is wide}
+                \State Likely-Failure
+            \ElsIf{fault-only-first}
+                \State Likely-Failure
+            \Else{}
+                \State Failure
+            \EndIf{}
+        \Else{}
+            \State Unchecked
+        \EndIf{}
+    \end{algorithmic}
+    \caption{Algorithm}
+\end{subfigure}
+\caption{Fast-path outcomes}
+\end{figure}
 
 A Success means no per-access capability checks are required.
 Likely-Failure and Unchecked results mean each access must be checked, to see if any of them actually raise an exception.
@@ -30,91 +53,73 @@ In this case, only archetypes that produce Likely-Failure outcomes need the slow
 However, it is likely that for complexity reasons all masked accesses will use wide ranges, thus producing Likely-Failure outcomes and requiring slow-paths for all archetypes anyway.
 Because the Likely-Failure and Failure cases require the slow-path anyway, computing the fast-path can only be worthwhile if Success is the common case.
 
+\subsection{Whole-access fast-paths}\label{chap:hardware:subsec:wholeaccessfastpath}
+It is technically possible to calculate a fast-path for the entirety of an access (see \cref{appx:fastpathfull}), but for some situations it may be equally/more expensive than checking each access.
+For example, the bounds for masked accesses depend on finding the minimum and maximum active indices, which in hardware may require a linear scan.
+Indexed accesses require finding the minimum/maximum offset values, which likely requires an expensive parallel reduction over all/some elements.
+In these cases hardware implementations could defer to the slow-path on all masked/indexed accesses, or for masked accesses use the wider, unmasked bounds and generate Likely-Failure outcomes.
+Unit and strided accesses are much easier to handle.
+
+Arbitrarily strided accesses (which may have positive, negative, or zero-valued strides) are relatively simple to calculate.
+After calculating the segment width (i.e. $\text{number of fields} * \text{element width}$) the full bounds just depends on the sign of the stride.
+Unit-stride accesses simplify this further, because the stride is equal to the segment width and guaranteed to be positive.
+\todomark{Captions for equations}
+
 \newcommand{\vstart}{\code{vstart}}
-\newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
+% \newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
+\newcommand{\vstartactive}{\code{vstart}}
 \newcommand{\evl}{\code{evl}}
-\newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
+% \newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
+\newcommand{\evlactive}{\code{evl}}
 \newcommand{\baseaddr}{\mathit{base}}
 
-\subsection{Masked accesses}
-For all masked accesses, masked-out/inactive segments should not trigger capability exceptions.
-Therefore, a tight bounds must include only the smallest and largest active segments.
-These segments can be found by inspecting the mask vector: either checking each bit in turn or using parallel logic to find the lowest/highest set bits.
-Care must be taken with these checks to ensure elements outside the range $[\textit{vstart}, \textit{evl})$ are not counted.
-
-\begin{align}
-    \vstartactive{} &= \min(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) \\
-    \evlactive{}    &= \max(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) + 1
-\end{align}
-
-\subsubsection*{Tradeoffs}
-If using parallel logic to find the lowest/highest bits, it could be difficult to account for $[\textit{vstart}, \textit{evl})$.
-An implementation could choose to only calculate tight bounds when the mask is fully utilized, i.e. $\textit{vstart} = 0, \textit{evl} = \textit{VLEN}$, and assume wider bounds otherwise.
-
-Accounting for masked accesses at all may not be worth the extra complexity.
-Only elements masked off on the edges make any difference, and it may be uncommon for long runs of edge elements to be masked off.
-Thus, an implementation could choose to ignore masking entirely when computing the ranges.
-This does mean that all failures become Likely-Failure when masking is enabled, because all elements outside the capability bounds may be masked off.
-
-\todomark{iterating over elements may still be more energy-efficient than doing individual capability checks?}
-
-\subsection{Unit accesses}
-For unit segmented accesses, which includes fault-only first, the tight address range for an access is simple to calculate.
-Whole register and bytemask accesses can simplify this by fixing \code{nf = 1} and \code{eew = 8}.
-
-\begin{equation}
-    \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
-\end{equation}
-\todomark{Note that the equation is a simplification of strided for \code{stride = nf * eew}}
-
-\subsubsection*{Tradeoffs}
-\code{nf} is not guaranteed to be a power of two (except for the whole-register case), so calculating the `tight' address range would require a multiplication by an arbitrary four-bit value between 1 and 8.
-If this multiplication is too expensive, implementations could choose to classify all $\code{nf} > 1$ cases as Unchecked.
-% \todomark{if nf == 1; as normal; if nf != 1 Unchecked}
-
-Unless extra restrictions are placed on \code{vstart}, calculating the start of this range requires another arbitrary multiplication.
-To avoid this one could assume \code{vstart = 0} and treat failures as Likely-Failure for other cases.
-%for the calculation, perform the capability check and treat failures as Likely-Failure (because the failure could be due to an element before \code{vstart}).
-% \todomark{make it clear that in this case vstart = 0 would still be a complete failure}
-Once could also classify all nonzero \code{vstart} accesses as Unchecked.
-% \todomark{if vstart == 0 failure = failure; if vstart != 0 all = Likely-Failure}
-
-Even if the previous two optimizations are applied, the final range still requires a multiplication $\evl{} * \code{eew}$.
-Thankfully, because \code{eew} may only be one of four powers-of-two, this can be encoded as a simple shift.
-
-\subsection{Strided accesses}
-Strided accesses bring further complication, especially as the stride may be negative.
 
 \begin{equation}
 \mathit{bounds}(\code{stride}) = \baseaddr{} + \left\{
     \begin{array}{ll}
-          [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
-          
-          [(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew}) & \code{stride} < 0
+            [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
+            
+            [(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew}) & \code{stride} < 0
     \end{array} 
 \right.
 \end{equation}
 
-This is formed of three components:
-\begin{itemize}
-    \item $\vstartactive{} * \code{stride}$, the start of the first segment. This can be simplified to 0, just like for unit accesses, to avoid an arbitrary multiplication.
-    \item $(\evlactive{} - 1) * \code{stride}$, the start of the final segment. This requires an arbitrary multiplication, unless strided accesses are all Unchecked.
-    \item $\code{nf} * \code{eew}$, the length of a segment, which can be implemented with a shift.
-\end{itemize}
-% Because the stride is not guaranteed to be larger than a segment (or even larger than a single element)
+\begin{equation}
+    \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
+\end{equation}
 
-% \todomark{stride may be negative}
+Ultimately, the potential up-front latency seemed like a dealbreaker for this approach.
+We turned our attention to fast-pathing smaller groups of elements.
 
-\subsection{Indexed accesses}
-This is the most complicated access of the bunch, because the addresses cannot be computed without reading the index register.
+\subsection{$m$-element known-range fast-paths}
+A hardware implementation of a vector unit may be able to issue $m$ requests within a set range in parallel.
+For example, elements in the same cache line may be accessible all at once.
+In these cases, checking elements individually would either require $m$ parallel bounds checks, $m$ checks' worth of latency, or something inbetween.
+In this subsection we consider a fast-path check for $m$ elements. 
 
-\begin{align}
-    [&\baseaddr{}\ +\ \min(\code{offsets}[\vstartactive{}..\evlactive{}]), \\
-    &\baseaddr{}\ +\ \max(\code{offsets}[\vstartactive{}..\evlactive{}])\ +\ \code{nf} * \code{eew})
-\end{align}
+% \todomark{pre-check: permissions}
+Capability checks can be split into two steps: address-agnostic (e.g. permissions checks, bounds decoding) and address-dependent (e.g. bounds checks).
+Address-agnostic steps can be performed before any bounds checking, and should add minimal start-up latency (bounds decoding must complete before the checks anyway, and permission checks can be performed in parallel).
+Once the bounds are decoded the actual checks consist of minimal logic\footnote{Likely requires two arithmetic operations per element, for checking against the top and bottom bounds.}, so a fast path must have very minimal logic to compete.
 
-The most expensive components here are of course $min,\,max$ of the offsets.
-These could be calculated in hardware through parallel reductions, making it slightly more efficient than looping over each element.
-A low-hanging optimization could be to remove the $\vstartactive{}..\evlactive{}$ range condition, performing the reduction over the whole register group, which would make failures Likely-Failure where $\vstartactive{}\ !=\ 0\ ||\ \evlactive{}\ !=\ \code{VLMAX}$.
-This calculation could also be restricted to certain register configurations to reduce the amount of required hardware.
-Indeed, the amount of hardware could be reduced to zero by simply classifying all indexed accesses as Unchecked.
+We first consider unit and strided accesses, and note two approaches.
+First, one could amortize the checking logic cost over multiple sets of $m$ elements by operating in terms of cache lines.
+Iterating through all accessed cache lines, and then iterating over the elements inside, allows the fast-path to hardcode the bounds width and do one check for multiple cycles of work (if cache lines contain more than $m$ elements).
+Cache-line-aligned allocations benefit here, as all fast-path checks will be in-bounds i.e. Successful, but misaligned data is guaranteed to create at least one Likely-Failure outcome per access (requiring a slow-path check).
+Calculating tight bounds for $m$ accessed elements per cycle could address this.
+
+% \todomark{unit/strided: by $m$ elements?}
+For unit and strided accesses, the bounds occupied by $m$ elements is straightforward to calculate, as the addresses can be generated in order.
+The minimum and maximum can then be picked easily to generate tight bounds.
+An $m$-way multiplexer is still required for taking the minimum and maximum, because \code{evl} and \code{vstart} may not be $m$-aligned.
+If $m$ is small, this also neatly extends to handle masked/inactive elements.
+This may use less logic overall than $m$ parallel bounds checks, depending on the hardware platform\footnote{e.g. on FPGAs multiplexers can be relatively cheap.}, but it definitely uses more logic than the cache-line approach.
+Clearly, there's a trade-off to be made.
+
+Indexed fast-paths are more complicated, because the addresses are unsorted.
+The two approaches above have different advantages for indexed accesses.
+If the offsets/indices are spatially close, just not sorted, cache line checks may efficiently cover all elements.
+An implementation could potentially cache the results, and refer back for each access, instead of trying to iterate through cache lines in order.
+Otherwise a $m$-way parallel reduction could be performed to find the min and max, but that would likely take up more logic than $m$ comparisons.
+This may be a moot point depending on the cache implementation though - if the $m$ accesses per cycle must be in the same cache line, and the addresses are spread out, you're limited to one access and therefore one check per cycle regardless.
+

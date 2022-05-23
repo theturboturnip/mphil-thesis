@@ -26,6 +26,8 @@ It's possible to port this to CHERI, but requires further investigation and thou
 
 \hypsubsection{hyp:hw_cap_bounds_checks_amortized}{Fast-path checks}
 
+\todomark{Change this! Answer is yes for accesses that succeed, no for accesses that fail (unless you change the spec such that capability exceptions are always imprecise exceptions that don't need to provide vstart). Many potential ways to actually coalesce checks.}
+
 In theory, certainly.
 Doing $1$ fast-path check instead of $n$ individual checks will amortize the cost of the check over the $n$ elements, but depending on the definition of \emph{cost} this may not be a significant improvement.
 Here, we evaluate cost in four dimensions typically central in architectural trade-offs.

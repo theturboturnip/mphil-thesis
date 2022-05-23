@@ -1,0 +1,96 @@
+\chapter{Fast path vector checks - Pre-checks}\label{appx:fastpathfull}
+This appendix describes methods of calculating tight bounds for vector memory accesses (\cref{chap:hardware:subsec:checking}) and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
+These methods calculate the entire bounds up front, and while they are used in the emulator a hardware implementation may find it introduces too much latency.
+\todomark{Justify appendix existence}
+\todomark{reference Success, Indeterminate, Failure cases}
+\todomark{fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once}
+
+\newcommand{\vstart}{\code{vstart}}
+\newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
+\newcommand{\evl}{\code{evl}}
+\newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
+\newcommand{\baseaddr}{\mathit{base}}
+
+
+\section{Masked accesses}
+For all masked accesses, masked-out/inactive segments should not trigger capability exceptions.
+Therefore, a tight bounds must include only the smallest and largest active segments.
+These segments can be found by inspecting the mask vector: either checking each bit in turn or using parallel logic to find the lowest/highest set bits.
+Care must be taken with these checks to ensure elements outside the range $[\textit{vstart}, \textit{evl})$ are not counted.
+
+\begin{align}
+    \vstartactive{} &= \min(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) \\
+    \evlactive{}    &= \max(i\ \forall\ \vstart{} \le i < \evl{}\ \text{where}\ \mathit{mask}[i] = 1) + 1
+\end{align}
+
+\subsection*{Tradeoffs}
+If using parallel logic to find the lowest/highest bits, it could be difficult to account for $[\textit{vstart}, \textit{evl})$.
+An implementation could choose to only calculate tight bounds when the mask is fully utilized, i.e. $\textit{vstart} = 0, \textit{evl} = \textit{VLEN}$, and assume wider bounds otherwise.
+
+Accounting for masked accesses at all may not be worth the extra complexity.
+Only elements masked off on the edges make any difference, and it may be uncommon for long runs of edge elements to be masked off.
+Thus, an implementation could choose to ignore masking entirely when computing the ranges.
+This does mean that all failures become Likely-Failure when masking is enabled, because all elements outside the capability bounds may be masked off.
+
+\todomark{iterating over elements may still be more energy-efficient than doing individual capability checks?}
+
+\section{Unit accesses}
+For unit segmented accesses, which includes fault-only first, the tight address range for an access is simple to calculate.
+Whole register and bytemask accesses can simplify this by fixing \code{nf = 1} and \code{eew = 8}.
+
+\begin{equation}
+    \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
+\end{equation}
+\todomark{Note that the equation is a simplification of strided for \code{stride = nf * eew}}
+
+\subsection*{Tradeoffs}
+\code{nf} is not guaranteed to be a power of two (except for the whole-register case), so calculating the `tight' address range would require a multiplication by an arbitrary four-bit value between 1 and 8.
+If this multiplication is too expensive, implementations could choose to classify all $\code{nf} > 1$ cases as Unchecked.
+% \todomark{if nf == 1; as normal; if nf != 1 Unchecked}
+
+Unless extra restrictions are placed on \code{vstart}, calculating the start of this range requires another arbitrary multiplication.
+To avoid this one could assume \code{vstart = 0} and treat failures as Likely-Failure for other cases.
+%for the calculation, perform the capability check and treat failures as Likely-Failure (because the failure could be due to an element before \code{vstart}).
+% \todomark{make it clear that in this case vstart = 0 would still be a complete failure}
+Once could also classify all nonzero \code{vstart} accesses as Unchecked.
+% \todomark{if vstart == 0 failure = failure; if vstart != 0 all = Likely-Failure}
+
+Even if the previous two optimizations are applied, the final range still requires a multiplication $\evl{} * \code{eew}$.
+Thankfully, because \code{eew} may only be one of four powers-of-two, this can be encoded as a simple shift.
+
+\section{Strided accesses}
+Strided accesses bring further complication, especially as the stride may be negative.
+
+\begin{equation}
+\mathit{bounds}(\code{stride}) = \baseaddr{} + \left\{
+    \begin{array}{ll}
+          [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
+          
+          [(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew}) & \code{stride} < 0
+    \end{array} 
+\right.
+\end{equation}
+
+This is formed of three components:
+\begin{itemize}
+    \item $\vstartactive{} * \code{stride}$, the start of the first segment. This can be simplified to 0, just like for unit accesses, to avoid an arbitrary multiplication.
+    \item $(\evlactive{} - 1) * \code{stride}$, the start of the final segment. This requires an arbitrary multiplication, unless strided accesses are all Unchecked.
+    \item $\code{nf} * \code{eew}$, the length of a segment, which can be implemented with a shift.
+\end{itemize}
+% Because the stride is not guaranteed to be larger than a segment (or even larger than a single element)
+
+% \todomark{stride may be negative}
+
+\section{Indexed accesses}
+This is the most complicated access of the bunch, because the addresses cannot be computed without reading the index register.
+
+\begin{align}
+    [&\baseaddr{}\ +\ \min(\code{offsets}[\vstartactive{}..\evlactive{}]), \\
+    &\baseaddr{}\ +\ \max(\code{offsets}[\vstartactive{}..\evlactive{}])\ +\ \code{nf} * \code{eew})
+\end{align}
+
+The most expensive components here are of course $min,\,max$ of the offsets.
+These could be calculated in hardware through parallel reductions, making it slightly more efficient than looping over each element.
+A low-hanging optimization could be to remove the $\vstartactive{}..\evlactive{}$ range condition, performing the reduction over the whole register group, which would make failures Likely-Failure where $\vstartactive{}\ !=\ 0\ ||\ \evlactive{}\ !=\ \code{VLMAX}$.
+This calculation could also be restricted to certain register configurations to reduce the amount of required hardware.
+Indeed, the amount of hardware could be reduced to zero by simply classifying all indexed accesses as Unchecked.

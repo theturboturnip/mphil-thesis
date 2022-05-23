@@ -22,74 +22,76 @@ thesis.tex- My acknowledgements ...
 11
 1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
 12
-1_25EmulationInvestigation/sub30_fast_path.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
+1_25EmulationInvestigation/sub30_fast_path.tex- Captions for equations
 13
-1_25EmulationInvestigation/sub30_fast_path.tex- if an address range is calculated then: if capability contains it: SUCCESS else if it was wide or FoF: Likely-Failure else: FAILURE
+1_25EmulationInvestigation/sub50_hyp.tex- Change this! Answer is yes for accesses that succeed, no for accesses that fail (unless you change the spec such that capability exceptions are always imprecise exceptions that don't need to provide vstart). Many potential ways to actually coalesce checks.
 14
-1_25EmulationInvestigation/sub30_fast_path.tex- if an address range isn't calculated: Unchecked
-15
-1_25EmulationInvestigation/sub30_fast_path.tex- Put the above into an algorithm format
-16
-1_25EmulationInvestigation/sub30_fast_path.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
-17
-1_25EmulationInvestigation/sub30_fast_path.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
-18
 1_25EmulationInvestigation/sub50_hyp.tex- Rewrite this as an energy equation? e.g. proportion of success * energy consumed by fast path etc.
-19
+15
 1_25EmulationInvestigation/sub50_hyp.tex- This hypothesis probably needs a summary
-20
+16
 1_30Software/content.tex- evaluation
-21
+17
 1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
-22
+18
 1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
-23
+19
 1_30Software/content.tex- Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V
-24
+20
 1_30Software/content.tex- example
-25
+21
 1_30Software/content.tex- the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory
-26
+22
 1_30Software/content.tex- example
-27
+23
 1_30Software/content.tex- example
-28
+24
 1_30Software/content.tex- example of CHERI-agnostic inline assembly
-29
+25
 1_30Software/content.tex- Beautify this table
-30
+26
 1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
-31
+27
 1_30Software/content.tex- Appendix on how this was done?
-32
+28
 1_30Software/content.tex- Example
-33
+29
 1_30Software/content.tex- example
-34
+30
 1_30Software/content.tex- example of error message?
-35
+31
 1_30Software/content.tex- Appendix which covers what I know so far about this problem?
-36
+32
 1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
-37
+33
 1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
-38
+34
 1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
-39
+35
 1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
-40
+36
 1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
+37
+2_1Appendix/fastpath_fullcheck.tex- Justify appendix existence
+38
+2_1Appendix/fastpath_fullcheck.tex- reference Success, Indeterminate, Failure cases
+39
+2_1Appendix/fastpath_fullcheck.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
+40
+2_1Appendix/fastpath_fullcheck.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
 41
-2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
+2_1Appendix/fastpath_fullcheck.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
 42
-2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
+2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
 43
-2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
+2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
 44
-2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
+2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
 45
-2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
+2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
 46
-1_40CapInVec/encoding_tables.tex- tabularx for evenly spacing columns here
+2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
 47
+1_40CapInVec/encoding_tables.tex- tabularx for evenly spacing columns here
+48
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing

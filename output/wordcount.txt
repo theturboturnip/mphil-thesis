@@ -1,13 +1,13 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15941
-Words in text: 14752
-Words in headers: 265
-Words outside text (captions, etc.): 887
-Number of headers: 100
-Number of floats/tables/figures: 16
-Number of math inlines: 33
-Number of math displayed: 4
+Sum count: 16084
+Words in text: 14868
+Words in headers: 260
+Words outside text (captions, etc.): 916
+Number of headers: 96
+Number of floats/tables/figures: 17
+Number of math inlines: 38
+Number of math displayed: 2
 Subcounts:
   text+headers+captions (#headers/#floats/#inlines/#displayed)
   298+1+14 (1/0/0/0) Chapter: Introduction\label{wc:start}\label{chap:intro}
@@ -39,13 +39,11 @@ Subcounts:
   82+3+13 (1/1/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   201+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
   944+7+85 (3/0/1/0) Subsection: Emulating CHERI
-  814+14+32 (5/0/1/0) Subsection: Emulating vectors
-  60+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
-  246+3+47 (1/0/0/0) Subsection: Possible fast-path outcomes
-  180+3+0 (2/0/3/1) Subsection: Masked accesses
-  159+3+0 (2/0/2/1) Subsection: Unit accesses
-  69+2+0 (1/0/3/1) Subsection: Strided accesses
-  109+2+0 (1/0/3/1) Subsection: Indexed accesses
+  806+14+32 (5/0/0/0) Subsection: Emulating vectors
+  67+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
+  224+3+53 (1/1/0/0) Subsection: Possible fast-path outcomes
+  186+2+0 (1/0/1/2) Subsection: Whole-access fast-paths}\label{chap:hardware:subsec:wholeaccessfastpath
+  470+3+23 (1/0/16/0) Subsection: $m$-element known-range fast-paths
   97+4+0 (1/0/0/0) Section: Going beyond the emulator
   129+2+0 (1/0/0/0) Subsection: Misaligned accesses
   154+6+20 (1/0/0/0) Subsection: Atomicity of accesses/General memory model

@@ -35,12 +35,15 @@ Once the archetype is found, supplemental calculations can be performed (e.g. co
 
 \subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
 The initial motivation for this project was investigating the impact of capability checks on performance.
-We investigate an approach using a \enquote{fast-path}, where certain instructions could check their whole access range against a capability immediately rather than check each individual element.
-Other approaches, such as optimizing a parallel checker for $n$ elements, were too hardware-specific and couldn't be modelled in software as well.
-\cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, i.e. the minimum range of bytes that must be accessible, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
+Rather than check each element's access invidually, we determine a set of \enquote{fast-path} checks which count as checks for multiple elements at once.
+In the emulator, this is done by computing the \enquote{tight bounds} for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds.
+\cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
 
-The emulator calculates tight bounds for all accesses.
-If this bounds doesn't pass the capability check, the emulator raises an imprecise trap and stops immediately.
+% We investigate an approach using a \enquote{fast-path}, where certain instructions could check their whole access range against a capability immediately rather than check each individual element.
+% Other approaches, such as optimizing a parallel checker for $n$ elements, were too hardware-specific and couldn't be modelled in software as well.
+% \cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, i.e. the minimum range of bytes that must be accessible, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
+
+If the tight bounds don't pass the capability check, the emulator raises an imprecise trap and stops immediately.
 In the case of fault-only-first loads, where synchronous exceptions (e.g. capability checks) are explicitly handled, the access continues regardless and elements are checked individually.
 This is also the expected behaviour if a capability check for \emph{wider} bounds fails.
 The emulator deviates from the spec in that \code{vstart} is \emph{not} set when the tight bounds check fails, as it does not know exactly which element would have triggered the exception.
