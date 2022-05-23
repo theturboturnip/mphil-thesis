@@ -1,3 +1,6 @@
+\documentclass[../thesis]{subfiles}
+\begin{document}
+
 \chapter{The CHERI-RVV software stack\label{chap:software}}
 While building hardware that can execute vector instructions is important, generating those vector instructions in software quickly and easily is equally important.
 This chapter explores the current state of the so-called ``CHERI-RVV software stack'': mainstream compiler support for vanilla RVV (\cref{chap:software:sec:compilersupport}), and the modifications required to bring support to CHERI-Clang (\cref{chap:software:sec:chericlang}).
@@ -229,3 +232,10 @@ These possibilities are investigated further in the next section.
 \pagebreak
 \input{1_30Software/sub50_hyp}
 \input{1_30Software/sub60_chericlangchanges}
+
+\makeatletter
+\typeout{\import@path}
+\makeatother
+\inputminted{python}{code/test.py}
+
+\end{document}

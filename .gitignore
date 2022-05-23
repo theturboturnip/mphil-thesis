@@ -19,3 +19,5 @@ thesis-class/*
 !thesis-class/CollegeShields/*
 # Pull in the license, as required by the license :)
 !thesis-class/License
+
+_minted-thesis

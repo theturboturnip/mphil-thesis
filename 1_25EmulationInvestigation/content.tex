@@ -1,3 +1,6 @@
+\documentclass[../thesis]{subfiles}
+\begin{document}
+
 \chapter{Hardware emulation investigation\label{chap:hardware}}
 In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \code{riscv-v-lite}.
 The emulator can partially emulate four unprivileged\footnote{i.e. entirely bare-metal without privilege levels for OSs or hypervisors.} RISC-V ISAs (\cref{tab:emu_arches}), and was also used as the base for capabilities-in-vectors research (\cref{chap:capinvec}).
@@ -44,3 +47,5 @@ This structure easily represents basic RISC-V architectures, and can scale up to
 \input{1_25EmulationInvestigation/sub30_fast_path}
 \input{1_25EmulationInvestigation/sub40_beyond_emu}
 \input{1_25EmulationInvestigation/sub50_hyp}
+
+\end{document}

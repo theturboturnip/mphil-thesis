@@ -1,3 +1,6 @@
+\documentclass[../thesis]{subfiles}
+\begin{document}
+
 \chapter{Capabilities-in-vectors\label{chap:capinvec}}
 Implementing \code{memcpy} correctly for CHERI systems requires copying the tag bits as well as the data.
 As it stands, any vectorized \code{memcpy} compiled and executed on the systems described in \cref{chap:software,chap:hardware} will not copy the tag bits, because the vector registers cannot store the tag bits and indeed cannot store valid capabilities.
@@ -45,3 +48,5 @@ The above emulator changes allowed a minimal \code{memcpy} example to be constru
 This, along with another test to ensure arithmetic accesses the register file in an integer context, is described in the evaluation (\cref{chap:eval}).
 
 \input{1_40CapInVec/sub50_hyp}
+
+\end{document}

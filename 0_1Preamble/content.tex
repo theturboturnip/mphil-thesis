@@ -251,3 +251,19 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% rotating table
 \usepackage{rotating}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% subfiles for chapters, include a fix for minted
+% THIS ONLY WORKS FOR \inputminted, NOT \begin{minted}
+\RequirePackage{minted}
+\RequirePackage{subfiles}
+\RequirePackage{xpatch}
+
+\makeatletter
+% fix for first kind
+\xpatchcmd\inputminted
+  {#3}
+  {\import@path #3}
+  {\typeout{Patched minted successfully}}{\typeout{Failed to patch minted! :(}}
+\makeatother

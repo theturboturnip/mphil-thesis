@@ -1,6 +1,7 @@
 %TC:macro \todomark [ignore]
 %TC:macro \todoref [ignore]
 %TC:macro \todocite [option:text,ignore]
+%TC:subst \subfile \input
 
 % The above comments tell texcount that some macros should not have their arguments counted as text.
 % \todomark, \todoref, and \todocite are all macros used during development - there will be no TODO messages
@@ -10,38 +11,41 @@
 % While the actual output of \cref{hyp:cap_in_vec_load_store} = "Hyp. H-8" (2 or 3 words), TeXcount counts it as "hyp cap in vec load store" (6 words).
 % This means the actual wordcount is an over-approximation.
 
+% TC:subst tells TeXcount to interpret \subfile as \input for the purposes of word counting.
+% TeXcount has native support for the subfiles package, but because this file doesn't have a preamble we can't tell TeXcount that we're using it.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Introduction
 %%
-\input{1_10Introduction/content}
+\subfile{1_10Introduction/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Background
 %%
-\input{1_20Background/content}
+\subfile{1_20Background/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Main Chapter
 %%
-\input{1_25EmulationInvestigation/content}
+\subfile{1_25EmulationInvestigation/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Main Chapter
 %%
-\input{1_30Software/content}
+\subfile{1_30Software/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Other Chapter
 %%
-\input{1_40CapInVec/content}
+\subfile{1_40CapInVec/content}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Conclusion (with future work)
 %%
-\input{1_50Evaluation/content}
+\subfile{1_50Evaluation/content}
 \label{wc:end}
