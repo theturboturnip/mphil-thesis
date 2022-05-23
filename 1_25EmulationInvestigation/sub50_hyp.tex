@@ -1,10 +1,8 @@
 \section{Testing hypotheses}
 
 \hypsubsection{hyp:hw_cap_as_vec_mem_ref}{Feasibility}
-% \subsubsection{In theory?}
 This is true.
 All vector memory access instructions index the scalar general-purpose register file to read the base address, and CHERI-RVV implementations can simply use this index for the scalar capability register file instead.
-% rather than a general-purpose register.
 This can be considered through the lens of adding CHERI to any RISC-V processor, and in particular adding Capability mode to adjust the behaviour of legacy instructions.
 RVV instructions can have their behaviour adjusted in exactly the same way as the scalar memory access instructions.
 
@@ -12,83 +10,18 @@ That approach then scales to other base architectures that have CHERI variants.
 For example, Morello's scalar Arm instructions were modified to use CHERI capabilities as memory references\cite[Section 1.3]{armltdMorelloArchitectureReference2021}, so one may simply try to apply those modifications to e.g. Arm SVE instructions.
 This only works where Arm SVE accesses memory references in the same way as scalar Arm instructions did i.e. through a scalar register file.
 
-Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a set of 64-bit integer addresses\cite{armltdArmCompilerScalable2019}.
+Arm SVE has some addressing modes like \code{u64base}, which uses a vector as a set of 64-bit integer addresses\cite{armltdArmCompilerScalable2019}.
 This has more complications, because simply dereferencing integer addresses without a capability is insecure.
 Would a CHERI version convert this mode to use capabilities-in-vectors, breaking compatibility with legacy code that expects integer references?
 Another option would be to only enable this instruction in Integer mode, and dereference relative to the DDC.
 It's possible to port this to CHERI, but requires further investigation and thought.
 
-% \subsubsection{In practice?}
-% Yes.
-
-% The practical hurdle for CHERI-RVV is defining the behaviour of vector instructions under Integer and Capability modes.
-% The 
-
 \hypsubsection{hyp:hw_cap_bounds_checks_amortized}{Fast-path checks}
+This is also true, at least for Successful accesses.
+Because the RVV spec requires that the faulting element is \emph{always} recorded\cite[Section 17]{specification-RVV-v1.0}, a Failure due to a capability violation requires elements to be checked individually.
+CHERI-RVV could change the specification so the faulting element doesn't need to be calculated, which would make Failures faster, but that still requires Likely-Failures to take the slow-path.
 
-\todomark{Change this! Answer is yes for accesses that succeed, no for accesses that fail (unless you change the spec such that capability exceptions are always imprecise exceptions that don't need to provide vstart). Many potential ways to actually coalesce checks.}
-
-In theory, certainly.
-Doing $1$ fast-path check instead of $n$ individual checks will amortize the cost of the check over the $n$ elements, but depending on the definition of \emph{cost} this may not be a significant improvement.
-Here, we evaluate cost in four dimensions typically central in architectural trade-offs.
-In order to determine improvement, we compare two theoretical implementations: one performing $m$ per-element checks per cycle (i.e. a slow-path), and one which performs a single fast-path check before falling back to the slow-path.
-We assume both implementations can issue $m$ memory requests per cycle, and only differ in checking logic.
-As noted above, we also assume that instructions with successful fast-paths are the common case.
-% \todomark{In a theoretical sense, definitely - $n$ individual checks can be replaced by 1 check, amortizing whatever the cost is}
-% \todomark{Evaluate cost in a hardware sense: compare a theoretical implementation which does each per-element check, potentially $m$ checks in parallel to issue $m$ requests in parallel, all pipelined with the actual accesses, vs. hardware that has a single capability check at the start which blocks it from initiating any accesses.}
-
-% \enquote{Cost} can be defined in multiple ways.
-% As with all concepts in hardware, implementing fast-path capability checks requires a trade-off between competing interests, which are each considered here.
-% As mentioned above, it is also assumed that successful accesses (i.e. those without any capability violations) are the common case.
-% Overall, it seems the key benefit of fast-path checks is power consumption.
-
-\subsubsection*{Power --- Better}
-If the fast-path check succeeds, then no power needs to be wasted on capability checks for the remaining cycles of the access.
-If the vector unit has its own dedicated capability check logic, it could even be clock gated to completely eliminate dynamic power.
-A fast-path check uses less power if it succeeds, and the bounds calculation logic uses less energy than $n - 1$ capability checks.
-Implementations which use large vectors or make careful use of the simplifications laid out in \cref{chap:hardware:sec:fastpath} should fulfil the second condition easily.
-
-However, if the fast-path check fails then you pay for the slow-path as well.
-Therefore, the overall benefit depends on the proportion of successful fast-path checks vs. failures, indeterminate results, and unchecked instructions.
-Assuming successful fast-paths are the common case, this approach provides a significant energy benefit.
-\todomark{Rewrite this as an energy equation? e.g. proportion of success * energy consumed by fast path etc.}
-
-% This shows a clear benefit over per-element checks under two conditions: the fast-path check is usually successful, so the bounds calculation logic uses less energy than $n - 1$ capability checks.
-
-
-% \begin{equation}
-% \begin{array}{lr}
-%     \mathit{slow-path} =& n\ \mathit{checks} \\
-% &\\
-%     \mathit{fast-path} =& 1\ \mathit{check} \\
-%      &+ \mathit{bounds}\ \mathit{logic} \\
-
-% \end{array}
-% \end{equation}
-
-\subsubsection*{Area --- Depends}
-% This depends on the relative area required for bounds calculation, and the number $m$ of parallel bounds checks in the base implementation.
-Slow-path circuitry is \emph{always} necessary for a fully conforming implementation, so the only possible area saving is in removing unnecessary capability-check logic.
-If the base implementation uses $m > 1$ capability checkers in parallel, then using a fast-path reduces that by $m - 1$ checker's worth of area.
-If the area for bounds calculation is smaller than $m - 1$ checkers, then there is a potential area saving.
-
-% No matter how you slice it, slow-path circuitry is \emph{always} necessary for a fully conforming implementation.
-% If the slow-path is always required, and always takes up area, then adding any circuitry for fast-path must require more area.
-% Elements from the slow-path, e.g. capability decoding units, may be shared with the fast-path, and any spare space in a slow-path unit could also be shared with the fast-path, so it may have a \emph{negligible} impact.
-% Crucially, adding a fast-path will never \emph{decrease} the area of a conformant design.
-
-\subsubsection*{Throughput --- No change}
-Assuming the bounds calculations can be pipelined to the same clock speed as a capability check, putting them before a set of pipelined accesses should not affect the throughput of those accesses.
-If the fast-path check is subdivided between different registers in a group, the fast-path check for one register should be performed in parallel with the accesses for other registers for maximum throughput.
-There is currently no reason to believe the bounds calculations have to significantly decrease clock speed or throughput.
-
-\subsubsection*{Latency --- No change or worse}
-If the bounds calculation can be done in parallel with other parts of the fast-path check e.g. capability decoding, then it could be that a complete fast-path check takes as many cycles as a single per-element check.
-In that case, the latency is not affected by using a fast-path check, because it can simply replace the first per-element check.
-If the fast-path check is slower than a per-element check, the latency impact depends on the available parallelism between capability checks and their respective accesses.
-
-In a naive implementation, where the fast-path check has to calculate the bounds and complete before any accesses can be issued, using a fast-path check would incur a higher latency.
-If it's possible to perform capability checks for accesses while they are in-flight\footnote{This runs the risk of e.g. side channel attacks, which would need to be mitigated or ignored.}, then the fast-path access could be done in parallel.
-A completely parallel fast-path check that succeeds would have zero latency cost, but a parallel fast-path failure could require the instruction to restart completely.
-
-\todomark{This hypothesis probably needs a summary}
+There are many ways to combine the checks for a set of vector elements, which can take advantage of the range constraints.
+For example, a unit-stride access could a hierarchy of checks: cache-line checks until a Likely-Failure, then tight $m$-element bounds until a Likely-Failure, then the slow-path.
+However, the choice of fast-path checks is inherently a trade-off between latency, area, energy usage, and more.
+Picking the right one for the job is highly dependent on the existing implementation, and indeed an implementation may decide that parallel per-element checks is better than a fast-path.

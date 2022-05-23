@@ -100,13 +100,13 @@ In this subsection we consider a fast-path check for $m$ elements.
 % \todomark{pre-check: permissions}
 Capability checks can be split into two steps: address-agnostic (e.g. permissions checks, bounds decoding) and address-dependent (e.g. bounds checks).
 Address-agnostic steps can be performed before any bounds checking, and should add minimal start-up latency (bounds decoding must complete before the checks anyway, and permission checks can be performed in parallel).
-Once the bounds are decoded the actual checks consist of minimal logic\footnote{Likely requires two arithmetic operations per element, for checking against the top and bottom bounds.}, so a fast path must have very minimal logic to compete.
+Once the bounds are decoded the actual checks consist of minimal logic\footnote{Likely requires two arithmetic operations per element, for checking against the top and bottom bounds.}, so a fast-path must have very minimal logic to compete.
 
 We first consider unit and strided accesses, and note two approaches.
 First, one could amortize the checking logic cost over multiple sets of $m$ elements by operating in terms of cache lines.
 Iterating through all accessed cache lines, and then iterating over the elements inside, allows the fast-path to hardcode the bounds width and do one check for multiple cycles of work (if cache lines contain more than $m$ elements).
 Cache-line-aligned allocations benefit here, as all fast-path checks will be in-bounds i.e. Successful, but misaligned data is guaranteed to create at least one Likely-Failure outcome per access (requiring a slow-path check).
-Calculating tight bounds for $m$ accessed elements per cycle could address this.
+Calculating tight bounds for the $m$ accessed elements per cycle could address this.
 
 % \todomark{unit/strided: by $m$ elements?}
 For unit and strided accesses, the bounds occupied by $m$ elements is straightforward to calculate, as the addresses can be generated in order.
@@ -123,3 +123,6 @@ An implementation could potentially cache the results, and refer back for each a
 Otherwise a $m$-way parallel reduction could be performed to find the min and max, but that would likely take up more logic than $m$ comparisons.
 This may be a moot point depending on the cache implementation though - if the $m$ accesses per cycle must be in the same cache line, and the addresses are spread out, you're limited to one access and therefore one check per cycle regardless.
 
+In summary, there are fast-path checks that consume less logic than $m$ parallel checks in certain circumstances.
+Even though a slow-path is always necessary, it can be implemented in a slow way (e.g. doing one check per cycle) to save on logic.
+Particularly if other parts of the system rely on constraining the addresses accessed in each cycle, a fast-path check can take advantage of those constraints. 
