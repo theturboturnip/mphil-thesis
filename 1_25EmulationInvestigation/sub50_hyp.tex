@@ -11,7 +11,12 @@ RVV instructions can have their behaviour adjusted in exactly the same way as th
 That approach then scales to other base architectures that have CHERI variants.
 For example, Morello's scalar Arm instructions were modified to use CHERI capabilities as memory references\cite[Section 1.3]{armltdMorelloArchitectureReference2021}, so one may simply try to apply those modifications to e.g. Arm SVE instructions.
 This only works where Arm SVE accesses memory references in the same way as scalar Arm instructions did i.e. through a scalar register file.
-Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a set of 64-bit addresses\cite{armltdArmCompilerScalable2019}, which require more specific attention.
+
+Arm SVE has other addressing modes like \code{u64base}, which uses a vector as a set of 64-bit integer addresses\cite{armltdArmCompilerScalable2019}.
+This has more complications, because simply dereferencing integer addresses without a capability is insecure.
+Would a CHERI version convert this mode to use capabilities-in-vectors, breaking compatibility with legacy code that expects integer references?
+Another option would be to only enable this instruction in Integer mode, and dereference relative to the DDC.
+It's possible to port this to CHERI, but requires further investigation and thought.
 
 % \subsubsection{In practice?}
 % Yes.

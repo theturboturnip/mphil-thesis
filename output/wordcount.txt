@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15851
-Words in text: 14662
+Sum count: 15911
+Words in text: 14722
 Words in headers: 265
 Words outside text (captions, etc.): 887
 Number of headers: 100
@@ -50,7 +50,7 @@ Subcounts:
   124+2+0 (1/0/0/0) Subsection: Misaligned accesses
   149+6+20 (1/0/0/0) Subsection: Atomicity of accesses/General memory model
   110+6+25 (1/0/0/0) Subsection: Relaxed access ordering and precise traps
-  732+14+17 (5/0/9/0) Section: Testing hypotheses
+  792+14+17 (5/0/9/0) Section: Testing hypotheses
   89+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
   65+3+0 (1/0/0/0) Section: Compiling vector code}\label{chap:software:sec:compilersupport
   110+3+51 (1/1/0/0) Subsection: Required command-line options
