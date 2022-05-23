@@ -1,9 +1,9 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15793
-Words in text: 14609
+Sum count: 15851
+Words in text: 14662
 Words in headers: 265
-Words outside text (captions, etc.): 882
+Words outside text (captions, etc.): 887
 Number of headers: 100
 Number of floats/tables/figures: 16
 Number of math inlines: 33
@@ -39,7 +39,7 @@ Subcounts:
   82+3+13 (1/1/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   201+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
   941+7+85 (3/0/1/0) Subsection: Emulating CHERI
-  761+14+27 (5/0/1/0) Subsection: Emulating vectors
+  814+14+32 (5/0/1/0) Subsection: Emulating vectors
   60+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
   246+3+47 (1/0/0/0) Subsection: Possible fast-path outcomes
   180+3+0 (2/0/3/1) Subsection: Masked accesses

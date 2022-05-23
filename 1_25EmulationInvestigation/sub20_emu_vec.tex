@@ -50,7 +50,7 @@ As noted in \cref{chap:hardware:sec:fastpath}, a fully compliant machine must ch
 If the fast-path check deems it appropriate, the emulator continues execution of the instruction in two phases.
 First, the mapping of vector elements to accessed memory addresses is found.
 The code for this step is independent of the access direction, and an effective description of how each type of access works.
-It can be found in \todomark{appendix XYZ}.
+It can be found in \cref{appx:code:vector_mem_access}.
 The previously computed tight bounds are sanity-checked against these accesses, and the accesses are actually performed.
 
 \subsubsection{Integer vs. Capability encoding mode\label{chap:emu:rvv_int_mode}}
