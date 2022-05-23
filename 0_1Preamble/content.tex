@@ -224,14 +224,23 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Booktabs
-\RequirePackage{booktabs}
+%% Tables
 
+% Pretty tables
+\usepackage{booktabs}
+
+% Tables with evenly spaced columns
+\usepackage{tabularx}
+% Y = X but centered
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% Long tables
 \usepackage{longtable}
 % For putting table rows in a macro instead of \input-ing them directly??
 \usepackage{catchfile}
 
-\usepackage{parnotes}
+% For notes in tables, which reset their numbering after each usage
+\usepackage[restart]{parnotes}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% git file ref

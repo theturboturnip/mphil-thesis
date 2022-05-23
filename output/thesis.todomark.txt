@@ -86,6 +86,4 @@ thesis.tex- My acknowledgements ...
 43
 2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
 44
-1_40CapInVec/encoding_tables.tex- tabularx for evenly spacing columns here
-45
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing

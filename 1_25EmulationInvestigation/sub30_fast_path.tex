@@ -9,14 +9,16 @@ The obvious case is fault-only-first loads, where capability exceptions may be h
 Implementations may also choose to calculate wider bounds than accessed for the sake of simplicity, or even forego a fast-path check altogether.
 Thus, a fast-path check can have four outcomes depending on the circumstances.
 
-\begin{figure}
+\begin{figure}[t]
 \begin{subtable}{0.5\textwidth}
-    \begin{tabular}{p{0.4\textwidth}p{0.5\textwidth}}
+    \begin{tabular}{ll}
         \toprule
         Success & All accesses will succeed \\
-        Likely-Failure & At least one access \emph{may} raise an exception \\
-        Failure & At least one access \emph{will} raise an exception \\
-        Unchecked & \multicolumn{1}{c}{---} \\
+        \midrule
+        Failure & At least one access \emph{will}\\& raise an exception \\
+        \midrule
+        Likely-Failure & At least one access \emph{may} \\
+        \emph{or} Unchecked & raise an exception \\
         \bottomrule
     \end{tabular}
     \caption{Possible fast-path outcomes}
