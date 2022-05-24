@@ -1,11 +1,11 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15725
-Words in text: 14545
-Words in headers: 248
-Words outside text (captions, etc.): 899
-Number of headers: 92
-Number of floats/tables/figures: 17
+Sum count: 15779
+Words in text: 14610
+Words in headers: 230
+Words outside text (captions, etc.): 906
+Number of headers: 88
+Number of floats/tables/figures: 16
 Number of math inlines: 31
 Number of math displayed: 2
 Subcounts:
@@ -61,12 +61,12 @@ Subcounts:
   202+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI
   198+5+29 (1/0/0/0) Subsection: Adapting vector intrinsics to CHERI
   206+6+4 (1/0/0/0) Subsection: Storing scalable vectors on the stack
-  861+27+0 (8/0/0/0) Section: Testing hypotheses}\label{chap:software:sec:hypotheses
-  42+4+1 (1/1/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
+  908+9+8 (4/0/0/0) Section: Testing hypotheses}\label{chap:software:sec:hypotheses
+  51+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   100+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
   428+3+105 (1/0/0/0) Section: Changing the emulator
   45+1+0 (1/0/0/0) Subsection: Testing
-  663+11+0 (8/0/2/0) Section: Testing hypotheses
+  672+11+0 (8/0/2/0) Section: Testing hypotheses
   50+1+0 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
   193+3+0 (1/0/0/0) Section: Testing the emulator
   63+2+6 (1/1/0/0) Subsection: \code{hello\_world}

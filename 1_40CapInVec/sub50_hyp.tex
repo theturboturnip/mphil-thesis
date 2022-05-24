@@ -24,9 +24,9 @@ TR-951 states that capability memory accesses must be atomic\cite[Section 11.3]{
 This applies to vectors, even in ways that don't apply to scalar accesses.
 
 Individual element accesses for a vector access must be atomic relative to each other.
-This is relevant for e.g. a strided store uses a zero or unaligned stride, such that one element writes a valid capability and another element overwrites part of that address range.
-In that case, either the second element should ``win'' and clear the tag bit, or the first element should ``win'' and write the full capability atomically.
-For the emulator this condition is easily met.
+This is relevant for e.g. a strided store using an unaligned stride, such that one element writes a valid capability and another element overwrites part of that address range.
+If unaligned 128-bit accesses are allowed, then either the unaligned second element should ``win'' and clear relevant tag bits, or the first element should ``win'' and write the full capability atomically.
+The emulator requires all 128-bit accesses to be aligned so meets this requirement easily.
 
 \subsubsection*{Provenance}
 Provenance requires the accesses be atomic as described above, and require that tag bits are copied correctly: the output tag bit must only be set if the input had a valid tag bit.

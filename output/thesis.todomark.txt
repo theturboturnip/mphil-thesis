@@ -64,26 +64,28 @@ thesis.tex- My acknowledgements ...
 32
 1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
 33
-1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
+1_30Software/sub50_hyp.tex- violate? exceed?
 34
-2_1Appendix/fastpath_fullcheck.tex- Justify appendix existence
+1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
 35
-2_1Appendix/fastpath_fullcheck.tex- reference Success, Indeterminate, Failure cases
+2_1Appendix/fastpath_fullcheck.tex- Justify appendix existence
 36
-2_1Appendix/fastpath_fullcheck.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
+2_1Appendix/fastpath_fullcheck.tex- reference Success, Indeterminate, Failure cases
 37
-2_1Appendix/fastpath_fullcheck.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
+2_1Appendix/fastpath_fullcheck.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
 38
-2_1Appendix/fastpath_fullcheck.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
+2_1Appendix/fastpath_fullcheck.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
 39
-2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
+2_1Appendix/fastpath_fullcheck.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
 40
-2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
+2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
 41
-2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
+2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
 42
-2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
+2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
 43
-2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
+2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
 44
+2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
+45
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing
