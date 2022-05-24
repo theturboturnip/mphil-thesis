@@ -1,4 +1,6 @@
-\chapter{Building the \code{riscv-gnu-toolchain} with vector support}\label{appx:building_rvv_gcc_toolchain}
+\chapter{Compiler information}
+
+\section{Building \code{riscv-gnu-toolchain} with vector support}\label{appx:building_rvv_gcc_toolchain}
 
 As of May 2022, the RISC-V GNU toolchain (hosted at \gitrepo{riscv-collab/riscv-gnu-toolchain}{https://github.com/riscv-collab/riscv-gnu-toolchain/}) does not support the vector extension or it's intrinsics.
 The \code{rvv-intrinsic} branch of this repository claimed to support vector intrinsics, but it was slightly outdated and has been deleted as of 17th May 2022.
@@ -6,7 +8,7 @@ It referenced a repository for \code{glibc} that no longer exists as a submodule
 I have archived the branch in my own repository (\gitrepo{theturboturnip/riscv-gnu-toolchain}{https://github.com/theturboturnip/riscv-gnu-toolchain}) and fixed that issue.
 This appendix describes how to build the toolchain.
 
-To build the full toolchain with intrinsic support, perform the following steps (derived by the author independently, then amended based on macOS instructions from \todocite{https://github.com/riscv-collab/riscv-gcc/issues/323}):
+To build the full toolchain with intrinsic support, perform the following steps (derived by the author independently, then amended based on macOS instructions from \footnote{\url{https://github.com/riscv-collab/riscv-gcc/issues/323}}):
 \begin{enumerate}
     % \todomark{Example}
     % \begin{itemize}
@@ -21,6 +23,80 @@ To build the full toolchain with intrinsic support, perform the following steps 
         \item[\code{\$}] \code{git -c http.sslVerify=false submodule ...}
     \end{itemize}
     \item Configure the compiler so it supports all General extensions, Compressed instructions, and Vector extension:
+    \item[\code{\$}] \code{./configure --prefix=<output directory> --with-arch=rv64gcv --with-abi=lp64d}
     \item Build the \code{newlib} version to compile for bare-metal platforms:
     \item[\code{\$}] \code{make newlib -j\$(nproc)}
 \end{enumerate}
+
+\section{Vanilla RVV command-line options\label{appx:vector_command_line}}
+\begin{table}[h]
+    \centering
+\begin{tabularx}{\linewidth}{llX}
+    \toprule
+    Compiler & Required Arguments & Notes \\ 
+    \midrule
+    Clang-13 & \code{-march=rv64gv0p10}  & \multirow[t]{2}{=}{Supports intrinsics, inline assembly for RVV v0.1} \\
+    & \code{-menable-experimental-extensions} & \\
+    \midrule
+    Clang-14+ & \code{-march=rv64gv} & Supports intrinsics, inline assembly for RVV v1.0 \\
+    \midrule
+    GCC 10.1 & \code{-march=rv64g_v} & Requires special toolchain (see \cref{appx:building_rvv_gcc_toolchain}) and has incomplete support (see \cref{chap:eval:subsec:compilerdifferences}) \\
+    \bottomrule
+\end{tabularx}
+    \caption{Command-line arguments for compiling RVV code on non-CHERI compilers\\(assuming the base ISA is \code{rv64g})}
+    \label{tab:rvv_cmdline_nocheri}
+\end{table}
+
+\section{CHERI-RVV command-line options}
+\begin{table}[h]
+    \centering
+\begin{tabularx}{\linewidth}{llX}
+    \toprule
+    Compiler & Required Arguments & Notes \\ 
+    \midrule
+    \multicolumn{1}{c}{CHERI} & \code{-march=rv64gv0p10xcheri} & \multirow[t]{2}{=}{Supports intrinsics, inline assembly for RVV v0.1} \\
+    Clang-13 & \code{-menable-experimental-extensions} & \\
+    & \code{-mabi=l64pc128} & ABI string sets capability width. \\
+    & \code{-mno-relax} & Must disable linker relaxations. \\
+    \bottomrule
+\end{tabularx}
+    \caption{Command-line arguments for compiling CHERI-RVV code\\(assuming the base ISA is \code{rv64g})}
+    \label{tab:rvv_cmdline_cheri}
+\end{table}
+
+By default CHERI-Clang doesn't actually compile capability-enabled code.
+The documentation on enabling capabilities is unfortunately sparse and outdated.
+In particular, the CHERI-Clang help menu states that \code{--cheri} will \enquote{Enable CHERI support with the default capability size}, but this has no effect (at least on RISC-V).
+To find up-to-date answers, we consulted the source code for the CHERIbuild build tool\footnote{\gitrepo{CSTRD-CHERI/cheribuild}{https://github.com/CTSRD-CHERI/cheribuild}}.
+
+CHERIbuild's code%
+\footnote{%
+\gitfile{config/compilation_targets.py:176}%
+    {CSTRD-CHERI/cheribuild}%
+    {https://github.com/CTSRD-CHERI/cheribuild/blob/ba3a0b6388436224968c906192c61d2ccbdd7616/pycheribuild/config/compilation_targets.py\#L176}%
+} revealed three requirements:
+\begin{itemize}
+    \item The architecture string must contain \code{xcheri}
+    \item The capability length must be set using the ABI string
+    \begin{itemize}
+        \item In pure-capability mode, pointers and capabilities are \code{CLEN} long
+        \begin{itemize}
+            \item Example string: \code{l64pc128}
+            \item Integer width (\code{long}, or \code{l}) = XLEN = 64-bits
+            \item Pointer width (\code{p}) = Capability width (\code{p}) = CLEN = 128-bits
+        \end{itemize}
+        \item For hybrid mode, pointers remain \code{XLEN} long and capability length is not specified
+        \begin{itemize}
+            \item Example string: \code{lp32}
+            \item Integer width (\code{l}) = XLEN = Pointer width (\code{p}) = 32-bits
+        \end{itemize}
+    \end{itemize}
+    \item ``Linker relaxations'', where function calls are converted to short jumps\cite{chenCompilerSupportLinker2019}, must be disabled.
+    \begin{itemize}
+        \item This is likely because CHERI requires function calls to go through capabilities
+        \item However the code that adds this option wasn't documented, so there may be more to it
+    \end{itemize}
+\end{itemize}
+
+Once the above options are set, plain CHERI-RISC-V code compiles without a hitch.
+Changes to CHERI-Clang itself are required to compile vectors (\cref{addingtochericlang}).

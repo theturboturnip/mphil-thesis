@@ -1,11 +1,11 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15703
-Words in text: 14519
-Words in headers: 231
-Words outside text (captions, etc.): 920
-Number of headers: 88
-Number of floats/tables/figures: 16
+Sum count: 15456
+Words in text: 14326
+Words in headers: 227
+Words outside text (captions, etc.): 870
+Number of headers: 87
+Number of floats/tables/figures: 14
 Number of math inlines: 31
 Number of math displayed: 2
 Subcounts:
@@ -51,14 +51,13 @@ Subcounts:
   402+2+0 (1/0/1/0) Section: Testing hypotheses
   89+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
   65+3+0 (1/0/0/0) Section: Compiling vector code}\label{chap:software:sec:compilersupport
-  110+3+47 (1/1/0/0) Subsection: Required command-line options
+  98+2+32 (1/0/0/0) Subsection: Available compilers
   64+2+0 (1/0/0/0) Subsection: Automatic vectorization
   138+2+0 (1/0/0/0) Subsection: Vector intrinsics
   343+2+48 (1/1/0/0) Subsection: Inline assembly
   317+4+20 (1/0/0/0) Subsection: RVV vs. Arm SVE}\label{chap:soft:compiling:armsve
-  65+5+0 (1/0/0/0) Section: Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang
-  194+3+35 (1/1/0/0) Subsection: Required command-line options
-  202+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI
+  78+5+0 (1/0/0/0) Section: Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang
+  202+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI}\label{addingtochericlang
   198+5+29 (1/0/0/0) Subsection: Adapting vector intrinsics to CHERI
   206+6+4 (1/0/0/0) Subsection: Storing scalable vectors on the stack
   908+9+8 (4/0/0/0) Section: Testing hypotheses}\label{chap:software:sec:hypotheses
