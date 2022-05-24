@@ -117,7 +117,7 @@ def main():
 
     with open(f"vector_memcpy_full.tex", "w") as f:
         print("\\begin{longtable}{rcccccc}", file=f)
-        print("\\caption{Results --- Vectorized memcpy}\\label{tab:fullresults:vectormemcpy}\\\\", file=f)
+        print("\\caption{Results --- Vectorized memcpy}\\\\", file=f)
         generate_table("vector_memcpy", df, file=f, longtable=True)
         print("\\end{longtable}", file=f)
 
