@@ -1,70 +1,49 @@
 \section{Testing hypotheses}\label{chap:software:sec:hypotheses}
 
-\hypsubsection{hyp:sw_vec_legacy}{Compiling legacy code for integer mode}
+\hypsubsection{hyp:sw_vec_legacy}{Compiling/running legacy code in integer mode}
+This is true for CHERI-RVV, when running the compiled programs in integer mode, as long as the programs only access memory within the DDC.
 
-This is true in theory and (partially) true in practice, with two assumptions:
-\begin{itemize}
-    \item The scalar elements of the code have this property
-    \item All usages of vector memory instructions access memory that the program has access to
-    \begin{itemize}
-        \item i.e. all addresses touched by vector memory instructions are within the bounds of the DDC
-    \end{itemize}
-\end{itemize}
+All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV integer mode, assuming the accessed addresses are all accessible through the DDC.
+There are no changes to instruction behaviour that require the compiler's handling of them to change, so a non-CHERI compiler and an integer-mode-CHERI compiler can always produce the same vector instructions from the same code.
+This does not apply to capability-mode-CHERI, because integer addressing is not supported in capability-mode-CHERI-RVV.
 
-The CHERI-RVV versions of the vector instructions used in \cref{chap:hardware} have identical encodings to legacy RVV instructions and function correctly in Integer mode.
-Not only is it theoretically possible for an RVV program to function correctly with no changes on CHERI-RVV, it should be possible to take a vanilla RVV binary and run it without modification on CHERI-RVV.
-In practice, this depends on compiler support for the three vectorization types in Hybrid compilation mode.
-
-\subsubsection*{Inline assembly - True}
-Integer mode CHERI-RVV instructions use the same general-purpose registers as memory references as in vanilla RVV.
-CHERI-Clang handles this case correctly.
-
-\subsubsection*{Intrinsics - False until CHERI-Clang is fixed}
-Intrinsics do not currently function on CHERI-Clang in pure-capability \emph{or} hybrid mode.
-
-\subsubsection*{Auto-vectorization - False}
-CHERI-Clang, as well as vanilla Clang, does not have auto-vectorization for RVV.
-
-\subsubsection*{Hybridized legacy programs}
-Hybrid-mode compliation allows pointers to be annotated with \code{\_\_capability}, which means they will be represented internally with capabilities instead of integer addresses.
-It's possible for scalar code to use mix and match capability instructions and integer-mode memory accesses, because CHERI-RISC-V adds instructions for dereferencing capabilities that work in both Integer and Capability encoding modes.
-Because the behaviour of CHERI-RVV instructions only changes with the encoding mode, it is impossible to use both capability-aware and integer-addressed RVV instructions in the same program.
+All legacy vector programs should produce equivalent binaries when compiled for integer-mode-CHERI.
+On top of that, all binaries compiled for non-CHERI RVV platforms should produce the same results when run on an equivalent integer-mode-CHERI RVV platform.
+Both claims assume the program doesn't perform accesses that \todomark{violate? exceed?} the DDC.
 
 \hypsubsection{hyp:sw_pure_compat}{Converting legacy code to pure-capability code}
-This is true in theory but not yet true in practice, with two assumptions:
-\begin{itemize}
-    \item The scalar elements of the code have this property
-    \item All usages of vector memory instructions access memory through references with correct provenance
-    \begin{itemize}
-        \item i.e. each vector memory instruction only accesses addresses within the intended provenance of the base pointer
-    \end{itemize}
-    \item All vector memory instructions use valid pointers as their base addresses
-    \begin{itemize}
-        \item e.g. there are no integer-to-pointer casts that would produce invalid capabilities in pure-capability mode
-    \end{itemize}
-\end{itemize}
+This is true for CHERI-RVV, but cannot be done in practice yet.
+Some engineering effort is required to support this in CHERI-Clang.
+Because this argument concerns source code, all three ways to generate CHERI-RVV instructions must be examined.
 
-All vanilla RVV vector instructions have CHERI-RVV counterparts which produce identical results in Capability mode.
-When recompiling for pure-capability mode, the only differences in the output binary from the original should be
-\begin{itemize}
-    \item The encoding mode used
-    \item The types of registers used for base addresses
-\end{itemize}
-If the abstractions used for vector programming are high-level enough to be independent of register types, a compiler may change the register types under the hood with no changes from the user.
-CHERI-Clang's support for these high-level abstractions is lacking.
+\subsubsection*{Inline Assembly - Unlikely}
+For GCC-style inline assembly, it is currently impossible for integer-addressed RVV source code to be recompiled in pure-capability mode without modification.
+Integer-addressed RVV assembly uses general-purpose registers for the base address, but the pure-capability instructions require capability registers instead.
+The base address register can either be specified directly, so must be changed to a capability register; or specified using template syntax and an ``r'' constraint (\todoref{constraint table}), which must be changed to a capability ``cr'' constraint.
 
-\subsubsection*{Inline assembly - False}
-Inline assembly allocates registers based on a user-provided register constraint.
-The `r' general-purpose register constraint used for legacy code does not match the `C' capability register constraint, which is required for capability-mode instructions.
-Thus, inline vector assembly would have to be updated to compile correctly for pure-capability systems.
+\todomark{Example?}
 
-\subsubsection*{Intrinsics - False until CHERI-Clang is fixed}
-Vector intrinsics, which take pointer types as arguments, are high-level enough for the compiler to change the register types.
-However, intrinsics do not currently function on CHERI-Clang in pure-capability \emph{or} hybrid mode.
+\todomark{Programmer could use helper macro btut that still requires source code changes}
 
-\subsubsection*{Auto-vectorization - False}
-A compiler that auto-vectorizes scalar code, as long as that code is valid under pure-capability CHERI, could easily choose to auto-vectorize it with CHERI instructions instead.
-Unfortunately CHERI-Clang, as well as vanilla Clang, does not have auto-vectorization for RVV.
+In theory, one could change the behaviour of inline assembly to automatically convert general purpose registers/constraints to capability versions in specific circumstances.
+However, this can have wide-reaching ramifications, potentially making code more difficult to understand, or even breaking existing code.
+
+\subsubsection*{Intrinsics - Yes}
+The current specification for RVV intrinsics uses pointer types for all base addresses\cite{specification-RVV-intrinsics-v1.0}.
+In pure-capability compilers all pointers should be treated as capabilities instead of integers, including those in intrinsics.
+Assuming all base address pointers are created in a valid manner (e.g. through \code{malloc} or monotonic decrease, and not through integer literals), the conversion to pure-capability should make them all valid capabilities which are compatible with the intrinsics.
+Therefore well-behaved code using RVV intrinsics should be compilable in pure-capability mode without changes.
+
+This is not currently the case for CHERI-Clang, as RVV memory access intrinsics are broken, but this can be fixed with engineering effort.
+
+\subsubsection*{Auto-vectorization - Yes}
+All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV pure-capability mode, assuming the base addresses can be converted to valid capabilities.
+Any scalar code that can be a) compiled in scalar pure-capability mode\footnote{This ensures all memory accesses use valid capabilities.}, and b) auto-vectorized by a legacy RVV compiler, must have an equivalent pure-capability vectorized form.
+This form could be acquired by performing the auto-vectorization, then converting the instructions to pure-capability counterparts.
+Therefore a pure-capability compiler can always auto-vectorize CHERI-compliant scalar code if some legacy compiler can also auto-vectorize it.
+
+This is not currently possible for CHERI-Clang, as RVV auto-vectorization is not implemented yet.
+Similar models (e.g. Arm SVE) already have auto-vectorization, so RVV auto-vectorization should be possible.
 
 \hypsubsection{hyp:sw_stack_vectors}{Saving vectors on the stack}
 % \todomark{Yes vectors can be stored on the stack}
