@@ -1,11 +1,11 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15388
-Words in text: 14265
+Sum count: 15385
+Words in text: 14257
 Words in headers: 227
-Words outside text (captions, etc.): 863
+Words outside text (captions, etc.): 868
 Number of headers: 87
-Number of floats/tables/figures: 14
+Number of floats/tables/figures: 15
 Number of math inlines: 31
 Number of math displayed: 2
 Subcounts:
@@ -30,12 +30,12 @@ Subcounts:
   162+5+27 (3/1/2/0) Subsection: Indexed accesses}\label{rvv:indexedmem
   67+3+6 (1/1/0/0) Subsection: Unit whole-register accesses
   95+3+5 (1/1/0/0) Subsection: Unit bytemask accesses
-  297+1+42 (1/0/0/0) Section: CHERI}\label{chap:bg:sec:cheri
+  296+1+47 (1/1/0/0) Section: CHERI}\label{chap:bg:sec:cheri
   298+2+0 (1/0/0/0) Subsection: CHERI-RISC-V ISA
-  147+2+13 (1/2/0/0) Subsection: Instruction changes
+  139+2+13 (1/2/0/0) Subsection: Instruction changes
   155+5+22 (1/0/0/0) Subsection: Capability and Integer encoding mode\label{chap:bg:subsec:cheriencodingmode}
-  123+5+20 (1/0/0/0) Subsection: Pure-capability and Hybrid compilation modes
-  133+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
+  123+5+20 (1/0/0/0) Subsection: Pure-capability and Hybrid compilation modes}\label{cheri_purecap_hybrid
+  134+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
   82+3+13 (1/1/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   201+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
   944+7+85 (3/0/1/0) Subsection: Emulating CHERI
