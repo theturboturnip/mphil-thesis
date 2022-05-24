@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15433
-Words in text: 14303
+Sum count: 15430
+Words in text: 14300
 Words in headers: 227
 Words outside text (captions, etc.): 870
 Number of headers: 87
@@ -14,7 +14,7 @@ Subcounts:
   389+1+42 (1/0/0/0) Section: Motivation
   224+3+2 (1/1/0/0) Section: Hypotheses and Aims
   98+1+0 (1/0/0/0) Chapter: Background\label{chap:background}
-  185+1+0 (1/0/0/0) Section: RISC-V}\label{chap:bg:sec:riscv
+  182+1+0 (1/0/0/0) Section: RISC-V}\label{chap:bg:sec:riscv
   164+6+0 (1/0/0/0) Section: A brief history of vector processing}\label{chap:bg:rvvstart
   168+4+0 (1/0/0/0) Section: The RVV vector model}\label{chap:bg:sec:rvv:vector_model
   421+1+0 (1/0/0/0) Subsection: \code{vtype}}\label{chap:bg:subsec:vtype

@@ -1,6 +1,6 @@
 \section{RISC-V}\label{chap:bg:sec:riscv}
 % RISC-V has extensions
-RISC-V is an open family of ISAs which defines ``base integer ISAs'' (e.g. all 64-bit RISC-V cores implement the RV64I Base Integer Instruction Set) and extensions (e.g. the ``M'' extension for integer multiplication).
+RISC-V is an open family of ISAs which defines ``base integer ISAs'' (e.g. all 64-bit RISC-V cores implement the RV64I base ISA) and extensions (e.g. the ``M'' extension for integer multiplication).
 A base instruction set combined with a set of extensions is known as a RISC-V ISA.
 Because RISC-V is open, anyone can design, manufacture, and sell chips implementing any RISC-V ISA.
 
@@ -8,8 +8,8 @@ Each RISC-V implementation has a set of constant parameters.
 The most common example is \code{XLEN}, the length of an integer register in bits, which is tied to the base integer ISA (e.g. 64-bit ISA implies \code{XLEN=64}).
 Other constant parameters include \code{CLEN}, the length of a capability in bits, defined by CHERI relative to \code{XLEN}; and \code{VLEN} and \code{ELEN}, which are used by RVV and entirely implementation-defined.
 
-The extensions of most relevance to this project are the ``V'' vector extension (RVV) and the CHERI extension.
-RVV recently became the officially ratified vector extension for RISC-V, which all RISC-V vector processing chips should implement going forward.
+The extensions of most relevance to this project are the ``V'' vector extension (RVV, specified in~\cite{specification-RVV-v1.0}) and the CHERI extension (specified in~\cite{TR-951}).
+RVV has recently been officially ratified, and is the de facto vector extension for RISC-V.
 The following sections summarize the vector extension, how it accesses memory, and previous implementations in academia.
 % \todomark{finish this para}
 
