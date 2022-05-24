@@ -17,7 +17,7 @@ This section examines support across the Clang and GCC compilers for various vec
 \subsection{Required command-line options}
 Before you can compile vector code, the compiler must be told to use a vector ISA.
 This is fortunately quite easy, only requiring an addition to the architecture feature string in most cases.
-On Clang 13 and other LLVM-13-based compilers, version 0.1 of the vector specification is supported as an experimental extension\footnote{It is difficult to verify the actual corresponding version, because there is no readily available specification for v0.1, and the extension supports instructions only present from v0.8 such as whole register accesses. See \todomark{evaluation} for more information.}.
+On Clang 13 and other LLVM-13-based compilers, version 0.1(?\footnote{It is difficult to verify the actual corresponding version, because there is no readily available specification for v0.1, and the extension supports instructions only present from v0.8 such as whole register accesses.}) of the vector specification is supported as an experimental extension.
 Clang/LLVM~14 and up support RVV v1.0.
 GCC is an interesting case --- there is a branch of \code{riscv-gcc-toolchain} that supports RVV v0.1, based on RISC-V GCC 10.1, but it was left untouched for a year and deleted as of 17th May 2022.
 See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and building this version.
@@ -43,16 +43,18 @@ See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and b
 \todomark{Figure page showing generated ASM for increment loop - see godbolt links MD}
 Compilers with auto-vectorization can automatically create vectorized code from a scalar program.
 For example, a scalar loop over an array that increments each element could be converted to a vectorized loop that increments multiple elements at once.
-Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007\footnote{\url{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}}).
+% Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007\footnote{\url{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}}).
 Currently there is no support for RVV auto-vectorization in Clang or GCC.
 Both compilers have support for Arm SVE auto-vectorization, explored further in \cref{chap:soft:compiling:armsve}.
 
 \subsection{Vector intrinsics}
-\enquote{Intrinsics} are functions built in to a compiler that can invoke low-level functionality and instructions directly for a specific architecture.
-When automatic vectorization is not available, intrinsics are the next best thing - they present a familiar high-level interface (function calls), that gives the programmer fine-grained control over which instructions to execute, typically providing an intrinsic for each vector instruction.
+\enquote{Intrinsics} are functions defined by the compiler that can invoke low-level functionality and instructions directly for a specific architecture.
+When automatic vectorization is not available, intrinsics are the next best thing --- they aren't portable across different ISAs, but present a familiar high-level interface (function calls) that gives fine-grained control over instructions.
+% RVV provides an intrinsic for each vector instruction.
 The compiler then handles low-level decisions like register allocation under the hood, and sometimes may provide extra functionality for ease of use.
 
-RVV has a comprehensive set of vector intrinsics\cite{specification-RVV-intrinsics}, implemented in the aforementioned special version of GCC and Clang~13+.
+RVV has a comprehensive set of vector intrinsics\cite{specification-RVV-intrinsics}.
+%, implemented in the aforementioned special version of GCC and Clang~13+.
 With these, the general strip-mining loop is easy to construct:
 \todomark{example based on \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
 \begin{enumerate}
@@ -61,17 +63,18 @@ With these, the general strip-mining loop is easy to construct:
     \item Pass the vector length to the computation/memory intrinsics, which operate on the vector variables.
 \end{enumerate}
 
-\todomark{Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V}
+% \todomark{Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V}
 
 \subsection{Inline assembly}
-If a compiler doesn't supply complete intrinsics, or if the programmer desires extremely fine-grained control, inline assembly may be used.
-The programmer gives a string of handwritten assembly code to the compiler, which is parsed and directly inserted into the output code at that point.
-The compiler still has to interpret the instruction and understand it correctly, but as long as it knows the instruction this method does not depend on any intrinsics being present (or functional\footnote{For example, CHERI-Clang could not compile code with vector intrinsics, so had to use inline assembly for all vector instructions.}).
+If a compiler doesn't supply complete intrinsics, or if the programmer desires even more control, inline assembly may be used.
+The programmer gives a string of handwritten assembly code to the compiler, which is parsed and directly inserted into the output code.
+The compiler still has to parse the instruction, but this method does not depend on any intrinsics being present (or functional).
+We used this for CHERI-Clang programs, as it could not use intrinsics without crashing.
 
 Inline assembly can interact with C code and variables through a template syntax.
 The programmer inserts a placeholder in the assembly code with a corresponding expression, noting how the expression is stored using a \enquote{constraint}.
-For our purposes, constraints enforce that a value is either in a register or in memory (see \cref{tab:inline_asm_constraints}).
-As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todomark{example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
+For our purposes, constraints enforce that a value is either in a register or in memory.
+% As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todomark{example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
 
 Using the constraint, the compiler determines how the expression's value is stored, and inserts a reference to it in the assembly string.
 Because this is done before the assembly string is parsed, and isn't immediately type-checked against the assembly instruction, it can lead to some difficult errors.
@@ -79,9 +82,45 @@ Because this is done before the assembly string is parsed, and isn't immediately
 Clang and GCC support inline assembly for RVV quite well, and even allows the intrinsic vector types to be referenced by assembly templates (thus making the compiler do register allocation instead of the programmer).
 The only caveat is that \emph{memory} constraints are not supported by RVV memory accesses.
 None of the vector memory access instructions support address offsets, unlike their scalar counterparts.
-Clang always treats the \emph{memory} constraint as an offset access, even when that offset is zero, so it adds an offset to the assembly string \todomark{example}, making it invalid.
-To get around this, one must use the pointer itself with a \emph{register} constraint - effectively saying \enquote{find the register this pointer is in, and use that as the base address for the memory access} \todomark{example}.
-On CHERI platforms, because pointers must be stored in capability registers, the \emph{capability register} constraint must be used instead (see \todomark{example of CHERI-agnostic inline assembly}).
+Clang always treats the \emph{memory} constraint as an offset access, even when that offset is zero, so it adds an offset to the assembly string (\cref{subfig:inline_asm_vector_memory}), making it invalid.
+To get around this, one must use the pointer itself with a \emph{register} constraint (\cref{subfig:inline_asm_vector_ptr_reg}).
+On CHERI platforms, because pointers must be stored in capability registers, the \emph{capability register} constraint must be used instead (\cref{subfig:inline_asm_vector_cap_reg}).
+
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}{0.6\textwidth}
+        \inputframedminted[gobble=4,firstline=6,lastline=6]{c}{./code/inline_asm.c}
+        \caption{Preamble}
+    \end{subfigure}
+
+    \begin{subfigure}{0.49\textwidth}
+        \inputframedminted[gobble=4,firstline=7,lastline=10]{c}{./code/inline_asm.c}
+        \caption{Load scalar from memory}\label{subfig:inline_asm_memory}
+    \end{subfigure}\hfill%
+    \begin{subfigure}{0.49\textwidth}
+        \inputframedminted[gobble=4,firstline=20,lastline=23]{c}{./code/inline_asm.c}
+        \caption{Failed attempt to load vector from memory}\label{subfig:inline_asm_vector_memory}
+    \end{subfigure}
+
+
+    \begin{subfigure}{0.49\textwidth}
+        \inputframedminted[gobble=4,firstline=32,lastline=35]{c}{./code/inline_asm.c}
+        \caption{Load vector from pointer in register}\label{subfig:inline_asm_vector_ptr_reg}
+    \end{subfigure}\hfill%
+    \begin{subfigure}{0.49\textwidth}
+        \inputframedminted[gobble=4,firstline=43,lastline=46]{c}{./code/inline_asm.c}
+        \caption{Load vector from capability in register}\label{subfig:inline_asm_vector_cap_reg}
+    \end{subfigure}
+
+    \begin{subfigure}{0.6\textwidth}
+        \centering
+        \inputframedminted[gobble=4,firstline=57,lastline=67]{c}{./code/inline_asm.c}
+        \caption{Portable code for CHERI and non-CHERI.\\\code{pure\_capabilities} is a feature added to CHERI-Clang for this project}\label{subfig:inline_asm_vector_portable}
+    \end{subfigure}
+
+    \caption{Inline assembly examples\\\url{https://godbolt.org/z/rW9orr66a}}
+    \todomark{Change the code font}
+\end{figure}
 
 Broadly speaking, inline assembly supports more RVV instructions than intrinsics do.
 It is used extensively in the testbench code for the evaluation (\cref{chap:eval}) alongside intrinsics where possible.
@@ -91,21 +130,22 @@ It is used extensively in the testbench code for the evaluation (\cref{chap:eval
 % This is an extremely useful feature, particularly if 
 % Because this is done before the assembly string is parsed, it can lead to some difficult-to-understand errors.
 
-\begin{table}[]
-    \centering
-    \begin{tabular}{c|c}
-       "="  & Output - the old value is overwritten. Can be combined with other constraints. \\
-        "r" & Store in a register \\
-        "vr" & Store in a vector register (RVV only) \\
-        "C" & Store in a capability register (CHERI-Clang only) \\
-        "m" & Store in memory \\
-    \end{tabular}
-    \caption{Inline assembly constraints\cite[Section 6.47.2]{UsingGNUCompiler2022}}
-    \label{tab:inline_asm_constraints}
-    \todomark{Beautify this table}
-\end{table}
+% \begin{table}[h]
+%     \centering
+%     \begin{tabular}{c|c}
+%        "="  & Output - the old value is overwritten. Can be combined with other constraints. \\
+%         "r" & Store in a register \\
+%         "vr" & Store in a vector register (RVV only) \\
+%         "C" & Store in a capability register (CHERI-Clang only) \\
+%         "m" & Store in memory \\
+%     \end{tabular}
+%     \caption{Inline assembly constraints\cite[Section 6.47.2]{UsingGNUCompiler2022}}
+%     \label{tab:inline_asm_constraints}
+%     \todomark{Beautify this table}
+% \end{table}
 
-\subsection{vs. Arm SVE}\label{chap:soft:compiling:armsve}
+\pagebreak
+\subsection{RVV vs. Arm SVE}\label{chap:soft:compiling:armsve}
 \emph{Summarizes \cite{armltdArmCompilerScalable2019}}
 
 Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\cite{stephensARMScalableVector2017}.

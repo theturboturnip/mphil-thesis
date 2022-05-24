@@ -287,6 +287,12 @@ end
 \usepackage{mdframed} %nice frames
 \definecolor{light-gray}{gray}{0.95} %the shade of grey that stack exchange uses
 
+\newcommand{\inputframedminted}[3][]{%
+\begin{mdframed}[backgroundcolor=light-gray]
+\inputminted[#1]{#2}{#3}
+\end{mdframed}
+}
+
 %% Pseudocode
 \usepackage{algpseudocode}
 

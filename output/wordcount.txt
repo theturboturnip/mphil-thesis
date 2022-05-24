@@ -1,9 +1,9 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15779
-Words in text: 14610
-Words in headers: 230
-Words outside text (captions, etc.): 906
+Sum count: 15703
+Words in text: 14519
+Words in headers: 231
+Words outside text (captions, etc.): 920
 Number of headers: 88
 Number of floats/tables/figures: 16
 Number of math inlines: 31
@@ -51,11 +51,11 @@ Subcounts:
   402+2+0 (1/0/1/0) Section: Testing hypotheses
   89+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
   65+3+0 (1/0/0/0) Section: Compiling vector code}\label{chap:software:sec:compilersupport
-  110+3+51 (1/1/0/0) Subsection: Required command-line options
-  98+2+5 (1/0/0/0) Subsection: Automatic vectorization
-  157+2+0 (1/0/0/0) Subsection: Vector intrinsics
-  381+2+25 (1/1/0/0) Subsection: Inline assembly
-  317+3+20 (1/0/0/0) Subsection: vs. Arm SVE}\label{chap:soft:compiling:armsve
+  110+3+47 (1/1/0/0) Subsection: Required command-line options
+  64+2+0 (1/0/0/0) Subsection: Automatic vectorization
+  138+2+0 (1/0/0/0) Subsection: Vector intrinsics
+  343+2+48 (1/1/0/0) Subsection: Inline assembly
+  317+4+20 (1/0/0/0) Subsection: RVV vs. Arm SVE}\label{chap:soft:compiling:armsve
   65+5+0 (1/0/0/0) Section: Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang
   194+3+35 (1/1/0/0) Subsection: Required command-line options
   202+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI
