@@ -168,7 +168,7 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Indexed accesses}
+\subsection{Indexed accesses}\label{rvv:indexedmem}
 \begin{figure}[h]
     \centering
     \begin{subtable}{\textwidth}
@@ -205,7 +205,7 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
     \caption{Parameters}
     \label{tab:RVV_mem_index}
     \end{subtable}\hfill
-    \begin{subfigure}[t]{0.5\textwidth}
+    \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{Figures/RVV_mem_index_3seg.pdf}
         \caption{Example of a segmented indexed access\\\code{EEW=8-bits}, \code{nf=3}}
         \label{fig:RVV_mem_index_3seg}
@@ -219,6 +219,7 @@ where each segment is offset by an index (in bytes) taken from another vector.
 \begin{itemize}
 \item The start of each segment is defined by \code{address + index\_vector[i]}.
 \item These instructions don't do anything if \code{vstart >= EVL}.
+\item Indexed segment loads may not overwrite the index vector\footnote{This allows restarting after raising an exception partway through a structure}.
 \end{itemize}
 
 % ORDERING
@@ -256,13 +257,12 @@ Upon entering a trap, it is implementation-defined how much of the faulting segm
 \begin{tabular}{ll}
 \toprule
         Masked? & False \\
-        Number of Registers & \paramt{<nreg>} \\
+        Registers & \paramt{<nreg>} \\
         \code{EEW} & \paramt{<eew>} \\
         \code{EVL} & \code{NFIELDS * VLEN / EEW} \\
         \code{EMUL} & 1 \\
     \bottomrule
 \end{tabular}
-\todomark{Make thinner}
 \caption{Parameters}
 \end{subtable}
     \caption{Unit Whole Register Information}

@@ -1,12 +1,12 @@
 \section{The RVV vector model}\label{chap:bg:sec:rvv:vector_model}
 \emph{Summarizes \cite[Sections 1-6, 17]{specification-RVV-v1.0}}
 
-\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
 
 RVV defines thirty-two vector registers, each of an implementation-defined constant width \code{VLEN}.
 These registers can be interpreted as \emph{vectors} of \emph{elements}.
 The program can configure the size of elements, and the implementation defines a maximum width \code{ELEN}.
-\cref{fig:RVV_simple_widths} shows a simple example of a 128-bit vector, where the maximum element length is 32-bits.
+\cref{fig:RVV_simple_widths} shows a simple example.
 
 RVV also adds some state that defines how the vector registers are used (see \cref{fig:RVV_added_state}).
 These are stored in RISC-V Control and Status Registers (CSRs), which the program can read.
@@ -15,7 +15,7 @@ These are stored in RISC-V Control and Status Registers (CSRs), which the progra
 Masked accesses (\cref{chap:bg:subsec:rvvmasking}) further divide the \emph{body} into \emph{active} and \emph{inactive} elements.
 This section also describes the vector exception model (\cref{chap:bg:subsec:vexceptions}).
 
-\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_simple_widths}
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_added_state}
 
 %---------------------------------
 \subsection{\code{vtype}}\label{chap:bg:subsec:vtype}
@@ -71,9 +71,6 @@ The program \emph{can} set \code{vstart} manually, but it may not always work.
 If an implementation couldn't arrive at the value itself, then it is allowed to reject it.
 The specification gives an example where a vector implementation never takes interrupts during an arithmetic instruction, so it would never set \code{vstart} during an arithmetic instruction, so it could raise an exception if \code{vstart} was nonzero for an arithmetic instruction.
 
-\figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vstart_trap}
-
-\figinput[width=0.8\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
 %---------------------------------
 \subsection{Masking --- Active/inactive elements}\label{chap:bg:subsec:rvvmasking}
 Most vector instructions allow for per-element \emph{masking} (see \cref{fig:RVV_mask_example}).
@@ -81,6 +78,10 @@ When masking is enabled, register \code{v0} acts as the `mask register', where e
 If the mask bit is 0, that element is \emph{active} and will be used as normal.
 If the mask bit is 1, that element will be \emph{inactive} and not written to (or depending on the mask-agnostic setting, overwritten with 1s).
 When masking is disabled, all elements are \emph{active}.
+
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_vstart_trap}
+\figinput[width=0.7\textwidth,pos=h]{1_20Background/figures/fig_RVV_mask_example}
+\clearpage
 
 \pagebreak
 %---------------------------------
@@ -128,7 +129,7 @@ The save-and-reload expectation then add two constraints on the trapping instruc
 \end{itemize}
 
 The idempotency option gives implementations a lot of leeway.
-Some instructions \todomark{examples} are specifically prohibited from overwriting their inputs to make them idempotent.
+Some instructions, such as  indexed segment loads (\cref{rvv:indexedmem}), are specifically prohibited from overwriting their inputs to make them idempotent.
 If an instruction is idempotent, an implementation is even allowed to repeat operations on elements \emph{preceding} \code{vstart}.
 However for memory accesses the idempotency depends on the memory being accessed.
 For example, reading or writing a memory-mapped I/O region may not be idempotent.
@@ -146,15 +147,12 @@ If an implementation sets \code{vstart} to the offending element, because operat
 
 %---------------------------------
 \subsubsection{Other modes}
-The RVV spec mentions two other potential trap modes.
-First is \enquote{Selectable precise/imprecise traps}, where an implementation provides a bit that selects between precise or imprecise traps.
-The intent is to allow precise traps to be selected for e.g. debugging purposes, and for imprecise traps to be selected for extra performance.
+The RVV spec notes two other possible future trap modes.
+First is \enquote{Selectable precise/imprecise traps}, where an implementation allows the user to select precise or imprecise traps for e.g. debugging or performance.
 
 The second mode is \enquote{Swappable traps}, where a trap handler could use special instructions to \enquote{save and restore the vector unit microarchitectural state}.
 The intent seems to be to support context switching with imprecise traps, which could also require the \emph{opaque} state (i.e. internal state not visible to the program) to be saved and restored.
 Right now, it seems that context switching always requires a precise trap.
-
-Neither of these modes are fully specified, but they are simply noted as possibilities for the future.
 
 %---------------------------------
 \subsection{Summary}\label{chap:bg:subsec:rvvsummary}

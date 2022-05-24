@@ -1,13 +1,17 @@
 \section{Previous RVV implementations\label{chap:bg:rvvend}}
-Even before v1.0 of the RVV specification was released, multiple implementations were released in academia and industry.
-These implementations showcase the diversity allowed by a scalable model: \citeauthor{johnsMinimalRISCVVector2020} integrated a minimal vector processor into a scalar pipeline meant for microcontrollers (\code{VLEN=32}) \cite{johnsMinimalRISCVVector2020}, \citeauthor{dimascioOnBoardDecisionMaking2021} employed a RVV implementation for deep learning in space\cite{dimascioOnBoardDecisionMaking2021}, and AndesCode, SiFive, and Alibaba have released cores with \code{VLEN}s up to 512\cite{AndesCoreNX27VProcessor}\cite{SiFiveIntelligenceX280}\cite{chenXuantie910CommercialMultiCore2020}.
-Other academic examples include Ara\cite{cavalcanteAra1GHzScalable2020}, Arrow\cite{assirArrowRISCVVector2021}, RISC-$\text{V}^2$\cite{patsidisRISCV2ScalableRISCV2020}, and Vicuna\cite{platzerVicunaTimingPredictableRISCV2021}, which all decouple the vector processing from the scalar pipeline\footnote{These implementations are not examined further as they do not go into detail on their load/store implementations.}.
+Academia and industry have implemented RVV even before v1.0 was released.
+% Even before v1.0 of the RVV specification was released, multiple implementations were released in academia and industry.
+The scalable vector model allows great diversity: \citeauthor{johnsMinimalRISCVVector2020} integrated a minimal vector processor into a microcontroller's scalar pipeline (\code{VLEN=32}) \cite{johnsMinimalRISCVVector2020}, \citeauthor{dimascioOnBoardDecisionMaking2021} used RVV for deep learning in space\cite{dimascioOnBoardDecisionMaking2021}, and AndesCode, SiFive, and Alibaba have released cores with \code{VLEN}s up to 512\cite{AndesCoreNX27VProcessor}\cite{SiFiveIntelligenceX280}\cite{chenXuantie910CommercialMultiCore2020}.
+Other academic examples include Ara\cite{cavalcanteAra1GHzScalable2020}, Arrow\cite{assirArrowRISCVVector2021}, RISC-$\text{V}^2$\cite{patsidisRISCV2ScalableRISCV2020}, and Vicuna\cite{platzerVicunaTimingPredictableRISCV2021}, which all decouple the vector processing from the scalar pipeline.
+%\footnote{These implementations are not examined further as they do not go into detail on their load/store implementations.}
 % \todomark{Planned to do a survey of existing implementations here - might be too many words?}
 
-This is only going to continue: multiple implementations were just recently presented at RISC-V Week in Paris (May 2022).
-Vitruvius\cite{minerviniVitruviusAreaEfficientRISCV2022} uses extremely long vectors \code{VLEN=256*64=16384}, is implemented as a decoupled processor, and is the first RISC-V processor to support the Open Vector Interface (OVI)\footnote{\gitrepo{semidynamics/OpenVectorInterface}{https://github.com/semidynamics/OpenVectorInterface}} for communicating with the scalar core.
+Very recently, more implementations were revealed at RISC-V Week in Paris (May 2022).
+% This is only going to continue: multiple implementations were just recently presented at RISC-V Week in Paris (May 2022).
+Vitruvius\cite{minerviniVitruviusAreaEfficientRISCV2022} uses extremely long vectors \code{VLEN = 16384}, is implemented as a decoupled processor, and is the first RISC-V processor to support the Open Vector Interface (OVI)\footnote{\gitrepo{semidynamics/OpenVectorInterface}{https://github.com/semidynamics/OpenVectorInterface}} to communicate with the scalar core.
 VecProM\cite{mahaleRISCVVPUVery2021} splits its approach into two, where vectors beyond a certain length are strip-mined and processed in hardware using a scratch memory, using OVI to connect multiple heterogeneous vector processors to a scalar core.
 Both were produced from the Barcelona Supercomputing Center under the European Processor Initiative.
+It seems that adoption of RVV will continue, making it a good choice for adapting to CHERI.
 
 % \todomark{This is only going to continue: an implementation was presented at RISC-V week(cite)}
 % Vitruvius: 256 * 64-bit elements

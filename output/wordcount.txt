@@ -1,9 +1,9 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15430
-Words in text: 14300
+Sum count: 15388
+Words in text: 14265
 Words in headers: 227
-Words outside text (captions, etc.): 870
+Words outside text (captions, etc.): 863
 Number of headers: 87
 Number of floats/tables/figures: 14
 Number of math inlines: 31
@@ -16,20 +16,20 @@ Subcounts:
   98+1+0 (1/0/0/0) Chapter: Background\label{chap:background}
   182+1+0 (1/0/0/0) Section: RISC-V}\label{chap:bg:sec:riscv
   164+6+0 (1/0/0/0) Section: A brief history of vector processing}\label{chap:bg:rvvstart
-  168+4+0 (1/0/0/0) Section: The RVV vector model}\label{chap:bg:sec:rvv:vector_model
+  157+4+0 (1/0/0/0) Section: The RVV vector model}\label{chap:bg:sec:rvv:vector_model
   421+1+0 (1/0/0/0) Subsection: \code{vtype}}\label{chap:bg:subsec:vtype
-  264+6+0 (1/0/0/0) Subsection: \code{vl} and \code{vstart} --- Prestart, body, tail}\label{chap:bg:subsec:vlvstart
-  81+4+41 (1/0/0/0) Subsection: Masking --- Active/inactive elements}\label{chap:bg:subsec:rvvmasking
-  759+10+46 (4/0/0/0) Subsection: Exception handling}\label{chap:bg:subsec:vexceptions
+  250+6+0 (1/0/0/0) Subsection: \code{vl} and \code{vstart} --- Prestart, body, tail}\label{chap:bg:subsec:vlvstart
+  95+4+41 (1/0/0/0) Subsection: Masking --- Active/inactive elements}\label{chap:bg:subsec:rvvmasking
+  730+10+46 (4/0/0/0) Subsection: Exception handling}\label{chap:bg:subsec:vexceptions
   78+1+0 (1/0/0/0) Subsection: Summary}\label{chap:bg:subsec:rvvsummary
+  178+3+6 (1/0/1/0) Section: Previous RVV implementations\label{chap:bg:rvvend}
   104+3+0 (1/0/0/0) Section: RVV memory instructions\label{chap:bg:sec:rvvmemory}
   124+2+0 (1/0/3/0) Subsection: Segmented accesses
   159+7+21 (3/1/2/0) Subsection: Unit and Strided accesses}\label{chap:bg:sec:rvv:unitstrideaccess
   159+3+17 (1/1/1/0) Subsection: Unit fault-only-first loads}\label{chap:bg:sec:rvv:fof
-  153+5+16 (3/1/2/0) Subsection: Indexed accesses
+  162+5+27 (3/1/2/0) Subsection: Indexed accesses}\label{rvv:indexedmem
   67+3+6 (1/1/0/0) Subsection: Unit whole-register accesses
   95+3+5 (1/1/0/0) Subsection: Unit bytemask accesses
-  182+3+24 (1/0/1/0) Section: Previous RVV implementations\label{chap:bg:rvvend}
   297+1+42 (1/0/0/0) Section: CHERI}\label{chap:bg:sec:cheri
   298+2+0 (1/0/0/0) Subsection: CHERI-RISC-V ISA
   147+2+13 (1/2/0/0) Subsection: Instruction changes
