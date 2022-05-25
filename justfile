@@ -43,12 +43,16 @@ count:
     # for each content file in the main body
     # run "texcount -1 -sum -merge -q $FILE"
     # and print each command before you run it
-    echo 1_*/content.tex chapters.tex | xargs -n1 -t texcount -1 -sum -merge -q
+    echo 1_*/content.tex chapters.tex | xargs -n1 -t ./texcount.pl -1 -sum -merge -q
+
+detail-count:
+    ./texcount.pl -sum -merge chapters.tex -v -html > ./output/mergedcount.html
+    xdg-open ./output/mergedcount.html
 
 savecount:
     #!/usr/bin/env sh
     mkdir -p ./output/
-    texcount -sum -merge chapters.tex > ./output/wordcount.txt
+    ./texcount.pl -sum -merge chapters.tex > ./output/wordcount.txt
 
 open: build-thesis
     xdg-open ./output/thesis.pdf
