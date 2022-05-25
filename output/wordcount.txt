@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15580
-Words in text: 14390
+Sum count: 15591
+Words in text: 14401
 Words in headers: 227
 Words outside text (captions, etc.): 930
 Number of headers: 87
@@ -72,5 +72,5 @@ Subcounts:
   257+4+14 (2/0/0/0) Subsection: \code{vector\_memcpy}
   101+3+0 (1/0/0/0) Subsection: \code{vector\_memcpy\_pointers}
   36+1+0 (1/0/0/0) Subsection: Summary
-  360+1+0 (1/0/0/0) Chapter: Conclusion
+  371+1+0 (1/0/0/0) Chapter: Conclusion
 

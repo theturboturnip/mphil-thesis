@@ -2,8 +2,8 @@
 \begin{document}
 
 \chapter{Conclusion}
-In this dissertation I have presented a possible fusion of CHERI and RVV implemented in an emulator (\cref{chap:hardware}), explored the impact on the software stack (\cref{chap:software}), and extended the RVV instruction set/vector model to store capabilities in vectors (\cref{chap:capinvec}).
-Throughout these chapters I have also presented conclusions to a set of hypotheses (\cref{tab:hypotheses}), which prove the general viability of adding scalable vector models to CHERI processsors.
+In this project we have built a new RISC-V emulator supporting one possible fusion of CHERI and RVV (\cref{chap:hardware}), explored the impact on the software stack by compiling and running test programs (\cref{chap:software,chap:eval}), and extended the RVV instruction set/vector model to store capabilities in vectors (\cref{chap:capinvec}).
+On top of this substantial implementation effort, we have presented conclusions to a set of hypotheses (\cref{tab:hypotheses}) proving the general viability of adding scalable vector models to CHERI processsors.
 
 \cref{hyp:hw_cap_as_vec_mem_ref} proved the most essential point, that a blanket replacement of all memory references with capabilities in all RVV instructions is valid.
 \cref{hyp:hw_cap_bounds_checks_amortized} then alleviated performance concerns by showing it was possible to combine the required capability checks for all vector accesses, amortizing the overall cost of checking, although with varying practical benefit.
