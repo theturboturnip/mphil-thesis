@@ -30,9 +30,56 @@
 
 \begin{document}
 
-\frontmatter
+%% MPhil Guidelines
+% Two versions
+% Anonymised:
+%     anonymous cover sheet title page
+%     word count page
+%     blank page (no acknowledgement)
+%     Abstract (no name)
+% Normal:
+%     named front cover
+%     Declaration of originality w/ name + date, can include word count
+%          declaration should include notable word count absences
+%     acknowledgement
+%     Abstract (no name)
+% My number = 2095J
 
+\ifdefined\turnipanon
+
+% \titlepage equivalent
+\includepdf{0_2ThesisInfo/blind_project_cover.pdf}
+
+% \declarationpage equivalent
+\pagestyle{empty}
+\wordcountdata{}
+
+% \acknowledgementspage equivalent
+\pagebreak
+\clearpage%
+\thispagestyle{empty}%
+\null%
+\pagebreak
+
+\else
+
+\camtitlepage{}
+
+\camdeclarationpage{}
+\wordcountdata{}
+\vfill\null
+
+\camacknowledgementspage{}
+
+\fi
+
+% Abstract and ToC
+\camabstractpage{}
+\camtocpage{}
+
+% Set chapter title format
 \ContentTitleFormat
+
 
 \clearpage
 \input{chapters}

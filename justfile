@@ -3,18 +3,38 @@ alias c := count
 alias rb := rebuild
 alias ba := build-all
 
+both: build-thesis build-thesis-anon
+
 clean:
-    latexmk -lualatex ./thesis.tex -outdir=./output/ -c
+    @mkdir -p ./output/
+    rm -rf ./output/*
+    @mkdir -p ./output_anon/
+    rm -rf ./output_anon/*
+    @mkdir -p ./submission/
+    rm -rf ./submission/*
 
 build-results:
     #!/usr/bin/env sh
     (cd ./1_50Evaluation/data && python3 ./generate_latex.py)
 
 build-thesis: savecount
+    @mkdir -p ./output/
     @# Run latexmk on just this thesis
     latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis.tex -outdir=./output/
 
-build-all: build-results build-thesis
+build-thesis-anon: savecount
+    @mkdir -p ./output_anon/
+    latexmk -shell-escape -interaction=nonstopmode -lualatex -pretex="\def\turnipanon{1}" -usepretex ./thesis.tex -outdir=./output_anon/
+
+build-all: build-results build-thesis build-thesis-anon
+
+final: build-all
+    #!/usr/bin/env sh
+    mkdir -p ./submission/
+    cp ./output/thesis.pdf ./submission/sws35-project.pdf
+    cp ./output_anon/thesis.pdf ./submission/2095J.pdf
+    # TODO generate source code, check its anonymised
+
 
 rebuild: clean build-all
 

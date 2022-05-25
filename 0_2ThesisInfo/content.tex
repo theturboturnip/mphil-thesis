@@ -6,22 +6,24 @@
 \title{Capability-Based Memory Protection for Scalable Vector Processing}
 
 %% The full name of the author (e.g.: James Smith):
+\ifdefined\turnipanon
+\author{Anonymous}
+\college{Anonymous}
+\collegeshield{}
+\else
 \author{Samuel Stark}
-
-%% College affiliation:
 \college{Clare College}
-
-%% College shield (optional):
 \collegeshield{CollegeShields/Clare}
+\fi
 
 %% Submission date (optional):
-\submissiondate{June 2022}
+\submissiondate{June 6th 2022}
 
 %% You can redefine the submission notice:
 % \submissionnotice{A badass thesis submitted on time for the Degree of PhD}
 
 %% Declaration date:
-\date{June 2022}
+\date{June 6th 2022}
 
 %% Word count
 \begin{luacode*}
@@ -40,9 +42,24 @@ function format_thousand(v)
     .. string.gsub(string.sub(s, pos+1), "(...)", ",%1")
 end
 \end{luacode*}
-\wordcount{\luadirect{tex.sprint(format_thousand(wordcount))} words}
-\wordcountmethod{\texttt{\luadirect{tex.sprint(wordcount_cmd)}}\\(Covers pages \pageref{wc:start}-\pageref{wc:end})}
+\newcommand{\wordcountdata}{
+{
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+Total Page Count:~\pageref*{LastPage}
+
+Main chapters (excluding front-matter, references, appendix): \pagedifference{wc:start}{wc:end} (pp~\pageref{wc:start}-\pageref{wc:end})
+
+Main chapters word count: \luadirect{tex.sprint(format_thousand(wordcount))} words
+
+Word count methodology: \texttt{\luadirect{tex.sprint(wordcount_cmd)}}\\
+This counts body text, heading text, caption text, and slightly over-counts references.
+The anonymous version redacts some trivially identifying information, but uses the same word count as the de-anonymized version.
+The appendices contain non-essential data that is summarized in the main text (e.g. full results, details on how to compile code), or re-statements of work done in the main text (e.g. a summary of all changes made to the CHERI-RISC-V spec).  
+\todomark{Make sure the hypotheses are counted at least once, should the reproductions also be counted?}
+}
+}
 
 %% PDF meta-info:
 \subjectline{Computer Science}
-\keywords{one two three}

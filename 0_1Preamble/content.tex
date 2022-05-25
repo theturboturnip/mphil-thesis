@@ -301,3 +301,18 @@ end
 
 %% Inline lists
 \usepackage[inline]{enumitem}
+
+%% Get last page
+\usepackage{lastpage}
+
+%% Count pages between
+\usepackage{refcount}
+\newcommand{\pagedifference}[2]{%
+  \number\numexpr\getpagerefnumber{#2}-\getpagerefnumber{#1}+1\relax}
+
+%% Redaction
+\ifdefined\turnipanon
+\newcommand{\redact}[1]{\textbf{redacted for anonymity}}
+\else
+\newcommand{\redact}[1]{#1}
+\fi

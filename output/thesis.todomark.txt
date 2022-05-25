@@ -1,67 +1,69 @@
 TODOs
 1
-thesis.tex- My acknowledgements ...
+thesis.tex- Make sure the hypotheses are counted at least once, should the reproductions also be counted?
 2
-1_10Introduction/content.tex- nine
+thesis.tex- My acknowledgements ...
 3
-1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
+1_10Introduction/content.tex- nine
 4
-1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
+1_25EmulationInvestigation/sub10_emu_cheri.tex- diagram
 5
-1_25EmulationInvestigation/sub20_emu_vec.tex- diagram of floating point ld/st vs. vector ld/st
+1_25EmulationInvestigation/sub10_emu_cheri.tex- show the program flow for using modules
 6
-1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
+1_25EmulationInvestigation/sub20_emu_vec.tex- diagram of floating point ld/st vs. vector ld/st
 7
-1_25EmulationInvestigation/sub30_fast_path.tex- Captions for equations
+1_25EmulationInvestigation/sub20_emu_vec.tex- Decision tree for operation decoding
 8
-1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
+1_25EmulationInvestigation/sub30_fast_path.tex- Captions for equations
 9
-1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
+1_30Software/content.tex- Figure page showing generated ASM for increment loop - see godbolt links MD
 10
-1_30Software/content.tex- Change the code font
+1_30Software/content.tex- example based on \url {https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}
 11
-1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
+1_30Software/content.tex- Change the code font
 12
-1_30Software/content.tex- Appendix on how this was done?
+1_30Software/content.tex- appendix based on \url {https://godbolt.org/z/zoWh9jq3o}
 13
-1_30Software/content.tex- Example
+1_30Software/content.tex- Appendix on how this was done?
 14
-1_30Software/content.tex- example
+1_30Software/content.tex- Example
 15
-1_30Software/content.tex- example of error message?
+1_30Software/content.tex- example
 16
-1_30Software/content.tex- Appendix which covers what I know so far about this problem?
+1_30Software/content.tex- example of error message?
 17
-1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
+1_30Software/content.tex- Appendix which covers what I know so far about this problem?
 18
-1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
+1_30Software/content.tex- segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to
 19
-1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
+1_30Software/content.tex- Example https://godbolt.org/z/KPTW7rcvY
 20
-1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
+1_30Software/content.tex- Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?
 21
-1_30Software/sub50_hyp.tex- violate? exceed?
+1_30Software/content.tex- LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere
 22
-1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
+1_30Software/sub50_hyp.tex- violate? exceed?
 23
-2_1Appendix/fastpath_fullcheck.tex- Justify appendix existence
+1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
 24
-2_1Appendix/fastpath_fullcheck.tex- reference Success, Indeterminate, Failure cases
+2_1Appendix/fastpath_fullcheck.tex- Justify appendix existence
 25
-2_1Appendix/fastpath_fullcheck.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
+2_1Appendix/fastpath_fullcheck.tex- reference Success, Indeterminate, Failure cases
 26
-2_1Appendix/fastpath_fullcheck.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
+2_1Appendix/fastpath_fullcheck.tex- fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once
 27
-2_1Appendix/fastpath_fullcheck.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
+2_1Appendix/fastpath_fullcheck.tex- iterating over elements may still be more energy-efficient than doing individual capability checks?
 28
-2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
+2_1Appendix/fastpath_fullcheck.tex- Note that the equation is a simplification of strided for \code {stride = nf * eew}
 29
-2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
+2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
 30
-2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
+2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
 31
-2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
+2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
 32
-2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
+2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
 33
+2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
+34
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing

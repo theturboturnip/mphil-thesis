@@ -315,14 +315,6 @@
 \newcommand{\@submissiondate}{}
 \newcommand{\submissiondate}[1]{\renewcommand{\@submissiondate}{#1}\cam@submissiondatetrue}
 
-% DOCVAR: wordcount (This will appear in the declaration for MPhil theses)
-\newcommand{\@wordcount}{Unknown}
-\newcommand{\wordcount}[1]{\renewcommand{\@wordcount}{#1}}
-
-% DOCVAR: wordcountmethod (This will appear in the declaration for MPhil theses)
-\newcommand{\@wordcountmethod}{Unspecified}
-\newcommand{\wordcountmethod}[1]{\renewcommand{\@wordcountmethod}{#1}}
-
 % DOCVAR: submissionnotice (The submission notice is shown on the bottom of the
 % title page.)
 \newcommand{\@submissionnotice}{%
@@ -372,7 +364,7 @@ for the degree of Doctor of Philosophy%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% Front matter
+%% Title page
 %%
 %% - outside and inside front cover
 %% - title leaf
@@ -383,7 +375,7 @@ for the degree of Doctor of Philosophy%
 %% Date of submission and defense. (optional)
 %% Place and date of publication and publishers (and other info by them).
 %%%%%
-\newcommand{\frontmatter}{
+\newcommand{\camtitlepage}{
 
 \pagestyle{empty}
 
@@ -491,6 +483,11 @@ for the degree of Doctor of Philosophy%
 
 % Epigraph on odd page. (optional)
 
+}
+
+\newcommand{\camdeclarationpage}{
+
+\pagestyle{empty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -504,16 +501,12 @@ for the degree of Doctor of Philosophy%
 {\ifcam@mphil
 \chapter*{Declaration}
 \thispagestyle{empty}
-I \@author{} of \@college{}, being a candidate for the M.Phil in
+I, \@author{} of \@college{}, being a candidate for the M.Phil in
 Advanced Computer Science, hereby declare that this report and the
 work described in it are my own work, unaided except as may be
 specified below, and that the report does not contain material that
 has already been used to any substantial extent for a comparable
 purpose.
-\\\vspace{15mm}
-Total Word Count: \@wordcount{}
-\\
-Word Count Method: \@wordcountmethod{}
 
 % Leaving some space for the signature:
 \vspace{15mm}
@@ -556,7 +549,11 @@ This dissertation does not exceed the prescribed limit of 60\,000 words.
 \fi}
 \fi
 
+}
 
+
+\newcommand{\camabstractpage}{
+    \pagestyle{empty}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Abstract
@@ -577,13 +574,20 @@ This dissertation does not exceed the prescribed limit of 60\,000 words.
 % For more info see https://www.cambridgestudents.cam.ac.uk/your-course/examinations/graduate-exam-information/after-examination/degree-approval-and-1
 \textbf{\large \@title}
 \par\vspace{0.3cm}
+% MPhil theses cannot have author name in abstract
+\ifcam@mphil
+\par\vspace{1em}
+\else
 \noindent\textit{\@author}
+\fi
 \par\vspace{0.6cm}
 
 \@abstract{}
 \fi
+}
 
-
+\newcommand{\camacknowledgementspage}{
+    \pagestyle{empty}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Acknowledgements
@@ -601,7 +605,10 @@ This dissertation does not exceed the prescribed limit of 60\,000 words.
 \@acknowledgements{}
 \fi}
 \fi
+}
 
+\newcommand{\camtocpage}{
+    \pagestyle{empty}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Table of contents, figures, symbols and glossary.
@@ -641,4 +648,14 @@ This dissertation does not exceed the prescribed limit of 60\,000 words.
 }
 \fi
 
+
+
+\newcommand{\frontmatter}{
+    \pagestyle{empty}
+    \camtitlepage{}
+    \camdeclarationpage{}
+    \camabstractpage{}
+    \camacknowledgementspage{}
+    \camtocpage{}
+}
 %%%%% EOF: cam-thesis.cls
