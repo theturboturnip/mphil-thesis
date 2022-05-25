@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15385
-Words in text: 14257
+Sum count: 15335
+Words in text: 14207
 Words in headers: 227
 Words outside text (captions, etc.): 868
 Number of headers: 87
@@ -66,11 +66,11 @@ Subcounts:
   428+3+105 (1/0/0/0) Section: Changing the emulator
   45+1+0 (1/0/0/0) Subsection: Testing
   672+11+0 (8/0/2/0) Section: Testing hypotheses
-  50+1+0 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
+  0+1+0 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
   193+3+0 (1/0/0/0) Section: Testing the emulator
   63+2+6 (1/1/0/0) Subsection: \code{hello\_world}
   257+4+20 (2/1/0/0) Subsection: \code{vector\_memcpy}
   101+3+4 (1/1/0/0) Subsection: \code{vector\_memcpy\_pointers}
   36+1+0 (1/0/0/0) Subsection: Summary
-  360+1+0 (1/0/0/0) Section: Conclusion
+  360+1+0 (1/0/0/0) Chapter: Conclusion
 

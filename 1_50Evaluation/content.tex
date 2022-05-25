@@ -2,8 +2,11 @@
 \begin{document}
 
 \chapter{Evaluation\label{chap:eval}}
-This project has two main research outcomes: an implementation for a potential CHERI-RVV specification, and a set of hypotheses/conclusions that can inform future work on combining scalable vector models with CHERI.
-This chapter describes the testing process for the emulator and concludes by summarizing the conclusions from previous chapters.
+% This project has two main research outcomes: an implementation for a potential CHERI-RVV specification, and a set of hypotheses/conclusions that can inform future work on combining scalable vector models with CHERI.
+% This chapter describes the testing process for the emulator and concludes by summarizing the conclusions from previous chapters.
+
+\todomark{Rewrite intro}
+\todomark{Upgrade subsection -> section}
 
 \section{Testing the emulator}
 In order to verify the correct behaviour of the emulator, a set of self-checking integration test C programs were constructed.
@@ -96,56 +99,5 @@ The copied pointers are examined to make sure their tag bits are all zeroed, and
 \subsection{Summary}
 All tests passed where available, and all tests were available on at least one compiler.
 This shows the emulator is correctly executing vector instructions, and that it is possible to correctly \code{memcpy} capabilties in vector registers.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
-% \section{Summarizing hypotheses}
-\section{Conclusion}
-In this dissertation I have presented a possible fusion of CHERI and RVV implemented in an emulator (\cref{chap:hardware}), explored the impact on the software stack (\cref{chap:software}), and extended the RVV instruction set/vector model to store capabilities in vectors (\cref{chap:capinvec}).
-Throughout these chapters I have also presented conclusions to a set of hypotheses (\cref{tab:hypotheses}), which prove the general viability of adding scalable vector models to CHERI processsors.
-
-\cref{hyp:hw_cap_as_vec_mem_ref} proved the most essential point, that a blanket replacement of all memory references with capabilities in all RVV instructions is valid.
-\cref{hyp:hw_cap_bounds_checks_amortized} then alleviated performance concerns by showing it was possible to combine the required capability checks for all vector accesses, amortizing the overall cost of checking, although with varying practical benefit.
-
-On the software side \cref{hyp:sw_vec_legacy,hyp:sw_pure_compat} showed that (in theory) non-CHERI vectorized code could be run on CHERI systems, and could also be recompiled for pure-capability execution with no source code changes, but that CHERI-Clang's current state adds some practical limitations.
-\cref{hyp:sw_stack_vectors,hyp:sw_multiproc} address the pausing and resuming of vector code, particularly saving and restoring variable-length architectural state, concluding that it is entirely possible but will require software adjustments.
-
-Through a limited investigation of capabilities-in-vectors, \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} showed that a highly constrained implementation could enable a fully-functional vectorized \code{memcpy} without violating CHERI security principles.
-It should be possible to extend the CHERI-RVV ISA with vector equivalents of existing CHERI scalar instructions, but I did not investigate this further.
-
-Overall, it is clear that scalable vector models can be adapted to CHERI without significant loss of functionality.
-While most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, any differences from RVV's model will require careful examination.
-Given the importance of vector processing to modern computing, and thus its importance to CHERI, I hope that this research and the software artifacts of this project (see \cref{appx:artifacts}) pave the way for future vector-enabled CHERI processor implementations.
-
-% The hypotheses, reproduced in \cref{tab:hypothesis_outcome}, are evaluated in \todoref{hardware hyp, software hyp, cap-in-vec hyp}.
-% They come to the broad conclusion that adapting RVV to a CHERI architecture is possible, and that other vector models like Arm SVE can be adapted in part\footnote{Further examination is required for some addressing modes.}, but the current software stack does not make writing CHERI-RVV programs easy.
-% In particular RVV intrinsics can and should be ported to CHERI-Clang, and auto-vectorization for RVV and CHERI-RVV would simplify the situation further.
-% The limited investigation of capabilities-in-vectors shows that minimal implementations designed to enable \code{memcpy} can avoid violating CHERI security principles, but adding more advanced capability manipulations requires careful consideration.
-
-% \begin{table}[h]
-%     \centering
-%     \begin{tabular}{lp{0.6\textwidth}cl}
-%     \toprule
-%         \multicolumn{2}{l}{Hypothesis} & In Theory & In Practice \\
-%         \midrule
-%         \ref*{hyp:hw_cap_as_vec_mem_ref} & \gethyptext{hyp:hw_cap_as_vec_mem_ref} & True  & True \\
-%         \ref*{hyp:hw_cap_bounds_checks_amortized} & \gethyptext{hyp:hw_cap_bounds_checks_amortized} & True & Benefit Varies \\
-%         \ref*{hyp:sw_vec_legacy} & \gethyptext{hyp:sw_vec_legacy} & True & True (ASM) \\
-%         \ref*{hyp:sw_pure_compat} & \gethyptext{hyp:sw_pure_compat} & True & False \\
-%         \ref*{hyp:sw_stack_vectors} & \gethyptext{hyp:sw_stack_vectors} & True & True \\
-%         \ref*{hyp:sw_multiproc} & \gethyptext{hyp:sw_multiproc} & True & True \\
-%         \ref*{hyp:cap_in_vec_storage} & \gethyptext{hyp:cap_in_vec_storage} & True & True \\
-%         \ref*{hyp:cap_in_vec_load_store} & \gethyptext{hyp:cap_in_vec_load_store} & True & True \\
-%         \ref*{hyp:cap_in_vec_manip} & \gethyptext{hyp:cap_in_vec_manip} & True & True \\
-%         \bottomrule
-%     \end{tabular}
-%     \caption{Hypothesis summary table}
-%     \label{tab:hypothesis_outcome}
-% \end{table}
-
-% \section{Conclusion}
-% \todomark{a conclusion}
-% It is clear that scalable vector models should not be a barrier for CHERI.
-% \todomark{The artifacts for this project are publicly available, see appendix blah}
 
 \end{document}
