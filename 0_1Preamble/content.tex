@@ -205,34 +205,27 @@ end
 \ifdefempty{\figinputPos}{\PackageError{turnipadjfig}{figinputPos empty}{This file expected arguments from figinput - make sure you include the figure file through figinput!}}{}
 }
 
+\newenvironment{turnipfig}{%
+% Assert the keys are non-empty
+\figcheckinputs{}
+% Make sure \figinputPos gets expanded
+\expandafter\figure\expandafter[\figinputPos]
+}{%
+\endfigure
+}
+
 % Example usage:
 % \begin{basicfig}{Figures/RVV_LMUL_Widening.pdf}
 %     \caption{This is RVV\_LMUL\_widening}
 %     \label{fig:RVV_LMUL_widening}
 % \end{basicfig}
 \newenvironment{basicfig}[1]{%
-% Assert the keys are non-empty
-\figcheckinputs{}
-% Start of environment
-% Use \expended to expand the value of \figinputPos in the right place, and put \noexpand at the start to make sure the \begin{figure} itself isn't expanded yet.
-\expanded{\noexpand\begin{figure}[\figinputPos]}
+\begin{turnipfig}
     \centering
     \includegraphics[width=\figinputWidth]{#1}
 }{%
-\end{figure}
+\end{turnipfig}
 }
-% \def\beginmyfigure#1{\begin{figure}[#1]}
-% \def\endmyfigure{\end{figure}}
-% \def\efigure{\begin{figure}}%
-
-% \let\origfigure\figure
-% \let\endorigfigure\endfigure
-% \renewenvironment{figure}[1][h]{%
-%     \expandafter\origfigure\expandafter[#1]%
-% }{%
-%     \endorigfigure
-% }
-  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Tables
