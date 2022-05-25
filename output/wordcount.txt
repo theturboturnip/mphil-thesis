@@ -1,10 +1,10 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15591
-Words in text: 14401
-Words in headers: 227
-Words outside text (captions, etc.): 930
-Number of headers: 87
+Sum count: 15665
+Words in text: 14457
+Words in headers: 224
+Words outside text (captions, etc.): 951
+Number of headers: 86
 Number of floats/tables/figures: 8
 Number of math inlines: 31
 Number of math displayed: 2
@@ -66,11 +66,11 @@ Subcounts:
   428+3+105 (1/0/0/0) Section: Changing the emulator
   45+1+0 (1/0/0/0) Subsection: Testing
   672+11+0 (8/0/2/0) Section: Testing hypotheses
-  0+1+0 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
-  193+3+0 (1/0/0/0) Section: Testing the emulator
-  63+2+0 (1/0/0/0) Subsection: \code{hello\_world}
-  257+4+14 (2/0/0/0) Subsection: \code{vector\_memcpy}
-  101+3+0 (1/0/0/0) Subsection: \code{vector\_memcpy\_pointers}
-  36+1+0 (1/0/0/0) Subsection: Summary
+  249+1+21 (1/0/0/0) Chapter: Evaluation\label{chap:eval}
+  63+2+0 (1/0/0/0) Section: \code{hello\_world}
+  166+2+0 (1/0/0/0) Section: \code{vector\_memcpy}
+  91+2+14 (1/0/0/0) Subsection: Compiler differences}\label{chap:eval:subsec:compilerdifferences
+  101+3+0 (1/0/0/0) Section: \code{vector\_memcpy\_pointers}
+  36+1+0 (1/0/0/0) Section: Summary
   371+1+0 (1/0/0/0) Chapter: Conclusion
 
