@@ -104,7 +104,7 @@ For example, an implementation that executes instructions out-of-order does not 
 
 If the trap was triggered by a synchronous exception, the \code{vstart} CSR must be updated with the element that caused it.
 The specification calls out synchronous exceptions in particular, but does not mention asynchronous interrupts.
-It's likely that imprecise traps for asynchronous interrupts should also set \code{vstart}, but this issue has been raised with the authors for further clarification\footnote{\url{https://github.com/riscv/riscv-v-spec/issues/799}}.
+It's likely that imprecise traps for asynchronous interrupts should also set \code{vstart}, but this issue has been raised with the authors for further clarification\footnote{\redact{\url{https://github.com/riscv/riscv-v-spec/issues/799}}}.
 The specification also states \enquote{There is no support for imprecise traps in the current standard extensions}, meaning that the other standard RISC-V exceptions do not use and have not considered imprecise traps.
 
 %---------------------------------

@@ -1,6 +1,7 @@
 %TC:macro \todomark [ignore]
 %TC:macro \todoref [ignore]
 %TC:macro \todocite [option:text,ignore]
+%TC:macro \redact [text]
 %TC:subst \subfile \input
 
 % The above comments tell texcount that some macros should not have their arguments counted as text.
@@ -13,6 +14,8 @@
 
 % TC:subst tells TeXcount to interpret \subfile as \input for the purposes of word counting.
 % TeXcount has native support for the subfiles package, but because this file doesn't have a preamble we can't tell TeXcount that we're using it.
+
+% Any text that is \redact-ed in the anonymous version is still counted.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Introduction
