@@ -117,6 +117,10 @@ The RVV and CHERI-RISC-V specifications are succinctly explained in \cref{chap:b
 
 \vfill\null
 
+% Count hypothesis words
+%TC:macro \definehyp [ignore,text]
+%TC:group table 0 1
+%TC:group tabular 1 1
 \newcommand{\definehyp}[2]{{\sethyptext{#1}{#2}}\newhyp{}\label{#1} & #2}
 \begin{table}[h]
     \centering
@@ -153,5 +157,8 @@ The RVV and CHERI-RISC-V specifications are succinctly explained in \cref{chap:b
     \caption{Project Hypotheses}%
     \label{tab:hypotheses}
 \end{table}
+% This table was an exception, usually don't count tables
+%TC:group table 0 0
+%TC:group tabular 1 0
 
 \end{document}

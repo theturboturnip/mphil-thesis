@@ -27,7 +27,7 @@
 
 %% Word count
 \begin{luacode*}
-wordcount_cmd = "texcount -1 -sum -merge -q chapters.tex"
+wordcount_cmd = "./texcount.pl -1 -sum -merge -q chapters.tex"
 
 local pip=io.popen(wordcount_cmd)
 wordcount=pip:read()
@@ -54,10 +54,11 @@ Main chapters (excluding front-matter, references, appendix): \pagedifference{wc
 Main chapters word count: \luadirect{tex.sprint(format_thousand(wordcount))} words
 
 Word count methodology: \texttt{\luadirect{tex.sprint(wordcount_cmd)}}\\
-This counts body text, heading text, caption text, and slightly over-counts references.
+TeXcount version: 3.2.0.41\\
+Counts body text, heading text, caption text, and slightly over-counts cross-references.
 The anonymous version redacts some trivially identifying information, but uses the same word count as the de-anonymized version.
 The appendices contain non-essential data that is summarized in the main text (e.g. full results, details on how to compile code), or re-statements of work done in the main text (e.g. a summary of all changes made to the CHERI-RISC-V spec).  
-\todomark{Make sure the hypotheses are counted at least once, should the reproductions also be counted?}
+\todomark{Should the hypothesis reproductions also be counted?}
 }
 }
 

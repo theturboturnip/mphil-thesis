@@ -1,6 +1,6 @@
 TODOs
 1
-thesis.tex- Make sure the hypotheses are counted at least once, should the reproductions also be counted?
+thesis.tex- Should the hypothesis reproductions also be counted?
 2
 thesis.tex- My acknowledgements ...
 3
