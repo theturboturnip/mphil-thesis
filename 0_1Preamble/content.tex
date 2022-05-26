@@ -83,6 +83,10 @@
 % center multiline captions
 \captionsetup{format=hang,justification=centering}
 
+% Add equation captioning
+\DeclareCaptionType{mycapequ}[][List of equations]
+\captionsetup[mycapequ]{labelformat=empty}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Subcaption (note: this must be included after the `caption` package). 
@@ -238,6 +242,10 @@ end
 % Y = X but centered
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 
+% \usepackage{array}
+% x = p but centered
+% \newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
 % multirow
 \usepackage{multirow}
 
@@ -256,12 +264,12 @@ end
 % Arg 2: file:line
 % Arg 3: repository
 % Arg 4: permalink
-\newcommand{\gitfile}[4][]{\href{#4}{\texttt{#2} in \texttt{#3}\ifstrempty{#1}{}{ (branch \texttt{#1})} on GitHub}}
+\newcommand{\gitfile}[4][]{\href{#4}{\texttt{#2} in \texttt{#3}\ifstrempty{#1}{}{ (\texttt{#1})} on GitHub}}
 
 % Arg 1 [optional]: branch
 % Arg 2: repository
 % Arg 3: link
-\newcommand{\gitrepo}[3][]{\href{#3}{\texttt{#2}\ifstrempty{#1}{}{ (branch \texttt{#1})} on Github}}
+\newcommand{\gitrepo}[3][]{\href{#3}{\texttt{#2}\ifstrempty{#1}{}{ (\texttt{#1})} on Github}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -275,7 +283,8 @@ end
 \RequirePackage{minted}
 \RequirePackage{subfiles}
 \RequirePackage{xpatch}
-
+\usemintedstyle{pastie}
+% \usemintedstyle{vs}
 \makeatletter
 % fix for first kind
 \xpatchcmd\inputminted
@@ -292,7 +301,7 @@ end
 
 %% Code frames
 \usepackage{mdframed} %nice frames
-\definecolor{light-gray}{gray}{0.95} %the shade of grey that stack exchange uses
+\definecolor{light-gray}{gray}{0.98} %the shade of grey that stack exchange uses
 
 \newcommand{\inputframedminted}[3][]{%
 \begin{mdframed}[backgroundcolor=light-gray]
