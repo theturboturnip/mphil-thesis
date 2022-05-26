@@ -44,9 +44,9 @@ Using \code{SafeTaggedCap} had a few major consequences.
 Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit.
 Secondly, it reuses the code path for accessing scalar capabilities in memory, so all related security properties are maintained (e.g. accesses must be 128-bit aligned, and are atomic).
 
-\subsection{Testing}
-The above emulator changes allowed a minimal \code{memcpy} example to be constructed, which could copy both capabilities and integer data mixed together.
-This, along with another test to ensure arithmetic accesses the register file in an integer context, is described in the evaluation (\cref{chap:eval}).
+% \subsection{Testing}
+% The above emulator changes allowed a minimal \code{memcpy} example to be constructed, which could copy both capabilities and integer data mixed together.
+% This, along with another test to ensure arithmetic accesses the register file in an integer context, is described in the evaluation (\cref{chap:capinvec:eval}).
 
 \input{1_40CapInVec/sub50_hyp}
 

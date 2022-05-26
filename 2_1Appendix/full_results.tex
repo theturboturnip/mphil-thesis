@@ -1,9 +1,30 @@
-\chapter{Full \code{vector_memcpy} results\label{chap:fullresults:vectormemcpy}}
+\chapter{Full test results\label{chap:fullresults}}
 
-% \CatchFileDef{\tablevecmemcpy}{1_50Evaluation/data/vector_memcpy_rows}{}
-% \begin{longtable}{rcccccc}
-%     \caption{Results --- Vectorized memcpy}\label{tab:fullresults:vectormemcpy}
-%     \input{1_50Evaluation/data/vector_memcpy_rows}% \tablevecmemcpy{}
-% \end{longtable}
+\section{Initial Smoke Tests}
+Some simple smoke tests were constructed to test the basic functionality of the emulator, particularly under CHERI.
+\code{hello\_world} runs three small functions which calculate Fibonacci numbers and factorials.
+Fibonacci is calculated with a simple recursive function, and with \emph{memoization} where previous outputs are cached in a static array.
+The tests compile on all compilers, and output the correct results on all architectures.
+\begin{table}[h]
+    \centering
+    \CatchFileDef{\tablehelloworld}{1_50Evaluation/data/hello_world_rows.tex}{}
+    \begin{tabular}{rcccccc}
+    \tablehelloworld
+    \end{tabular}
+    \caption{\code{hello\_world} results --- Basic program tests}\label{tab:fullresults:helloworld}
+\end{table}
+
+
+\section{\code{vector\_memcpy}}
+The scope of this test, including testing many permutations of \code{vtype}, meant the full table couldn't be included in the main paper.
 \input{1_50Evaluation/data/vector_memcpy_full}
 
+\pagebreak
+\section{\code{vector\_memcpy\_pointers}}
+This is already referenced in the main paper (\todoref{vectormemcpypointers}) and included here for completeness.\\
+
+
+\CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
+\begin{tabular}{rcccccc}
+\tablevecmemcpypointers
+\end{tabular}

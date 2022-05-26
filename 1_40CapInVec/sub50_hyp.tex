@@ -1,4 +1,4 @@
-\section{Testing hypotheses}
+\section{Evaluating hypotheses}
 
 \hypsubsection{hyp:cap_in_vec_storage}{Holding capabilities in vectors}
 It is possible for a single vector register to hold a capability (and differentiate a capability from integer data) as long as \code{VLEN = CLEN}.
@@ -53,3 +53,21 @@ Any manipulations that create capabilities, or potentially any manipulations tha
 
 \subsubsection*{Integrity}
 As stated before, capabilities-in-vectors cannot be dereferenced directly, so there is no impact on Integrity.
+
+\subsection{Verification and testing: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval}
+We constructed a second test program to verify that \code{vector\_memcpy} could be performed correctly with capabilities-in-vectors.
+It copies an array of \code{Element} structures that hold pointers to static \code{Base} structures.
+% \code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
+On CHERI platforms, even in Integer mode, capability pointers are used and copied.
+The first test simply copies the data and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
+The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers.
+The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
+
+\begin{table}[h]
+    \centering
+    \CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
+    \begin{tabular}{rcccccc}
+    \tablevecmemcpypointers
+    \end{tabular}
+    \caption{\code{vector\_memcpy\_pointers} results}\label{tab:fullresults:vectormemcpyptrs}
+\end{table}

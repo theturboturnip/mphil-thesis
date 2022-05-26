@@ -18,7 +18,7 @@ This section examines support across the Clang and GCC compilers for various vec
 Compiler support for RVV varies.
 On Clang 13 and other LLVM-13-based compilers, version 0.1(?\footnote{It is difficult to verify the actual corresponding version, because there is no readily available specification for v0.1, and the extension supports instructions only present from v0.8 such as whole register accesses.}) of the vector specification is supported as an experimental extension.
 Clang/LLVM~14 and up support RVV v1.0.
-GCC is an interesting case --- there is a version based on RISC-V GCC 10.1 that partially supports RVV (see \cref{chap:eval:subsec:compilerdifferences}), but it was left untouched for a year and deleted as of 17th May 2022.
+GCC is an interesting case --- there is a version based on RISC-V GCC 10.1 that partially supports RVV (see \cref{compilerdifferences}), but it was left untouched for a year and deleted as of 17th May 2022.
 See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and building this version, and \cref{tab:rvv_cmdline_nocheri} for the required command-line arguments to enable RVV.
 
 \subsection{Automatic vectorization}
@@ -105,7 +105,7 @@ On CHERI platforms, because pointers must be stored in capability registers, the
 \end{figure}
 
 Broadly speaking, inline assembly supports more RVV instructions than intrinsics do.
-It is used extensively in the testbench code for the evaluation (\cref{chap:eval}) alongside intrinsics where possible.
+It is used extensively in the testbench code for the evaluation (\cref{chap:software:eval}) alongside intrinsics where possible.
 
 % the compiler determines where the value of the expression is/should be stored, and inserts a reference to that location in the assembly string.
 % The programmer may also control where the expression is stored by setting a \enquote{constraint}.
