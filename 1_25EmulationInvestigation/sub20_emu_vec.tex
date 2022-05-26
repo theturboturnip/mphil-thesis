@@ -19,19 +19,36 @@ It is then easy to define the checking and execution phases separately for each 
 \subsubsection{Decoding phase}\label{chap:hardware:subsec:decoding}
 Decoding is split into two steps: finding the encoded \paramt{nf} and \paramt{eew} values, then interpreting them based on the encoded archetype.
 % Vector memory accesses are encoded under the F extension's Load and Store major opcodes, which already encodes an element width.
-Vector memory access instructions are encoded similarly to the F extension's floating-point load/store instructions, which include an ``element width''.
+% Vector memory access instructions are encoded similarly to the F extension's floating-point load/store instructions, which include an ``element width''.
+Vector memory accesses reuse instruction encodings from the F extension's floating-point load/store instructions, which include an ``element width''.
 The vector extension adds four extra ``element width'' values which imply the access is vectorized.
 % This element width is used to differentiate between vector accesses and scalar floating-point accesses, where a vector access can have one of four widths (8, 16, 32, 64).
 If any of these values are found, the instruction is interpreted as a vector access and \paramt{nf} is extracted.
 % \paramt{nf} is encoded consistently in all vector memory access instructions
 
-Once the generic parameters are extracted, the \paramt{mop} is checked to determine the indexing method (Unit, Strided, Indexed-Ordered, or Indexed-Unordered).
-If a unit access is selected, the second argument field encodes an extra value to choose between different unit-stride archetypes (normal unit access, fault-only-first, whole register, or bytemask).
-Strided and indexed accesses just use their dedicated archetypes.
-Once the archetype is found, supplemental calculations can be performed (e.g. computing \code{EVL = ceil(vl/8)} for bytemask accesses), and the relevant information is returned as a \code{DecodedMemOp} enumeration.
+Once the generic parameters are extracted, the addressing method is determined from \paramt{mop} (Unit, Strided, Indexed-Ordered, or Indexed-Unordered).
+If a unit access is selected, the second argument field \paramt{umop} selects a unit-stride archetype (normal access, fault-only-first, whole register, or bytemask).
+% Strided and indexed accesses just use their dedicated archetypes.
+Extra archetype-specific calculations are performed (e.g. computing \code{EVL = ceil(vl/8)} for bytemask accesses), and the relevant information is returned as a \code{DecodedMemOp} enum.
 
-\todomark{diagram of floating point ld/st vs. vector ld/st}
-\todomark{Decision tree for operation decoding}
+% \todomark{diagram of floating point ld/st vs. vector ld/st}
+% \todomark{table of floating point ld/st, vector ld/st instructions}
+\todomark{appx - Decision tree for operation decoding?}
+
+\newcommand{\mcb}[2]{\multicolumn{#1}{|c|}{#2}}
+\begin{table}
+    % \begin{tabularx}{\textwidth}{@{}*{32}{p{\dimexpr(\textwidth-64\tabcolsep)/32\relax}}@{}}
+    \small\begin{tabularx}{\textwidth}{XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX}
+    % \small\begin{tabularx}{\textwidth}{p{}}
+                % \begin{tabular}{*{32}{p{3cm}}}
+            % 31&&29&28&27&26&25&24&&&&20&19&&&&15&14&&12&11&&&&7&6&&&&&&0 \\
+        \hline
+        \mcb{3}{nf} & mew & \mcb{2}{\paramt{mop}} & vm & \mcb{5}{\paramt{umop}/rs2/vs2} & \mcb{5}{rs1} & \mcb{3}{width} & \mcb{5}{vd} & \mcb{7}{Opcode} \\
+        \hline
+    \end{tabularx}
+    \caption{Floating-point and Vector load/store encoding}
+    \todomark{fix}
+\end{table}
 
 \subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
 The initial motivation for this project was investigating the impact of capability checks on performance.

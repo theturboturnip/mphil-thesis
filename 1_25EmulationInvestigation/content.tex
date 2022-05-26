@@ -4,7 +4,7 @@
 \chapter{Hardware emulation investigation\label{chap:hardware}}
 In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named \code{riscv-v-lite}.
 The emulator can partially emulate four unprivileged\footnote{i.e. entirely bare-metal without privilege levels for OSs or hypervisors.} RISC-V ISAs (\cref{tab:emu_arches}), and was also used as the base for capabilities-in-vectors research (\cref{chap:capinvec}).
-This chapter explores the development of the emulator, the implementation of CHERI support (including supplementary libraries), the addition of vector support, and the conclusions drawn about the integration of CHERI and RVV (referred to as CHERI-RVV throughout).
+This chapter explores the development of the emulator, the implementation of CHERI support (including supplementary libraries), the addition of vector support, and the conclusions drawn about CHERI-RVV.
 
 \begin{table}[h]
     \centering
@@ -19,17 +19,16 @@ This chapter explores the development of the emulator, the implementation of CHE
     \bottomrule
     \end{tabular}
     \parnotes
-    \caption{\code{riscv-v-lite} supported architectures}
-    \label{tab:emu_arches}
+    \caption{\code{riscv-v-lite} supported architectures}\label{tab:emu_arches}
 \end{table}
 
 \section{Developing the emulator}\label{chap:software:sec:emu}
 
-The emulator for each architecture follows a similar pattern.
-A \code{Processor} struct stores the register file and the available RAM.
-A separate \code{ProcessorModules} struct holds all ISA modules the processor can execute (e.g. the base RV64 Integer ISA, the Multiply extension, and the Vector extension).
-
-The gap between the \code{Processor} and the ISA modules is bridged by a module-specific ``connector'' struct, which holds references to data in the \code{Processor} that is required by the ISA module.
+Each architecture is simulated in the same way.
+A \code{Processor} struct holds the register file and memory, and a separate \code{ProcessorModules} struct holds the ISA modules the architecture can use.
+% A separate \code{ProcessorModules} struct holds all ISA modules the processor can execute (e.g. the base RV64 Integer ISA, the Multiply extension, and the Vector extension).
+Each ISA module uses a ``connector'' struct to manipulate data in the \code{Processor}.
+% The gap between the \code{Processor} and the ISA modules is bridged by a module-specific ``connector'' struct, which holds references to data in the \code{Processor} that is required by the ISA module.
 For example, the RV64 Integer ISA's connector contains the current PC, a virtual reference to a register file, and a virtual reference to memory.
 This allows different \code{Processor} structs (e.g. a normal RV64 and a CHERI-enabled RV64) to reuse the same ISA modules despite using different register file implementations.
 

@@ -40,14 +40,14 @@ Integrating capabilities into the emulator was relatively simple thanks to the m
 A capability-addressed memory type was created, which wraps a simple integer-addressed memory in logic which performs the relevant capability checks.
 For integer encoding mode, a further integer-addressed memory type was created which wraps the capability addressed mode, where all integer addresses are bundled with the DDC before passing through to the capability-addressed memory.
 Similarly, a merged capability register file type was created that exposed integer-mode and capability-mode accesses.
-This layered approach meant code for basic RV64I operations did not need to be modified to handle CHERI at all - simply passing the integer-mode memory and register file would perform all relevant checks.
+This layered approach meant code for basic RV64I operations did not need to be modified to handle CHERI at all --- simply passing the integer-mode memory and register file would perform all relevant checks.
 
 \todomark{diagram}
 
 % i.e. isn't the module system nice for overriding specific behaviour like Capability-mode RV64I :)
 Integrating capability instructions was also simple.
 Two new ISA modules were created: \code{XCheri64} for the new CHERI instructions, and \code{Rv64imCapabilityMode} to override the behaviour of legacy instructions in capability-encoding-mode.
-\todomark{show the program flow for using modules}
+\todomark{appendix - the program flow for using modules}
 The actual Processor structure was left mostly unchanged.
 Integer addresses were changed to capabilities throughout,
 memory and register file types were changed as described above, and the PCC/DDC were added.

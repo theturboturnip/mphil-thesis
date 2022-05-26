@@ -63,9 +63,8 @@ In these cases hardware implementations could defer to the slow-path on all mask
 Unit and strided accesses are much easier to handle.
 
 Arbitrarily strided accesses (which may have positive, negative, or zero-valued strides) are relatively simple to calculate.
-After calculating the segment width (i.e. $\text{number of fields} * \text{element width}$) the full bounds just depends on the sign of the stride.
-Unit-stride accesses simplify this further, because the stride is equal to the segment width and guaranteed to be positive.
-\todomark{Captions for equations}
+After calculating the segment width (i.e. $\text{number of fields} * \text{element width}$) the full bounds just depends on the sign of the stride (\cref{eq:tightboundsstrided}).
+Unit-stride accesses simplify this further, because the stride is equal to the segment width and guaranteed to be positive (\cref{eq:tightboundsunit}).
 
 \newcommand{\vstart}{\code{vstart}}
 % \newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
@@ -73,22 +72,26 @@ Unit-stride accesses simplify this further, because the stride is equal to the s
 \newcommand{\evl}{\code{evl}}
 % \newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
 \newcommand{\evlactive}{\code{evl}}
-\newcommand{\baseaddr}{\mathit{base}}
+\newcommand{\baseaddr}{\code{base}}
 
+\begin{mycapequ}[!ht]
 
-\begin{equation}
-\mathit{bounds}(\code{stride}) = \baseaddr{} + \left\{
-    \begin{array}{ll}
-            [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
+\begin{equation}\label{eq:tightboundsstrided}
+\baseaddr{}\ +\ \begin{cases}
+        \code{[\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew})} & \code{stride} \ge 0 \\
             
-            [(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew}) & \code{stride} < 0
-    \end{array} 
-\right.
+        \code{[(\evlactive{} - 1) * \code{stride}, \vstartactive{} * \code{stride} + \code{nf} * \code{eew})} & \code{stride} < 0
+    \end{cases}
 \end{equation}
+\caption{Tight bounds for strided access}
+\end{mycapequ}
 
-\begin{equation}
-    \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
+\begin{mycapequ}[!ht]
+\begin{equation}\label{eq:tightboundsunit}
+    \baseaddr{}\ +\ \code{[\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})}
 \end{equation}
+\caption{Tight bounds for unit-stride access}
+\end{mycapequ}
 
 Ultimately, the potential up-front latency seemed like a dealbreaker for this approach.
 We turned our attention to fast-pathing smaller groups of elements.
