@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15202
-Words in text: 14014
+Sum count: 15218
+Words in text: 14030
 Words in headers: 225
 Words outside text (captions, etc.): 930
 Number of headers: 82
@@ -52,7 +52,7 @@ Subcounts:
   66+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
   65+3+0 (1/0/0/0) Section: Compiling vector code}\label{chap:software:sec:compilersupport
   95+2+32 (1/0/0/0) Subsection: Available compilers
-  64+2+0 (1/0/0/0) Subsection: Automatic vectorization
+  80+2+0 (1/0/0/0) Subsection: Automatic vectorization
   138+2+0 (1/0/0/0) Subsection: Vector intrinsics
   344+2+48 (1/1/0/0) Subsection: Inline assembly
   317+4+20 (1/0/0/0) Subsection: RVV vs. Arm SVE}\label{chap:soft:compiling:armsve

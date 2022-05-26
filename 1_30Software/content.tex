@@ -26,8 +26,11 @@ See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and b
 Compilers with auto-vectorization can automatically create vectorized code from a scalar program.
 For example, a scalar loop over an array that increments each element could be converted to a vectorized loop that increments multiple elements at once.
 % Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007\footnote{\url{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}}).
-Currently there is no support for RVV auto-vectorization in Clang or GCC.
-Both compilers have support for Arm SVE auto-vectorization, explored further in \cref{chap:soft:compiling:armsve}.
+Clang and GCC support auto-vectorization in Arm SVE, explored further in \cref{chap:soft:compiling:armsve}, but don't yet support it for RVV.
+Arm SVE and RVV are quite similar, so there shouldn't be anything blocking auto-vectorization for RVV, it just requires engineering effort.
+% There's nothing preventing RVV auto-vectorization, especially as the similar Arm SVE model has auto-vectorization (see \cref{chap:soft:compiling:armsve}), but currently Clang and GCC do not support it.
+% Currently there is no support for RVV auto-vectorization in Clang or GCC.
+% Both compilers have support for Arm SVE auto-vectorization, explored further in \cref{chap:soft:compiling:armsve}.
 
 \subsection{Vector intrinsics}
 \enquote{Intrinsics} are functions defined by the compiler that can invoke low-level functionality and instructions directly for a specific architecture.
