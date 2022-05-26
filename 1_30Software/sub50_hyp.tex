@@ -56,6 +56,17 @@ Placing variable-length structures on the stack is possible as long as the lengt
 This isn't exclusive to CHERI --- to push and pop values on the stack, the stack pointer must be incremented or decremented by the size of the value.
 Because the length already has to be measured, and CHERI-RISC-V supports setting capability bounds from runtime-computed values, it's entirely possible to correctly set tight bounds for capabilities pointing to variable-length vectors on the stack.
 
+% Arm SVE explicitly defines a ``sizeless type'' in the C language extensions \cite{} that may be stored on the stack, so this will need to be implemented for 
+% \todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
+
+A minor complication is presented by a note in TR-949\cite[Section 3.8.2]{TR-949} concerning ``re-materializing bounded stack variables''.
+This section implies LLVM can try to re-create a pointer-to-stack at any time with minimal cost, but this may not be able to apply to vectors.
+Measuring the bounds requires measuring \code{VLMAX} by changing \code{vl}, which could then require saving/restoring the old value.
+This is only a performance issue, and in the worst case we can just say pointers-to-stack-vectors are not re-materializable, so it isn't a dealbreaker.
+Further investigation of this issue is left as future work.
+% LLVM allows pointers to be non-re-materializable, so this isn't a dealbreaker, but it should be investigated in the future.
+% Further investigation of this issue is left as future work.
+
 \hypsubsection{hyp:sw_multiproc}{Running CHERI-RVV code in a multiprocessing system}
 % \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
 This requires two conditions: an OS must be able to save and restore vector state, and the vector hardware must support resuming from an interrupted state.
@@ -72,9 +83,14 @@ To verify the behaviour of the CHERI-RVV instructions, we developed a self-check
 At first it was hand-written, but in order to test a wide range of \code{vtype}s we now generate it with a Python script.
 It consists of fifty-seven tests of different vector memory access archetypes under various configurations (\cref{tab:vectormemcpyschemes}).
 
-The test code is compatible with integer-mode and capability-mode CHERI (and non-CHERI) through preprocessor macros, as shown in \todoref{preprocessor macro}.
+% The test code is compatible with integer-mode and capability-mode CHERI (and non-CHERI) through preprocessor macros, as shown in .
 \todomark{Put the compatibility preprocessor stuff in the compiler appendix}
-To make up for inconsistent RVV support, the test code checks the compiler version and implements operations with inline assembly or intrinsics as supported.
+The test code will use intrinsics wherever the compiler supports them (see \cref{compilerdifferences}), and falls back to inline assembly otherwise.
+Inline assembly uses the preprocessor macro from \todoref{preprocessor macro} to handle CHERI and non-CHERI platforms.
+On CHERI platforms, which don't support intrinsics, the preprocessor macro from \todoref{preprocessor macro} is used to support inline ASM.
+% Where the compiler supports intrinsics, the test code will use them, and otherwiuse
+% Based on the compiler version, the test code runs operations with intrinsics where
+% To make up for inconsistent RVV support, the test code checks the compiler version and implements operations with inline assembly or intrinsics as supported.
 % Because the compilers don't have consistent RVV support (see \cref{compilerdifferences})
 % These tests are run under \emph{harnesses}, which provide setup and self-checking code for common cases:
 % The Vanilla harness tests a simple \code{memcpy} between two arrays;
@@ -101,19 +117,9 @@ The full set of test results is available in \cref{chap:fullresults}.
         
         Unit Stride (Segmented) & Segmented & All \\
 
-        Fault-only-First Boundary & - & All \\
+        Fault-only-First Boundary & --- & All \\
     \bottomrule
     \end{tabular}
     \caption{\code{vector\_memcpy} test schemes and harnesses}
     \label{tab:vectormemcpyschemes}
 \end{table}
-
-
-\subsubsection{Compiler differences}\label{compilerdifferences}
-\todomark{Could move this into the Compiler information appendix - it doesn't seem like a good ending to the chapter}
-While most compilers support all memory access archetypes, there are a few notable exceptions.
-GCC has the most: there is no support for fractional LMUL or bytemask accesses, the intrinsics for segmented accesses are named differently, and fault-only-first intrinsics emit incorrect instructions\footnote{On GCC, fault-only-first intrinsics seem to emit \code{vsetvli}.}.
-GCC RVV support has been deprioritized in favor of LLVM\footnote{\url{https://github.com/riscv-collab/riscv-gcc/issues/320}}, so the rough edges make sense.
-LLVM-13-based compilers (including CHERI-Clang) support all specified archetypes except bytemask accesses.
-CHERI-Clang doesn't support intrinsics, but all inline assembly support is intact.
-Support for bytemask accesses is only available in LLVM-14 and up.

@@ -100,3 +100,11 @@ CHERIbuild's code%
 
 Once the above options are set, plain CHERI-RISC-V code compiles without a hitch.
 Changes to CHERI-Clang itself are required to compile vectors (\cref{addingtochericlang}).
+
+\section{Compiler support for RVV}\label{compilerdifferences}
+While most compilers support all memory access archetypes, there are a few notable exceptions.
+GCC has the most: there is no support for fractional LMUL or bytemask accesses, the intrinsics for segmented accesses are named differently, and fault-only-first intrinsics emit incorrect instructions\footnote{On GCC, fault-only-first intrinsics seem to emit \code{vsetvli}.}.
+GCC RVV support has been deprioritized in favor of LLVM\footnote{\url{https://github.com/riscv-collab/riscv-gcc/issues/320}}, so the rough edges make sense.
+LLVM-13-based compilers (including CHERI-Clang) support all specified archetypes except bytemask accesses.
+CHERI-Clang doesn't support intrinsics, but all inline assembly support is intact.
+Support for bytemask accesses is only available in LLVM-14 and up.

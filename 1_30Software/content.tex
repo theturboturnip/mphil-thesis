@@ -48,8 +48,6 @@ With these, the general strip-mining loop is easy to construct:
     \item Pass the vector length to the computation/memory intrinsics, which operate on the vector variables.
 \end{enumerate}
 
-% \todomark{Hammer home that intrinsics aren't reusable across instruction sets? e.g. AVX intrinsics don't work with RISC-V}
-
 \subsection{Inline assembly}
 If a compiler doesn't supply complete intrinsics, or if the programmer desires even more control, inline assembly may be used.
 The programmer gives a string of handwritten assembly code to the compiler, which is parsed and directly inserted into the output code.
@@ -59,7 +57,6 @@ We used this for CHERI-Clang programs, as it could not use intrinsics without cr
 Inline assembly can interact with C code and variables through a template syntax.
 The programmer inserts a placeholder in the assembly code with a corresponding expression, noting how the expression is stored using a \enquote{constraint}.
 For our purposes, constraints enforce that a value is either in a register or in memory.
-% As an example, writing to a memory address stored in a variable could use a constraint \code{"m"(*addr)} - i.e. \enquote{the value pointed to by \code{addr} is stored in memory}. \todomark{example} \todomark{the previous sentence kinda sucks at getting the point across. Using a constraint forces the compiler to move the value into a register/memory}
 
 Using the constraint, the compiler determines how the expression's value is stored, and inserts a reference to it in the assembly string.
 Because this is done before the assembly string is parsed, and isn't immediately type-checked against the assembly instruction, it can lead to some difficult errors.
@@ -71,13 +68,14 @@ Clang always treats the \emph{memory} constraint as an offset access, even when 
 To get around this, one must use the pointer itself with a \emph{register} constraint (\cref{subfig:inline_asm_vector_ptr_reg}).
 On CHERI platforms, because pointers must be stored in capability registers, the \emph{capability register} constraint must be used instead (\cref{subfig:inline_asm_vector_cap_reg}).
 
-\begin{figure}[p]
+\begin{figure}[hb]
     \centering
     \begin{subfigure}{0.6\textwidth}
         \inputframedminted[gobble=4,firstline=6,lastline=6]{c}{./code/inline_asm.c}
         \caption{Preamble}
     \end{subfigure}
 
+    \vspace{1em}
     \begin{subfigure}{0.49\textwidth}
         \inputframedminted[gobble=4,firstline=7,lastline=10]{c}{./code/inline_asm.c}
         \caption{Load scalar from memory}\label{subfig:inline_asm_memory}
@@ -87,57 +85,25 @@ On CHERI platforms, because pointers must be stored in capability registers, the
         \caption{Failed attempt to load vector from memory}\label{subfig:inline_asm_vector_memory}
     \end{subfigure}
 
-
+    \vspace{1em}
     \begin{subfigure}{0.49\textwidth}
         \inputframedminted[gobble=4,firstline=32,lastline=35]{c}{./code/inline_asm.c}
         \caption{Load vector from pointer in register}\label{subfig:inline_asm_vector_ptr_reg}
-    \end{subfigure}\hfill%
-    \begin{subfigure}{0.49\textwidth}
-        \inputframedminted[gobble=4,firstline=43,lastline=46]{c}{./code/inline_asm.c}
-        \caption{Load vector from capability in register}\label{subfig:inline_asm_vector_cap_reg}
-    \end{subfigure}
-
-    \begin{subfigure}{0.6\textwidth}
-        \centering
-        \inputframedminted[gobble=4,firstline=57,lastline=67]{c}{./code/inline_asm.c}
-        \caption{Portable code for CHERI and non-CHERI.\\\code{pure\_capabilities} is a feature added to CHERI-Clang for this project}\label{subfig:inline_asm_vector_portable}
-    \end{subfigure}
+    \end{subfigure}    
 
     \caption{Inline assembly examples\\\url{https://godbolt.org/z/rW9orr66a}}
-    \todomark{Change the code font}
 \end{figure}
 
 Broadly speaking, inline assembly supports more RVV instructions than intrinsics do.
 It is used extensively in the testbench code for the evaluation (\cref{chap:software:eval}) alongside intrinsics where possible.
 
-% the compiler determines where the value of the expression is/should be stored, and inserts a reference to that location in the assembly string.
-% The programmer may also control where the expression is stored by setting a \enquote{constraint}.
-% This is an extremely useful feature, particularly if 
-% Because this is done before the assembly string is parsed, it can lead to some difficult-to-understand errors.
-
-% \begin{table}[h]
-%     \centering
-%     \begin{tabular}{c|c}
-%        "="  & Output - the old value is overwritten. Can be combined with other constraints. \\
-%         "r" & Store in a register \\
-%         "vr" & Store in a vector register (RVV only) \\
-%         "C" & Store in a capability register (CHERI-Clang only) \\
-%         "m" & Store in memory \\
-%     \end{tabular}
-%     \caption{Inline assembly constraints\cite[Section 6.47.2]{UsingGNUCompiler2022}}
-%     \label{tab:inline_asm_constraints}
-%     \todomark{Beautify this table}
-% \end{table}
-
 \pagebreak
 \subsection{RVV vs. Arm SVE}\label{chap:soft:compiling:armsve}
-\emph{Summarizes \cite{armltdArmCompilerScalable2019}}
-
 Arm SVE uses a similar model to RVV, where the vector length may scale between 128 and 2048\footnote{RVV slightly differs here, as it allows VLEN smaller than 128.} and the instructions are designed to be totally agnostic across different platforms\cite{stephensARMScalableVector2017}.
 Arm have released a C language extension to support SVE development (\cite{armltdARMLanguageExtensions2020}), supported by the Arm Compiler for Embedded\footnote{\url{https://developer.arm.com/Tools\%20and\%20Software/Arm\%20Compiler\%20for\%20Embedded}}, Clang, and GCC.
 They support all of the previously examined vectorization types.
 
-Auto-vectorization is supported, and the main focus of the user guide is helping the compiler decide whether to auto-vectorize \cite{armltdArmCompilerScalable2019}.
+Auto-vectorization is supported, and the main focus of the user guide (\cite{armltdArmCompilerScalable2019}) is helping the compiler decide whether to auto-vectorize.
 Intrinsics are also supported, and seem to cover all of the SVE instructions, but take a slightly different approach to RVV.
 Arm SVE intrinsics do not directly map to available instructions, but aim to \enquote{provide a regular interface and leave the compiler to pick the best mapping to SVE instructions}, while RVV intrinsics (at least for memory) tend to map 1:1 to existing instructions.
 Arm's approach gives more flexibility for future extensions, as the same intrinsics could be compiled to new instructions with newer compilers.
@@ -149,12 +115,26 @@ Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\cite{armltdARMLan
 Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label (see \url{https://godbolt.org/z/zoWh9jq3o}), which is more error prone than the RVV method.
 Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can be found in \todomark{appendix based on \url{https://godbolt.org/z/zoWh9jq3o}}.
 
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \inputframedminted[gobble=4,firstline=43,lastline=46]{c}{./code/inline_asm.c}
+        \caption{Load vector from capability in register}\label{subfig:inline_asm_vector_cap_reg}
+    \end{subfigure}\hfill{}
+    \begin{subfigure}[t]{0.54\textwidth}
+        \centering
+        \inputframedminted[gobble=4,firstline=57,lastline=67]{c}{./code/inline_asm.c}
+        \caption{Portable code for CHERI and non-CHERI\parnote{This relies on the \code{pure\_capabilities} feature flag, which was added to CHERI-Clang for this project.}.}\label{subfig:inline_asm_vector_portable}
+    \end{subfigure}
+    \parnotes{}
+    \caption{Inline assembly examples (CHERI)}
+\end{figure}
 
 \pagebreak
 \section{Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang}
 Current CHERI compiler work is done on CHERI-Clang, a fork of Clang and other LLVM tools that supports capabilities.
-It's based on LLVM~13, so it includes support for vanilla RVV v0.1, but none of the vector-extension related code had been updated to work with capabilities.
-This section outlines the changes one has to make to CHERI-Clang and vector code to compile programs for CHERI-RVV.
+It's based on LLVM~13, and supports vanilla RVV v0.1, but the vector-related code had not been updated to handle capabilities.
+This section outlines the changes made to CHERI-Clang, and the changes required for vector code, to compile programs for CHERI-RVV.
 The required command-line options for CHERI-Clang are shown in \cref{tab:rvv_cmdline_cheri}.
 
 \subsection{Adapting vector assembly instructions to CHERI}\label{addingtochericlang}
@@ -164,26 +144,26 @@ Vanilla RVV vector memory accesses use the General Purpose Registers (GPR) to st
 CHERI-Clang added a GPCR set, i.e. the General Purpose Capability Registers.
 As noted in \cref{chap:emu:rvv_int_mode} CHERI-RVV requires the vector memory accesses to support integer \emph{and} capability mode, therefore two versions of the vector accesses must be created: versions which take a capability base address, only available in CHERI/Capability mode, and versions which take integer base addresses for Integer mode.
 
-\todomark{Appendix on how this was done?}
-With the above changes, inline assembly could be used to insert capability-enabled vector instructions\todomark{Example}.
+With the above changes, inline assembly could be used to insert capability-enabled vector instructions (\cref{subfig:inline_asm_vector_cap_reg}).
 However, as this requires using a capability register constraint for the base address, inline assembly code written for CHERI-RVV is not inherently compatible with vanilla RVV.
-For un-annotated pointers (e.g. \code{int*}), which are only capabilities in pure-capability code and integers in legacy or hybrid code, a conditional macro can be used to insert the correct constraint: \todomark{example}.
+For un-annotated pointers (e.g. \code{int*}), which are only capabilities in pure-capability code and integers in legacy or hybrid code, a conditional macro can be used to insert the correct constraint (\cref{subfig:inline_asm_vector_portable}).
 However, this falls apart in hybrid code for manually annotated pointers (e.g. \code{int* \_\_capability}) because the macro cannot detect the annotation.
-
 
 \subsection{Adapting vector intrinsics to CHERI}
 Vector intrinsics are another story entirely.
-When compiling for pure-capability libraries, all attempts to use vector intrinsics crash CHERI-Clang \todomark{example of error message?}.
+When compiling for pure-capability libraries, all attempts to use vector intrinsics crash CHERI-Clang.
 This is due to a similar issue to inline assembly: the intrinsics (both the Clang intrinsic functions and the underlying LLVM IR intrinsics) were designed to take regular pointers and cannot handle it when capabilities are used instead.
 \todomark{Appendix which covers what I know so far about this problem?}
-Unfortunately the code for generating the intrinsics on both levels is spread across many files, and there's no simple way to change the associated pointer type (much less changing it for pure capability vs. hybrid mode).
+Unfortunately the code for generating the intrinsics is spread across many files, and there's no simple way to change the pointers to capabilities (much less changing it on-the-fly for pure capability vs. hybrid mode).
 
-It seems that significant compiler development work is required to bring vector intrinsics up to scratch on CHERI-Clang.
+It seems that significant engineering work is required to bring vector intrinsics up to scratch on CHERI-Clang.
 We did experiment with creating replacement wrapper functions, where each function tried to mimic an intrinsic using inline asssembly.
-These were rejected for two reasons: the increased overhead of a function call on every vector instruction\footnote{This could have been eliminated by using preprocessor macros instead of real functions, but they are difficult to program and do not easily support returning values like intrinsics do.}, and the lack of support for passing vector types as arguments or return values.
-The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\cite{specification-RISCV-ABI-v1.0rc2}, and CHERI has its own issues with saving vector registers on the stack.
+These were rejected for two reasons: the increased overhead of a function call on every vector instruction\footnote{We tried using preprocessor macros instead of real functions, but they are difficult to program and do not support returning values like intrinsics do.}, and the lack of support for passing vector types as arguments or return values.
+The RISC-V ABI treats all vector registers as temporary and explicitly states that \enquote{vector registers are not used for passing arguments or return values}\cite{specification-RISCV-ABI-v1.0rc2}.
+CHERI-Clang would try to return them by saving them to the stack, but this had its own issues.
+% Even if we wanted to change that, because the registers and CHERI has its own issues with saving vector registers on the stack.
 
-\todomark{segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to}
+% \todomark{segue into saving registers on stack doesn't make sense - doesn't explain why someone would want to}
 
 \subsection{Storing scalable vectors on the stack}
 If a program uses more data than can fit in registers, or calls a function which may overwrite important register values, the compiler will save those register values to memory on the stack.
@@ -191,15 +171,11 @@ Because vector registers are temporary, and thus may be overwritten by called fu
 This also applies to multiprocessing systems where a process can be paused, have the state saved, and resume later.
 RVV provides the whole-register memory access instructions explicitly to make this process easy.
 
-CHERI-Clang contains an LLVM IR pass\footnote{llvm/lib/CodeGen/CheriBoundAllocas.cpp} which enforces strict bounds on so-called ``stack capabilities'' (capabilities pointing to stack-allocated data), which by definition requires knowing the size of the data ahead of time.
+CHERI-Clang contains an LLVM IR pass\footnote{\gitfile{llvm/lib/CodeGen/CheriBoundAllocas.cpp}{CTSRD-CHERI/llvm-project}{https://github.com/CTSRD-CHERI/llvm-project/blob/master/llvm/lib/CodeGen/CheriBoundAllocas.cpp}} which enforces strict bounds on so-called ``stack capabilities'' (capabilities pointing to stack-allocated data), which by definition requires knowing the size of the data ahead of time.
 This pass assumes all stack-allocated data has a static size, and crashes when dynamically-sized types e.g. scalable vectors are allocated.
 It is therefore impossible (for now) to save vectors on the stack in CHERI-Clang, although it's clear that it's theoretically possible.
 For example, the length of the required vector allocations could be calculated based on \code{VLEN} before each stack allocation is performed, or if performance is a concern stack bounds for those allocations could potentially be ignored altogether.
 These possibilities are investigated further in the next section.
-
-\todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
-
-\todomark{LLVM IR pass is investigated in TR-949 \$3.8.2, worth noting somewhere}
 
 \pagebreak
 \input{1_30Software/sub50_hyp}
