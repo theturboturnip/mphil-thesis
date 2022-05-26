@@ -1,11 +1,3 @@
 TODO Refs
 1
-1_30Software/sub50_hyp.tex- constraint table
-2
-1_30Software/sub50_hyp.tex- preprocessor macro
-3
-1_30Software/sub50_hyp.tex- preprocessor macro
-4
 1_60Conclusion/content.tex- chap:software,chap:eval
-5
-2_1Appendix/full_results.tex- vectormemcpypointers

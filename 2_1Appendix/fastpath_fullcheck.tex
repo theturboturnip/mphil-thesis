@@ -1,16 +1,14 @@
 \chapter{Fast path vector checks - Pre-checks}\label{appx:fastpathfull}
 This appendix describes methods of calculating tight bounds for vector memory accesses (\cref{chap:hardware:subsec:checking}) and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
 These methods calculate the entire bounds up front, and while they are used in the emulator a hardware implementation may find it introduces too much latency.
-\todomark{Justify appendix existence}
-\todomark{reference Success, Indeterminate, Failure cases}
-\todomark{fast-path could be split up? i.e. for LMUL = 8, could execute a fast-path for each register in the group rather than all 8 at once}
+
+% \todomark{reference Success, Indeterminate, Failure cases}
 
 \newcommand{\vstart}{\code{vstart}}
 \newcommand{\vstartactive}{\code{vstart}_{\mathit{active}}}
 \newcommand{\evl}{\code{evl}}
 \newcommand{\evlactive}{\code{evl}_{\mathit{active}}}
-\newcommand{\baseaddr}{\mathit{base}}
-
+\newcommand{\baseaddr}{\code{base}}
 
 \section{Masked accesses}
 For all masked accesses, masked-out/inactive segments should not trigger capability exceptions.
@@ -32,8 +30,6 @@ Only elements masked off on the edges make any difference, and it may be uncommo
 Thus, an implementation could choose to ignore masking entirely when computing the ranges.
 This does mean that all failures become Likely-Failure when masking is enabled, because all elements outside the capability bounds may be masked off.
 
-\todomark{iterating over elements may still be more energy-efficient than doing individual capability checks?}
-
 \section{Unit accesses}
 For unit segmented accesses, which includes fault-only first, the tight address range for an access is simple to calculate.
 Whole register and bytemask accesses can simplify this by fixing \code{nf = 1} and \code{eew = 8}.
@@ -41,7 +37,6 @@ Whole register and bytemask accesses can simplify this by fixing \code{nf = 1} a
 \begin{equation}
     \baseaddr{} + [\vstartactive{} * \code{nf} * \code{eew}, \evlactive{} * \code{nf} * \code{eew})
 \end{equation}
-\todomark{Note that the equation is a simplification of strided for \code{stride = nf * eew}}
 
 \subsection*{Tradeoffs}
 \code{nf} is not guaranteed to be a power of two (except for the whole-register case), so calculating the `tight' address range would require a multiplication by an arbitrary four-bit value between 1 and 8.
@@ -62,7 +57,7 @@ Thankfully, because \code{eew} may only be one of four powers-of-two, this can b
 Strided accesses bring further complication, especially as the stride may be negative.
 
 \begin{equation}
-\mathit{bounds}(\code{stride}) = \baseaddr{} + \left\{
+\baseaddr{} + \left\{
     \begin{array}{ll}
           [\vstartactive{} * \code{stride}, (\evlactive{} - 1) * \code{stride} + \code{nf} * \code{eew}) & \code{stride} \ge 0 \\
           

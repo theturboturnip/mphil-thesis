@@ -19,8 +19,8 @@ Because this argument concerns source code, all three ways to generate CHERI-RVV
 \subsubsection*{Inline Assembly --- Unlikely}
 For GCC-style inline assembly, it is currently impossible for integer-addressed RVV source code to be recompiled in pure-capability mode without modification.
 Integer-addressed RVV assembly uses general-purpose registers for the base address, but the pure-capability instructions require capability registers instead.
-The base address register can either be specified directly, so must be changed to a capability register; or specified using template syntax and an ``r'' constraint (\todoref{constraint table}), which must be changed to a capability ``cr'' constraint.
-Using a preprocessor macro in the template syntax (\todoref{preprocessor macro}) could make code portable between non-CHERI and CHERI, but adding this still requires source code changes.
+The base address register can either be specified directly, so must be changed to a capability register; or specified using template syntax and an ``r'' constraint, which must be changed to a capability ``C'' constraint (\cref{fig:inlineasm,fig:inlineasmcheri}).
+Using a preprocessor macro in the template syntax (e.g. \cref{subfig:inline_asm_vector_portable}) could make code portable between non-CHERI and CHERI, but adding it still requires source code changes.
 
 In theory, one could change the behaviour of inline assembly to automatically convert general purpose registers/constraints to capability versions in specific circumstances.
 However, this can have wide-reaching ramifications, potentially making code more difficult to understand, or even breaking existing code.
@@ -86,17 +86,18 @@ It consists of fifty-seven tests of different vector memory access archetypes un
 % The test code is compatible with integer-mode and capability-mode CHERI (and non-CHERI) through preprocessor macros, as shown in .
 \todomark{Put the compatibility preprocessor stuff in the compiler appendix}
 The test code will use intrinsics wherever the compiler supports them (see \cref{compilerdifferences}), and falls back to inline assembly otherwise.
-Inline assembly uses the preprocessor macro from \todoref{preprocessor macro} to handle CHERI and non-CHERI platforms.
-On CHERI platforms, which don't support intrinsics, the preprocessor macro from \todoref{preprocessor macro} is used to support inline ASM.
+Inline assembly uses the preprocessor macro from \cref{subfig:inline_asm_vector_portable} to handle CHERI and non-CHERI platforms.
+% On CHERI platforms, which don't support intrinsics, the preprocessor macro from \todoref{preprocessor macro} is used to support inline ASM.
 % Where the compiler supports intrinsics, the test code will use them, and otherwiuse
 % Based on the compiler version, the test code runs operations with intrinsics where
 % To make up for inconsistent RVV support, the test code checks the compiler version and implements operations with inline assembly or intrinsics as supported.
 % Because the compilers don't have consistent RVV support (see \cref{compilerdifferences})
-% These tests are run under \emph{harnesses}, which provide setup and self-checking code for common cases:
-% The Vanilla harness tests a simple \code{memcpy} between two arrays;
-% Masked tests that every other element is copied, not all of them;
-% Segmented tests a \code{memcpy} into four separate output arrays, each a different field of a four-field structure.
-% There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test verifies that out-of-bounds exceptions are swallowed and \code{vl} is reduced accordingly.
+
+These tests are run under \emph{harnesses}, which provide setup and self-checking code for common cases:
+The Vanilla harness tests a simple \code{memcpy} between two arrays;
+Masked tests that every other element is copied, not all of them;
+Segmented tests a \code{memcpy} into four separate output arrays, each a different field of a four-field structure.
+There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test verifies that out-of-bounds exceptions are swallowed and \code{vl} is reduced accordingly.
 All tests were successful when they ran, but some testbenches could not be built with some compilers.
 The full set of test results is available in \cref{chap:fullresults}.
 

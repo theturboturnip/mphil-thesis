@@ -1,18 +1,18 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15218
-Words in text: 14030
-Words in headers: 225
-Words outside text (captions, etc.): 930
-Number of headers: 82
-Number of floats/tables/figures: 8
+Sum count: 15205
+Words in text: 14072
+Words in headers: 223
+Words outside text (captions, etc.): 877
+Number of headers: 81
+Number of floats/tables/figures: 9
 Number of math inlines: 31
 Number of math displayed: 2
 Subcounts:
   text+headers+captions (#headers/#floats/#inlines/#displayed)
   298+1+14 (1/0/0/0) Chapter: Introduction\label{wc:start}\label{chap:intro}
-  389+1+42 (1/0/0/0) Section: Motivation
-  403+3+2 (1/0/0/0) Section: Hypotheses and Aims
+  389+1+31 (1/0/0/0) Section: Motivation
+  404+3+2 (1/0/0/0) Section: Hypotheses and Aims
   98+1+0 (1/0/0/0) Chapter: Background\label{chap:background}
   182+1+0 (1/0/0/0) Section: RISC-V}\label{chap:bg:sec:riscv
   164+6+0 (1/0/0/0) Section: A brief history of vector processing}\label{chap:bg:rvvstart
@@ -22,7 +22,7 @@ Subcounts:
   97+4+56 (1/0/0/0) Subsection: Masking --- Active/inactive elements}\label{chap:bg:subsec:rvvmasking
   730+10+46 (4/0/0/0) Subsection: Exception handling}\label{chap:bg:subsec:vexceptions
   79+1+5 (1/0/0/0) Subsection: Summary}\label{chap:bg:subsec:rvvsummary
-  178+3+6 (1/0/1/0) Section: Previous RVV implementations\label{chap:bg:rvvend}
+  178+3+2 (1/0/1/0) Section: Previous RVV implementations\label{chap:bg:rvvend}
   104+3+0 (1/0/0/0) Section: RVV memory instructions\label{chap:bg:sec:rvvmemory}
   125+2+33 (1/0/3/0) Subsection: Segmented accesses
   159+7+21 (3/1/2/0) Subsection: Unit and Strided accesses}\label{chap:bg:sec:rvv:unitstrideaccess
@@ -36,13 +36,13 @@ Subcounts:
   155+5+22 (1/0/0/0) Subsection: Capability and Integer encoding mode\label{chap:bg:subsec:cheriencodingmode}
   123+5+20 (1/0/0/0) Subsection: Pure-capability and Hybrid compilation modes}\label{cheri_purecap_hybrid
   134+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
-  82+3+10 (1/0/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
-  201+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
-  944+7+85 (3/0/1/0) Subsection: Emulating CHERI
-  806+14+32 (5/0/0/0) Subsection: Emulating vectors
+  72+3+10 (1/0/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
+  168+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
+  944+7+45 (3/0/1/0) Subsection: Emulating CHERI
+  783+14+32 (5/0/0/0) Subsection: Emulating vectors
   67+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
   224+3+53 (1/1/0/0) Subsection: Possible fast-path outcomes
-  186+2+0 (1/0/1/2) Subsection: Whole-access fast-paths}\label{chap:hardware:subsec:wholeaccessfastpath
+  190+2+10 (1/0/1/2) Subsection: Whole-access fast-paths}\label{chap:hardware:subsec:wholeaccessfastpath
   537+3+23 (1/0/17/0) Subsection: $m$-element known-range fast-paths
   97+4+0 (1/0/0/0) Section: Going beyond the emulator
   129+2+0 (1/0/0/0) Subsection: Misaligned accesses
@@ -54,14 +54,14 @@ Subcounts:
   95+2+32 (1/0/0/0) Subsection: Available compilers
   80+2+0 (1/0/0/0) Subsection: Automatic vectorization
   138+2+0 (1/0/0/0) Subsection: Vector intrinsics
-  344+2+48 (1/1/0/0) Subsection: Inline assembly
-  317+4+20 (1/0/0/0) Subsection: RVV vs. Arm SVE}\label{chap:soft:compiling:armsve
-  78+5+0 (1/0/0/0) Section: Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang
-  202+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI}\label{addingtochericlang
-  198+5+29 (1/0/0/0) Subsection: Adapting vector intrinsics to CHERI
-  206+6+4 (1/0/0/0) Subsection: Storing scalable vectors on the stack
-  908+9+8 (4/0/0/0) Section: Evaluating hypotheses}\label{chap:software:sec:hypotheses
-  219+7+14 (2/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy}}\label{chap:software:eval
+  344+2+25 (1/1/0/0) Subsection: Inline assembly
+  316+4+52 (1/1/0/0) Subsection: RVV vs. Arm SVE}\label{chap:soft:compiling:armsve
+  73+5+0 (1/0/0/0) Section: Compiling vector code with CHERI-Clang}\label{chap:software:sec:chericlang
+  213+6+0 (1/0/0/0) Subsection: Adapting vector assembly instructions to CHERI}\label{addingtochericlang
+  200+5+24 (1/0/0/0) Subsection: Adapting vector intrinsics to CHERI
+  206+6+6 (1/0/0/0) Subsection: Storing scalable vectors on the stack
+  1013+9+8 (4/0/0/0) Section: Evaluating hypotheses}\label{chap:software:sec:hypotheses
+  210+5+0 (1/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy}}\label{chap:software:eval
   51+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   100+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
   428+3+105 (1/0/0/0) Section: Changing the emulator

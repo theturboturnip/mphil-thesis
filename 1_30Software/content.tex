@@ -91,7 +91,7 @@ On CHERI platforms, because pointers must be stored in capability registers, the
         \caption{Load vector from pointer in register}\label{subfig:inline_asm_vector_ptr_reg}
     \end{subfigure}    
 
-    \caption{Inline assembly examples\\\url{https://godbolt.org/z/rW9orr66a}}
+    \caption{Inline assembly examples\\\url{https://godbolt.org/z/rW9orr66a}}\label{fig:inlineasm}
 \end{figure}
 
 Broadly speaking, inline assembly supports more RVV instructions than intrinsics do.
@@ -127,7 +127,7 @@ Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can
         \caption{Portable code for CHERI and non-CHERI\parnote{This relies on the \code{pure\_capabilities} feature flag, which was added to CHERI-Clang for this project.}.}\label{subfig:inline_asm_vector_portable}
     \end{subfigure}
     \parnotes{}
-    \caption{Inline assembly examples (CHERI)}
+    \caption{Inline assembly examples (CHERI)}\label{fig:inlineasmcheri}
 \end{figure}
 
 \pagebreak
