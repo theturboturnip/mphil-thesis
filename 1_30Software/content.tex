@@ -24,7 +24,6 @@ GCC RVV support has also been deprioritized in favour of LLVM\footnote{\url{http
 See \cref{appx:building_rvv_gcc_toolchain} for more information on finding and building this version, and \cref{tab:rvv_cmdline_nocheri} for the required command-line arguments to enable RVV.
 
 \subsection{Automatic vectorization}
-\todomark{Figure page showing generated ASM for increment loop - see godbolt links MD}
 Compilers with auto-vectorization can automatically create vectorized code from a scalar program.
 For example, a scalar loop over an array that increments each element could be converted to a vectorized loop that increments multiple elements at once.
 % Although this is simple in some cases, auto-vectorization can take significant effort and time to implement (for example, GCC started implementing it for x86 in 2003 and only turned on basic support in 2007\footnote{\url{https://gcc.gnu.org/projects/tree-ssa/vectorization.html}}).
@@ -34,7 +33,7 @@ Arm SVE and RVV are quite similar, so there shouldn't be anything blocking auto-
 % Currently there is no support for RVV auto-vectorization in Clang or GCC.
 % Both compilers have support for Arm SVE auto-vectorization, explored further in \cref{chap:soft:compiling:armsve}.
 
-\subsection{Vector intrinsics}
+\subsection{Vector intrinsics}\label{chap:software:subsec:vectorintrinsics}
 \enquote{Intrinsics} are functions defined by the compiler that can invoke low-level functionality and instructions directly for a specific architecture.
 When automatic vectorization is not available, intrinsics are the next best thing --- they aren't portable across different ISAs, but present a familiar high-level interface (function calls) that gives fine-grained control over instructions.
 % RVV provides an intrinsic for each vector instruction.
@@ -43,12 +42,12 @@ The compiler then handles low-level decisions like register allocation under the
 RVV has a comprehensive set of vector intrinsics\cite{specification-RVV-intrinsics}.
 %, implemented in the aforementioned special version of GCC and Clang~13+.
 With these, the general strip-mining loop is easy to construct:
-\todomark{example based on \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/blob/master/examples/rvv_memcpy.c}}
 \begin{enumerate}
     \item Use a \code{vsetvl} intrinsic to get the vector length for this iteration.
     \item Allocate vector registers by declaring variables with vector types (e.g. \code{vuint32m8_t} represents 8 registers worth of 32-bit unsigned integers).
     \item Pass the vector length to the computation/memory intrinsics, which operate on the vector variables.
 \end{enumerate}
+\cref{example:rvv} contains an example.
 
 \subsection{Inline assembly}
 If a compiler doesn't supply complete intrinsics, or if the programmer desires even more control, inline assembly may be used.
@@ -114,8 +113,8 @@ Arm SVE also supports inline assembly, but the experience is notably worse than 
 The two standout issues are a lack of register allocation and the use of condition code flags for branching.
 Unlike RVV, the intrinsic types for vector values cannot be referenced in inline assembly\cite{stephensARMScalableVector2017}, so all vector registers must be allocated and tracked by the programmer.
 Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\cite{armltdARMLanguageExtensions2020}, do not return the number of updated elements, and instead set the condition flags based on how many elements are updated.
-Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label (see \url{https://godbolt.org/z/zoWh9jq3o}), which is more error prone than the RVV method.
-Examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM can be found in \todomark{appendix based on \url{https://godbolt.org/z/zoWh9jq3o}}.
+Because there is no way to branch based on the condition flags in C, the programmer must manually insert a label for the top of the loop, and a branch to that label, which is more error prone than the RVV method.
+See \cref{example:armsvec} for examples of Arm SVE code with auto-vectorization, intrinsics, and inline ASM.
 
 \begin{figure}
     \centering
@@ -173,7 +172,7 @@ CHERI-Clang would try to return them by saving them to the stack, but this had i
 
 \subsection{Storing scalable vectors on the stack}
 If a program uses more data than can fit in registers, or calls a function which may overwrite important register values, the compiler will save those register values to memory on the stack.
-Because vector registers are temporary, and thus may be overwritten by called functions, they must also be saved/restored from the stack\todomark{Example https://godbolt.org/z/KPTW7rcvY}.
+Because vector registers are temporary, and thus may be overwritten by called functions, they must also be saved/restored from the stack (see \cref{example:saverestore}).
 This also applies to multiprocessing systems where a process can be paused, have the state saved, and resume later.
 RVV provides the whole-register memory access instructions explicitly to make this process easy\cite[Section 7.9]{specification-RVV-v1.0}.
 

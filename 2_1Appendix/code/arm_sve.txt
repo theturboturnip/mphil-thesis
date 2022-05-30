@@ -1,0 +1,97 @@
+
+#include <stdint.h>
+
+void test_auto_vector(int64_t* data, int64_t n) {
+    for (int i = 0; i < n; i++) {
+        data[i] += 1;
+    }
+}
+
+#include <arm_sve.h>
+
+void test_intrinsics_sve(int64_t* data, int64_t n) {
+    if (n == 0) return;
+    int64_t i = 0;
+    svbool_t pg = svwhilelt_b64(i, n);
+    svint64_t one = svdup_s64(1);
+    do {
+        svint64_t d_vec = svld1(pg, &data[i]);
+        svst1(pg, &data[i], svadd_z(pg, d_vec, one));
+        i += svcntd();
+        pg = svwhilelt_b64(i, n);
+    }
+    while (svptest_any(svptrue_b64(), pg)); 
+}
+
+void test_asm_sve(int64_t* data, int64_t n) {
+    if (n == 0) return;
+    int64_t i = 0;
+
+    asm ("whilelt p0.d, %0, %1" :: "r"(i), "r"(n));
+    asm ("mov z0.d, #1");
+    asm("loop:");
+    {
+        // svint64_t d_vec = svld1(pg, &data[i]);
+        // Load data[i] -> z1.d, where i = 64-bit index (3 bit shift up from 8-bit)
+        asm ("ld1d z1.d, p0/z, [%0, %1, lsl #3]" :: "r"(data), "r"(i));
+        // Add z1 + z0, storing the results in z1, where p0/Masks the addition 
+        asm ("add z1.d, p0/m, z1.d, z0.d");
+        asm ("st1d z1.d, p0, [%0, %1, lsl #3]" :: "r"(data), "r"(i) : "memory");
+        // svst1(pg, &data[i], svadd_z(pg, d_vec, one));
+        i += svcntd();
+        // This sets the Z flag to 1 if nothing is left
+        asm ("whilelt p0.d, %0, %1" :: "r"(i), "r"(n));
+        // b.ne = Not Equal = (if Z flag is 0)
+        // if Z flag is 0 i.e. something is left, jump to loop
+        asm ("b.ne loop");
+    }
+}
+
+
+
+test_auto_vector:
+        cmp     x1, 0
+        ble     .L1
+        mov     w3, w1
+        mov     x2, 0
+        cntd    x4
+        whilelo p0.d, wzr, w1
+.L3:
+        ld1d    z0.d, p0/z, [x0, x2, lsl 3]
+        add     z0.d, z0.d, #1
+        st1d    z0.d, p0, [x0, x2, lsl 3]
+        add     x2, x2, x4
+        whilelo p0.d, w2, w3
+        b.any   .L3
+.L1:
+        ret
+test_intrinsics_sve:
+        cbz     x1, .L6
+        mov     x2, 0
+        cntd    x3
+        whilelt p0.d, xzr, x1
+        mov     z1.d, #1
+.L8:
+        ld1d    z0.d, p0/z, [x0, x2, lsl 3]
+        movprfx z0.d, p0/z, z0.d
+        add     z0.d, p0/m, z0.d, z1.d
+        st1d    z0.d, p0, [x0, x2, lsl 3]
+        add     x2, x2, x3
+        whilelt p0.d, x2, x1
+        b.any   .L8
+.L6:
+        ret
+test_asm_sve:
+        cbz     x1, .L13
+        mov     x2, 0
+        whilelt p0.d, x2, x1
+        mov z0.d, #1
+loop:
+        ld1d z1.d, p0/z, [x0, x2, lsl #3]
+        add z1.d, p0/m, z1.d, z0.d
+        st1d z1.d, p0, [x0, x2, lsl #3]
+        cntd    x0
+        whilelt p0.d, x0, x1
+        b.ne loop
+.L13:
+        ret

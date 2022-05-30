@@ -82,6 +82,14 @@ CHERI-Clang doesn't support intrinsics, but all inline assembly support is intac
 Support for bytemask accesses is only available in LLVM-14 and up.
 
 \pagebreak
+\section{Ensuring compatibility between different compilers}
+The \code{vector\_memcpy} test program uses the preprocessor to identify the current compiler and how that compiler supports various vector instructions.
+It is reproduced here in case it can be useful for other vector-agnostic programs.
+
+\inputframedminted[breaklines=true]{c}{./code/compatibility_snippet.c}
+
+
+\pagebreak
 \section{Building \code{riscv-gnu-toolchain} with vector support}\label{appx:building_rvv_gcc_toolchain}
 
 As of May 2022, the RISC-V GNU toolchain (hosted at \gitrepo{riscv-collab/riscv-gnu-toolchain}{https://github.com/riscv-collab/riscv-gnu-toolchain/}) does not support the vector extension or it's intrinsics.

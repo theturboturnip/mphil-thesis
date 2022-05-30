@@ -4,7 +4,6 @@ Initially it was hand-written, but in order to test a wide range of \code{vtype}
 It consists of fifty-seven tests of different vector memory access archetypes under various configurations (\cref{tab:vectormemcpyschemes}).
 
 % The test code is compatible with integer-mode and capability-mode CHERI (and non-CHERI) through preprocessor macros, as shown in .
-\todomark{Put the compatibility preprocessor stuff in the compiler appendix}
 The test code uses intrinsics wherever the compiler supports them (see \cref{compilerdifferences}), and falls back to inline assembly otherwise.
 Inline assembly uses the preprocessor macro from \cref{subfig:inline_asm_vector_portable} to handle CHERI and non-CHERI platforms.
 % On CHERI platforms, which don't support intrinsics, the preprocessor macro from \todoref{preprocessor macro} is used to support inline ASM.
