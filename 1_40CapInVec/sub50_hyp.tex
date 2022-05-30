@@ -43,9 +43,11 @@ The emulator doesn't allow capabilities-in-vectors to be dereferenced directly, 
 \hypsubsection{hyp:cap_in_vec_manip}{Manipulating capabilities in vectors}
 The emulator limits all manipulation to clearing the tag bit, achieved by writing data to the register in an integer context.
 In theory, it's possible to do more complex transformations, which can be proven by implementing each vector manipulation on vector elements as sequential scalar manipulations on scalar elements.
+
 With this method, all pre-existing scalar capability manipulations can become vector manipulations, but the utility seems limited.
 For example, instructions for creating capabilities or manipulating bounds en masse don't have an obvious use case.
 If more transformations are added they should be considered carefully, rather than creating vector equivalents for all scalar manipulations.
+For example, revocation as described in \cite{xiaCHERIvokeCharacterisingPointer2019} may benefit from a vector equivalent to \code{CLoadTags}.
 
 \subsubsection*{Provenance \& Monotonicity}
 Because the only possible manipulations clear the tag bit, it's impossible to create or change capabilities, so Provenance and Monotonicity cannot be violated.

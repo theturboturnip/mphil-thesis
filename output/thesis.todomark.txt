@@ -24,22 +24,16 @@ thesis.tex- Should the hypothesis reproductions also be counted?
 12
 1_30Software/sub50_hyp.tex- Put the compatibility preprocessor stuff in the compiler appendix
 13
-1_40CapInVec/content.tex- This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.
-14
-1_60Conclusion/content.tex- put summary on top
-15
-1_60Conclusion/content.tex- future work - implementation?
-16
 2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
-17
+14
 2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
-18
+15
 2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
-19
+16
 2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
-20
+17
 2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
-21
+18
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing
-22
+19
 2_1Appendix/artifacts.tex- make sure to redact online copies

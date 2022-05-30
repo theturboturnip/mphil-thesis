@@ -4,6 +4,7 @@
 \chapter{Capabilities-in-vectors\label{chap:capinvec}}
 Implementing \code{memcpy} correctly for CHERI systems requires copying the tag bits as well as the data.
 As it stands, any vectorized \code{memcpy} compiled and executed on the systems described in \cref{chap:software,chap:hardware} will not copy the tag bits, because the vector registers cannot store the tag bits and indeed cannot store valid capabilities.
+Manipulating capabilities-in-vectors could also accelerate CHERI-specific processes, such as revoking capabilities for freed memory\cite{xiaCHERIvokeCharacterisingPointer2019}.
 This chapter examines the changes made to the emulator to support storing capabilities-in-vectors, and determines the conditions required for the related hypotheses to be true.
 \cref{appx:capinvec} lists the changes made and all the relevant properties of the emulator that allow storing capabilities in vectors.
 
@@ -21,9 +22,9 @@ This part of the project aimed to investigate \cref{hyp:cap_in_vec_storage,hyp:c
     \end{itemize}
 \end{itemize}
 
-First, we had to consider the impact of vectors on the theoretical vector model.
-We decided that any operation with element widths less than \code{CLEN} cannot output valid capabilities under any circumstances\footnote{This avoids edge cases with masking, where one part of a capability could be modified while the other parts are left alone.}.
-This, of course, means a new element width equal to \code{CLEN} must be introduced.
+% First, we had to consider the impact of vectors on the theoretical vector model.
+First, we considered the impact on the theoretical vector model.
+We decided that any operation with elements smaller than \code{CLEN} cannot output valid capabilities under any circumstances\footnote{This avoids edge cases with masking, where one part of a capability could be modified while the other parts are left alone.}, meaning a new element width equal to \code{CLEN} must be introduced.
 We set \code{ELEN = VLEN = CLEN = 128}\footnote{The tag bits are implicitly instead of explicitly included here because \code{VLEN,ELEN} must be powers of two.} for our vector unit.
 
 Two new memory access instructions were created to take advantage of this new element width, and the \code{vsetvl} family were adjusted to support 128-bit values.
@@ -36,13 +37,16 @@ These instruction changes affected inline assembly only, rather than adding vect
 The next step was to add capability support to the vector register file.
 Our approach to capabilities-in-vectors is similar in concept to the Merged scalar register file for CHERI-RISC-V (\cref{chap:bg:subsec:cherimergedreg}), in that the same bits of a register can be accessed in two contexts: an integer context, zeroing the tag, or a capability context which maintains the current tag.
 The only instructions which can access data in a capability context are the aforementioned 128-bit memory accesses\footnote{The encoding mode (\cref{chap:bg:subsec:cheriencodingmode}) does not affect register usage: when using the Integer encoding mode, instructions can still access the vector register in a capability context. This is just like how scalar capability registers are still accessible in Integer encoding mode.}.
-All other instructions will read out untagged integer data, and clear tag bits when writing data.
-A new CHERI-specific vector register file was created, where each register is a \code{SafeTaggedCap} (page \pageref{safetaggedcap}) i.e. either zero-tagged integer data or a valid tagged capability.
+All other instructions will read out untagged integer data and clear tags when writing data.
 
-\todomark{This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.}
-Using \code{SafeTaggedCap} had a few major consequences.
-Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit.
-Secondly, it reuses the code path for accessing scalar capabilities in memory, so all related security properties are maintained (e.g. accesses must be 128-bit aligned, and are atomic).
+A new CHERI-specific vector register file was created, where each register is a \code{SafeTaggedCap} (p\pageref{safetaggedcap}) i.e. either zero-tagged integer data or a valid tagged capability.
+This makes it much harder to accidentally violate Provenance, and reuses the code path (and related security properties) for accessing capabilities in memory.
+Just like scalar accesses, vectorized capability accesses are atomic and 128-bit aligned.
+
+% \todomark{This paragraph is bad. Plan: split the above paragraph into two, incorporate impact on Provenance and required memory accesses into second half.}
+% Using \code{SafeTaggedCap} had a few major consequences.
+% Firstly, \code{SafeTaggedCap} enforces the Provenance security property within the vector unit.
+% Secondly, it reuses the code path for accessing scalar capabilities in memory, so all related security properties are maintained (e.g. accesses must be 128-bit aligned, and are atomic).
 
 % \subsection{Testing}
 % The above emulator changes allowed a minimal \code{memcpy} example to be constructed, which could copy both capabilities and integer data mixed together.

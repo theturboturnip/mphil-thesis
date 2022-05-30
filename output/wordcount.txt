@@ -1,10 +1,10 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15205
-Words in text: 14072
-Words in headers: 223
-Words outside text (captions, etc.): 877
-Number of headers: 81
+Sum count: 15501
+Words in text: 14339
+Words in headers: 227
+Words outside text (captions, etc.): 902
+Number of headers: 83
 Number of floats/tables/figures: 9
 Number of math inlines: 31
 Number of math displayed: 2
@@ -32,7 +32,7 @@ Subcounts:
   95+3+5 (1/1/0/0) Subsection: Unit bytemask accesses
   296+1+47 (1/1/0/0) Section: CHERI}\label{chap:bg:sec:cheri
   298+2+0 (1/0/0/0) Subsection: CHERI-RISC-V ISA
-  139+2+0 (1/0/0/0) Subsection: Instruction changes
+  139+2+0 (1/0/0/0) Subsection: Instruction changes}\label{cheri_instructions
   155+5+22 (1/0/0/0) Subsection: Capability and Integer encoding mode\label{chap:bg:subsec:cheriencodingmode}
   123+5+20 (1/0/0/0) Subsection: Pure-capability and Hybrid compilation modes}\label{cheri_purecap_hybrid
   134+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
@@ -63,9 +63,11 @@ Subcounts:
   1013+9+8 (4/0/0/0) Section: Evaluating hypotheses}\label{chap:software:sec:hypotheses
   210+5+0 (1/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy}}\label{chap:software:eval
   51+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
-  100+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
-  428+3+105 (1/0/0/0) Section: Changing the emulator
-  672+11+0 (8/0/2/0) Section: Evaluating hypotheses
+  114+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
+  408+3+105 (1/0/0/0) Section: Changing the emulator
+  686+11+0 (8/0/2/0) Section: Evaluating hypotheses
   109+6+0 (1/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval
-  353+1+0 (1/0/0/0) Chapter: Conclusion
+  103+1+6 (1/0/0/0) Chapter: Conclusion
+  305+2+0 (1/0/0/0) Section: Evaluating hypotheses
+  204+2+19 (1/0/0/0) Section: Future work
 
