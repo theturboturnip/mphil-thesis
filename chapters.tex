@@ -9,17 +9,13 @@
 %TC:usepackage cleveref
 %TC:usepackage subfiles
 %TC:usepackage amsmath
+%TC:macroword \code 1
+%TC:macro \code [ignore]
 
 % The above comments tell texcount that some macros should not have their arguments counted as text.
 % \todomark, \todoref, and \todocite are all macros used during development - there will be no TODO messages
 % in the final release.
 % In particular, \todomark is sometimes used with long sentences e.g. \todomark{Should I use a different sentence here?} which I don't want to count.
-% The \cref and \crefrange macros are used throughout the thesis, and are counted slightly incorrectly:
-% While the actual output of \cref{hyp:cap_in_vec_load_store} = "Hyp. H-8" (2 or 3 words), TeXcount counts it as "hyp cap in vec load store" (6 words).
-% This means the actual wordcount is an over-approximation.
-
-% TC:subst tells TeXcount to interpret \subfile as \input for the purposes of word counting.
-% TeXcount has native support for the subfiles package, but because this file doesn't have a preamble we can't tell TeXcount that we're using it.
 
 % Any text that is \redact-ed in the anonymous version is still counted.
 

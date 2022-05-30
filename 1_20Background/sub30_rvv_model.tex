@@ -29,7 +29,7 @@ It can be 8, 16, 32, or 64.
 The second field is the Vector Register Group Multiplier (\code{LMUL}).
 Vector instructions don't just operate over a single register, but over a register \emph{group} as defined by this field.
 For example, if \code{LMUL=8} then each instruction would operate over 8 register's worth of elements.
-These groups must use aligned register indices, so if \code{LMUL=4} all vector register operands should be multiples of 4 e.g. \code{v0, v4, v8} etc.
+These groups must use aligned register indices, so if \code{LMUL=4} all vector register operands should be multiples of 4 e.g. \code{v0}, \code{v4}, \code{v8} etc.
 In some implementations this may increase throughput, which by itself is beneficial for applications.
 
 However, the true utility of \code{LMUL} lies in widening/narrowing operations (see \cref{fig:RVV_LMUL_widening}).

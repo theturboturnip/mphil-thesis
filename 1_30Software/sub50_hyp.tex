@@ -1,91 +1,11 @@
-\section{Evaluating hypotheses}\label{chap:software:sec:hypotheses}
-
-\hypsubsection{hyp:sw_vec_legacy}{Compiling/running legacy code in integer mode}
-This is true for CHERI-RVV, when running the compiled programs in integer mode, as long as the programs only access memory within the DDC.
-
-All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV integer mode, assuming the accessed addresses are all accessible through the DDC.
-There are no changes to instruction behaviour that require the compiler's handling of them to change, so a non-CHERI compiler and an integer-mode-CHERI compiler can always produce the same vector instructions from the same code.
-This does not apply to capability-mode-CHERI, because integer addressing is not supported in capability-mode-CHERI-RVV.
-
-All legacy vector programs should produce equivalent binaries when compiled for integer-mode-CHERI.
-On top of that, all binaries compiled for non-CHERI RVV platforms should produce the same results when run on an equivalent integer-mode-CHERI RVV platform.
-Both claims assume the program doesn't perform accesses that \todomark{violate? exceed?} the DDC.
-
-\hypsubsection{hyp:sw_pure_compat}{Converting legacy code to pure-capability code}
-This is true for CHERI-RVV, but cannot be done in practice yet.
-Some engineering effort is required to support this in CHERI-Clang.
-Because this argument concerns source code, all three ways to generate CHERI-RVV instructions must be examined.
-
-\subsubsection*{Inline Assembly --- Unlikely}
-For GCC-style inline assembly, it is currently impossible for integer-addressed RVV source code to be recompiled in pure-capability mode without modification.
-Integer-addressed RVV assembly uses general-purpose registers for the base address, but the pure-capability instructions require capability registers instead.
-The base address register can either be specified directly, so must be changed to a capability register; or specified using template syntax and an ``r'' constraint, which must be changed to a capability ``C'' constraint (\cref{fig:inlineasm,fig:inlineasmcheri}).
-Using a preprocessor macro in the template syntax (e.g. \cref{subfig:inline_asm_vector_portable}) could make code portable between non-CHERI and CHERI, but adding it still requires source code changes.
-
-In theory, one could change the behaviour of inline assembly to automatically convert general purpose registers/constraints to capability versions in specific circumstances.
-However, this can have wide-reaching ramifications, potentially making code more difficult to understand, or even breaking existing code.
-
-\subsubsection*{Intrinsics --- Yes}
-The current specification for RVV intrinsics uses pointer types for all base addresses\cite{specification-RVV-intrinsics}.
-In pure-capability compilers all pointers should be treated as capabilities instead of integers, including those in intrinsics.
-All RVV memory intrinsics have equivalent RVV instructions, which all use capabilities in pure-capability mode, so changing the intrinsics to match is valid.
-
-Assuming all base address pointers are created in a valid manner (e.g. through \code{malloc} or monotonic decrease, and not through integer literals), the conversion to pure-capability should make them all valid capabilities which are compatible with the intrinsics.
-Therefore well-behaved code using RVV intrinsics should be compilable in pure-capability mode without changes.
-
-This is not currently the case for CHERI-Clang, as RVV memory access intrinsics are broken, but this can be fixed with engineering effort.
-
-\subsubsection*{Auto-vectorization --- Yes}
-All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV pure-capability mode, assuming the base addresses can be converted to valid capabilities.
-Any scalar code that can be 
-\begin{enumerate*}[label=\alph*)]
-    \item compiled in scalar pure-capability mode\footnote{This ensures all memory accesses use valid capabilities.}, and
-    \item auto-vectorized by a legacy RVV compiler,
-\end{enumerate*}
-must have an equivalent pure-capability vectorized form.
-This form could be acquired by performing the auto-vectorization in legacy mode, ensuring all base addresses are available as capabilities, then making the vector instructions use those capabilities.
-Therefore a pure-capability compiler can always auto-vectorize CHERI-compliant scalar code if some legacy compiler can also auto-vectorize it.
-
-This is not currently possible for CHERI-Clang, as RVV auto-vectorization is not implemented yet.
-Similar models (e.g. Arm SVE) already have auto-vectorization, so RVV auto-vectorization (and thus CHERI-RVV auto-vectorization) should be possible.
-
-\hypsubsection{hyp:sw_stack_vectors}{Saving vectors on the stack}
-% \todomark{Yes vectors can be stored on the stack}
-This is true in theory, but not yet supported by CHERI-Clang in practice.
-Placing variable-length structures on the stack is possible as long as the length can be known at runtime (and as long as the stack has space, of course).
-This isn't exclusive to CHERI --- to push and pop values on the stack, the stack pointer must be incremented or decremented by the size of the value.
-Because the length already has to be measured, and CHERI-RISC-V supports setting capability bounds from runtime-computed values, it's entirely possible to correctly set tight bounds for capabilities pointing to variable-length vectors on the stack.
-
-% Arm SVE explicitly defines a ``sizeless type'' in the C language extensions \cite{} that may be stored on the stack, so this will need to be implemented for 
-% \todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
-
-A minor complication is presented by a note in TR-949\cite[Section 3.8.2]{TR-949} concerning ``re-materializing bounded stack variables''.
-This section implies LLVM can try to re-create a pointer-to-stack at any time with minimal cost, but this may not be able to apply to vectors.
-Measuring the bounds requires measuring \code{VLMAX} by changing \code{vl}, which could then require saving/restoring the old value.
-This is only a performance issue, and in the worst case we can just say pointers-to-stack-vectors are not re-materializable, so it isn't a dealbreaker.
-Further investigation of this issue is left as future work.
-% LLVM allows pointers to be non-re-materializable, so this isn't a dealbreaker, but it should be investigated in the future.
-% Further investigation of this issue is left as future work.
-
-\hypsubsection{hyp:sw_multiproc}{Running CHERI-RVV code in a multiprocessing system}
-% \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
-This requires two conditions: an OS must be able to save and restore vector state, and the vector hardware must support resuming from an interrupted state.
-The first condition is easy to fulfil by extending the previous hypothesis. 
-If it is possible to save variable-length vectors on the stack, given their length is known at runtime, it must also be possible to save their data on the heap.
-Some OSs might need to make changes to their ``current process state'' structure to support variable-length data, and they would also need to allocate space for the \code{vtype} value, but it is certainly possible.
-
-The second condition can be upheld in two ways.
-First, if the OS only context switches and services interrupts while the vector hardware is in a complete state (i.e. not partially executing an instruction), then context switches and interrupts are completely transparent to the vector hardware and no changes need to be made.
-Secondly, if context switches and interrupts can actually interrupt vector instructions partway through, then they can only be cleanly resumed if the vector hardware supports precise traps for the exact instruction being executed.
-
-\subsection{Testing and evaluation: \code{vector\_memcpy}}\label{chap:software:eval}
-To expose bugs in the CHERI-RVV instructions, we developed a self-checking test program for the emulator to execute.
-At first it was hand-written, but in order to test a wide range of \code{vtype}s we now generate it with a Python script.
+\section{Testing and evaluation}\label{chap:software:sec:hypotheses}\label{chap:software:eval}
+We developed a self-checking test program for the emulator to execute, which helped gather information for the hypotheses and find bugs in the compiler and emulator.
+Initially it was hand-written, but in order to test a wide range of \code{vtype}s we began generating it with a Python script.
 It consists of fifty-seven tests of different vector memory access archetypes under various configurations (\cref{tab:vectormemcpyschemes}).
 
 % The test code is compatible with integer-mode and capability-mode CHERI (and non-CHERI) through preprocessor macros, as shown in .
 \todomark{Put the compatibility preprocessor stuff in the compiler appendix}
-The test code will use intrinsics wherever the compiler supports them (see \cref{compilerdifferences}), and falls back to inline assembly otherwise.
+The test code uses intrinsics wherever the compiler supports them (see \cref{compilerdifferences}), and falls back to inline assembly otherwise.
 Inline assembly uses the preprocessor macro from \cref{subfig:inline_asm_vector_portable} to handle CHERI and non-CHERI platforms.
 % On CHERI platforms, which don't support intrinsics, the preprocessor macro from \todoref{preprocessor macro} is used to support inline ASM.
 % Where the compiler supports intrinsics, the test code will use them, and otherwiuse
@@ -93,7 +13,7 @@ Inline assembly uses the preprocessor macro from \cref{subfig:inline_asm_vector_
 % To make up for inconsistent RVV support, the test code checks the compiler version and implements operations with inline assembly or intrinsics as supported.
 % Because the compilers don't have consistent RVV support (see \cref{compilerdifferences})
 
-These tests are run under \emph{harnesses}, which provide setup and self-checking code for common cases:
+The tests are run inside \emph{harnesses}, which provide setup and self-checking code for common cases:
 The Vanilla harness tests a simple \code{memcpy} between two arrays;
 Masked tests that every other element is copied, not all of them;
 Segmented tests a \code{memcpy} into four separate output arrays, each a different field of a four-field structure.
@@ -124,3 +44,83 @@ The full set of test results is available in \cref{chap:fullresults}.
     \caption{\code{vector\_memcpy} test schemes and harnesses}
     \label{tab:vectormemcpyschemes}
 \end{table}
+
+\hypsubsection{hyp:sw_vec_legacy}{Compiling/running legacy code in integer mode}
+This is true for CHERI-RVV, when running the compiled programs in integer mode, as long as the programs only access memory within the DDC.
+
+All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV integer mode, assuming the accessed addresses are all accessible through the DDC.
+There are no changes to instruction behaviour that require the compiler's handling of them to change, so a non-CHERI compiler and an integer-mode-CHERI compiler can always produce the same vector instructions from the same code.
+This does not apply to capability-mode-CHERI, because integer addressing is not supported in capability-mode-CHERI-RVV.
+
+All legacy vector programs should produce equivalent binaries when compiled for integer-mode-CHERI.
+On top of that, all binaries compiled for vanilla RVV platforms should produce the same results when run on an equivalent integer-mode-CHERI-RVV platform.
+Both claims assume the program doesn't perform out-of-bounds accesses relative to the DDC.
+
+\hypsubsection{hyp:sw_pure_compat}{Converting legacy code to pure-capability code}
+This is true for CHERI-RVV, but cannot be done in practice yet.
+Engineering effort is required to support this in CHERI-Clang.
+Because this argument concerns source code, all three ways to generate CHERI-RVV instructions must be examined.
+
+\subsubsection*{Inline Assembly --- Unlikely}
+For GCC-style inline assembly, it is currently impossible for integer-addressed RVV source code to be recompiled in pure-capability mode without modification.
+Integer-addressed RVV uses general-purpose registers for the base address, but pure-capability instructions require capability registers instead.
+The base address register can either be specified directly, so must be changed to a capability register; or specified using template syntax and an ``r'' constraint, which must be changed to a ``C'' constraint (\cref{fig:inlineasm,fig:inlineasmcheri}).
+Using a preprocessor macro (e.g. \cref{subfig:inline_asm_vector_portable}) could make code portable between non-CHERI and CHERI, but this is still a source code change.
+
+In theory, one could change the behaviour of inline assembly to automatically convert general purpose registers/constraints to capability versions in specific circumstances.
+However, this can have wide-reaching ramifications, potentially making code more difficult to understand, or even breaking existing code.
+
+\subsubsection*{Intrinsics --- Yes}
+The current specification for RVV intrinsics uses pointer types for all base addresses\cite{specification-RVV-intrinsics}.
+In pure-capability compilers all pointers should be treated as capabilities instead of integers, including those in intrinsics.
+All RVV memory intrinsics have equivalent RVV instructions, which all use capabilities in pure-capability mode, so changing the intrinsics to match is valid.
+
+Assuming all base address pointers are created in a valid manner (e.g. through \code{malloc} or monotonic decrease, and not through integer literals), the conversion to pure-capability should make them all valid capabilities which are compatible with the intrinsics.
+Therefore well-behaved code using RVV intrinsics should be compilable in pure-capability mode without changes.
+
+This is not currently the case for CHERI-Clang, as RVV memory access intrinsics are broken, but this can be fixed with engineering effort.
+
+\subsubsection*{Auto-vectorization --- Yes}
+All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV pure-capability mode, assuming the base addresses can be converted to valid capabilities.
+Any scalar code that can be 
+\begin{enumerate*}[label=\alph*)]
+    \item compiled in scalar pure-capability mode\footnote{This ensures all memory accesses use valid capabilities.}, and
+    \item auto-vectorized by a legacy RVV compiler,
+\end{enumerate*}
+must have an equivalent pure-capability vectorized form.
+This form could be acquired by performing the auto-vectorization in legacy mode, ensuring all base addresses are available as capabilities, then making the vector instructions use those capabilities.
+Therefore a pure-capability compiler can always auto-vectorize CHERI-compliant scalar code if some legacy compiler can also auto-vectorize it.
+
+This is not currently possible for CHERI-Clang, as RVV auto-vectorization is not implemented yet.
+Similar models (e.g. Arm SVE) already have auto-vectorization, so RVV auto-vectorization (and thus CHERI-RVV auto-vectorization) should be possible.
+
+% \pagebreak
+\hypsubsection{hyp:sw_stack_vectors}{Saving vectors on the stack}
+% \todomark{Yes vectors can be stored on the stack}
+This is true in theory, but not yet supported by CHERI-Clang in practice.
+Placing variable-length structures on the stack is possible as long as the length can be known at runtime (and as long as the stack has space, of course).
+This isn't exclusive to CHERI --- to push and pop values on the stack, the stack pointer must be incremented or decremented by the size of the value.
+Because the length already has to be measured, and CHERI-RISC-V supports setting capability bounds from runtime-computed values, it's entirely possible to correctly set tight bounds for capabilities pointing to variable-length vectors on the stack.
+
+% Arm SVE explicitly defines a ``sizeless type'' in the C language extensions \cite{} that may be stored on the stack, so this will need to be implemented for 
+% \todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
+
+\pagebreak
+A minor complication is presented by a note in TR-949\cite[Section 3.8.2]{TR-949} concerning ``re-materializing bounded stack variables''.
+This section implies LLVM can try to re-create a pointer-to-stack at any time with minimal cost, but this may not be able to apply to vectors.
+Measuring the bounds requires measuring \code{VLMAX} by changing \code{vl}, which could then require saving/restoring the old value.
+This is only a performance issue, and in the worst case we can just say pointers-to-stack-vectors are not re-materializable, so it isn't a dealbreaker.
+Further investigation of this issue is left as future work.
+% LLVM allows pointers to be non-re-materializable, so this isn't a dealbreaker, but it should be investigated in the future.
+% Further investigation of this issue is left as future work.
+
+\hypsubsection{hyp:sw_multiproc}{Running CHERI-RVV code in a multiprocessing system}
+% \todomark{H-D: Yes IFF vectors can be stored on the stack. May require a dynamic stack bounds calculation based on VLEN.}
+This requires two conditions: an OS must be able to save and restore vector state, and the vector hardware must support resuming from an interrupted state.
+The first condition is easy to fulfil by extending the previous hypothesis. 
+If it is possible to save variable-length vectors on the stack, given their length is known at runtime, it must also be possible to save their data on the heap.
+Some OSs might need to make changes to their ``current process state'' structure to support variable-length data, and they would also need to allocate space for the \code{vtype} value, but it is certainly possible.
+
+The second condition can be upheld in two ways.
+First, if the OS only context switches and services interrupts while the vector hardware is in a complete state (i.e. not partially executing an instruction), then context switches and interrupts are completely transparent to the vector hardware and no changes need to be made.
+Secondly, if context switches and interrupts can actually interrupt vector instructions partway through, then they can only be cleanly resumed if the vector hardware supports precise traps for the exact instruction being executed.

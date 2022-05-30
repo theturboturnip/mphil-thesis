@@ -39,7 +39,7 @@ If CHERI CPUs want to benefit from vector processing's increased performance and
 But adding CHERI's bounds-checking to the mix may affect these semantics, and could impact performance (e.g. checking each element's access in turn may be slow).
 
 % \todomark{if this were the only priority, vectorized memory access doesn't need to be that fast relative to arithmetic?}
-Vector memory access performance is more critical than one may initially assume, because vectors are used for more than just computation.
+\label{vectorized_memcpy}Vector memory access performance is more critical than one may initially assume, because vectors are used for more than just computation.
 % \todomark{memcpy is a very common operation, vectorized on many platforms (cite)}
 A prime example is \code{memcpy}: for \code{x86\_64}, \code{glibc} includes multiple versions of the function\footnote{It appears memcpy is implemented as a copy of memmove.} taking advantage of vector platforms, then selects one to use at runtime\footnote{\gitfile{sysdeps/x86_64/multiarch/ifunc-memmove.h}{bminor/glibc}{https://github.com/bminor/glibc/blob/7b1cfba79ee54221ffa7d7879433b7ee1728cd76/sysdeps/x86_64/multiarch/ifunc-memmove.h}}.
 % \todomark{thus memory accesses themselves should be optimized}

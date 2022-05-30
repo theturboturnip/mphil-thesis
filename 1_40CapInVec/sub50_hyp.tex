@@ -1,4 +1,20 @@
-\section{Evaluating hypotheses}
+\section{Testing and evaluation}\label{chap:capinvec:eval}
+We constructed a second test program to ensure \code{memcpy} could be performed correctly with capabilities-in-vectors.
+It copies an array of \code{Element} structures that hold pointers to static \code{Base} structures.
+% \code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
+On CHERI platforms, even in Integer mode, capability pointers are used and copied.
+The first test simply copies the data and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
+The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers.
+The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
+
+\begin{table}[h]
+    \centering
+    \CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
+    \begin{tabular}{rcccccc}
+    \tablevecmemcpypointers
+    \end{tabular}
+    \caption{\code{vector\_memcpy\_pointers} results}\label{tab:fullresults:vectormemcpyptrs}
+\end{table}
 
 \hypsubsection{hyp:cap_in_vec_storage}{Holding capabilities in vectors}
 It is possible for a single vector register to hold a capability (and differentiate a capability from integer data) as long as \code{VLEN = CLEN}.
@@ -17,6 +33,7 @@ The emulator's integer/capability context approach, where the tag bit may only b
 Integrity is not affected by how a capability is stored, as long as the other properties are maintained.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
 \hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}\label{chap:capinvec:hyp_load_store}
 For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements.
 They must require all accesses be \code{CLEN}-aligned, or at least only load valid caps from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
@@ -40,6 +57,7 @@ The same conditions for scalar and other vector accesses apply to maintain Integ
 The emulator doesn't allow capabilities-in-vectors to be dereferenced directly, but if an implementation allows it those capabilities would also need to be checked.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
 \hypsubsection{hyp:cap_in_vec_manip}{Manipulating capabilities in vectors}
 The emulator limits all manipulation to clearing the tag bit, achieved by writing data to the register in an integer context.
 In theory, it's possible to do more complex transformations, which can be proven by implementing each vector manipulation on vector elements as sequential scalar manipulations on scalar elements.
@@ -55,21 +73,3 @@ Any manipulations that create capabilities, or potentially any manipulations tha
 
 \subsubsection*{Integrity}
 As stated before, capabilities-in-vectors cannot be dereferenced directly, so there is no impact on Integrity.
-
-\subsection{Testing and evaluation: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval}
-We constructed a second test program to ensure \code{vector\_memcpy} could be performed correctly with capabilities-in-vectors.
-It copies an array of \code{Element} structures that hold pointers to static \code{Base} structures.
-% \code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
-On CHERI platforms, even in Integer mode, capability pointers are used and copied.
-The first test simply copies the data and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
-The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers.
-The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
-
-\begin{table}[h]
-    \centering
-    \CatchFileDef{\tablevecmemcpypointers}{1_50Evaluation/data/vector_memcpy_pointers_rows}{}
-    \begin{tabular}{rcccccc}
-    \tablevecmemcpypointers
-    \end{tabular}
-    \caption{\code{vector\_memcpy\_pointers} results}\label{tab:fullresults:vectormemcpyptrs}
-\end{table}

@@ -43,7 +43,7 @@ void inline_asm_vector_cap_reg(void) {
     // "vle32.v v8, (ca0)" - valid
     asm ("vle32.v %0, (%1)"
             : "=vr"(vec_val)
-            : "c"(ptr));
+            : "C"(ptr));
 }
 #endif
 

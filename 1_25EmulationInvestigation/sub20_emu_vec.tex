@@ -76,5 +76,11 @@ The previously computed tight bounds are sanity-checked against these accesses, 
 \subsubsection{Integer vs. Capability encoding mode\label{chap:emu:rvv_int_mode}}
 As noted in \cref{chap:bg:subsec:cheriencodingmode} CHERI-RISC-V defines two execution modes that the program can switch between.
 In Integer mode \enquote{address operands to existing RISC-V load and store opcodes contain integer addresses} which are implicitly dereferenced relative to the default data capability, and in Capability mode those opcodes are modified to use capability operands.
+
 Integer mode was included in the interests of maintaining compatibility with legacy code that hasn't been adapted to capabilities.
 As similar vector code may also exist, CHERI-RVV treats vector memory access instructions as \enquote{existing RISC-V load and store opcodes} and requires that they respect integer/capability mode.
+
+We do not define new mode-agnostic instructions, like \code{S[BHWD][U].CAP} and \code{S[BHWD].DDC} (\cref{cheri_instructions}), which means vector programs cannot mix capability and integer addressing without changing encoding modes.
+This may make incremental adoption more difficult, and in the future we should examine existing vanilla RVV programs to determine if it's worth adding those instructions.
+% This could cause complications, but 
+% This should not cause too many complications, as vector accesses appear infrequently enough in code that changing them all at once should be feasible.
