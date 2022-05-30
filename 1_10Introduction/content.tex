@@ -117,7 +117,9 @@ The RVV and CHERI-RISC-V specifications are succinctly explained in \cref{chap:b
 
 \vfill\null
 
-% Count hypothesis words
+% Count hypothesis words - normally they shouldn't be counted, because they're inside a table,
+% but we can't easily count when they're reproduced in later sections.
+% Count them once here, and not after, which is equivalent to not counting them here but counting after.
 %TC:macro \definehyp [ignore,text]
 %TC:group table 0 1
 %TC:group tabular 1 1

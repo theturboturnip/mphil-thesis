@@ -4,8 +4,11 @@
 %TC:macro \redact [text]
 %TC:macro \gitfile [option:text,text,text,ignore]
 %TC:macro \gitrepo [option:text,text,ignore]
-%TC:subst \subfile \input
 %TC:fileinclude \figinput file
+%TC:usepackage hyperref
+%TC:usepackage cleveref
+%TC:usepackage subfiles
+%TC:usepackage amsmath
 
 % The above comments tell texcount that some macros should not have their arguments counted as text.
 % \todomark, \todoref, and \todocite are all macros used during development - there will be no TODO messages

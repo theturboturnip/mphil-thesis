@@ -55,10 +55,9 @@ Main chapters word count: \luadirect{tex.sprint(format_thousand(wordcount))} wor
 
 Word count methodology: \texttt{\luadirect{tex.sprint(wordcount_cmd)}}\\
 TeXcount version: 3.2.0.41\\
-Counts body text, heading text, caption text, and slightly over-counts cross-references.
+Counts body text, heading text, and caption text. Does not include text in tables, figures, or appendices.
 The anonymous version redacts some trivially identifying information, but uses the same word count as the de-anonymized version.
-The appendices contain non-essential data that is summarized in the main text (e.g. full results, details on how to compile code), or re-statements of work done in the main text (e.g. a summary of all changes made to the CHERI-RISC-V spec).  
-\todomark{Should the hypothesis reproductions also be counted?}
+The appendices contain non-essential data that is summarized in the main text (e.g. full results, details on how to compile code), or re-statements of work done in the main text (e.g. a summary of all changes made to the CHERI-RISC-V spec).
 }
 }
 
