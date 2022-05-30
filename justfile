@@ -45,14 +45,14 @@ count:
     # and print each command before you run it
     echo 1_*/content.tex chapters.tex | xargs -n1 -t ./texcount.pl -1 -sum -merge -q
 
-detail-count:
-    ./texcount.pl -sum -merge chapters.tex -v -html > ./output/mergedcount.html
-    xdg-open ./output/mergedcount.html
+opencount:
+    xdg-open ./output/wordcount.html
 
 savecount:
     #!/usr/bin/env sh
     mkdir -p ./output/
     ./texcount.pl -sum -merge chapters.tex > ./output/wordcount.txt
+    ./texcount.pl -sum -merge chapters.tex -v -html > ./output/wordcount.html
 
 open: build-thesis
     xdg-open ./output/thesis.pdf

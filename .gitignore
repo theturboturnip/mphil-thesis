@@ -6,6 +6,7 @@ output/*
 !output/thesis.pdf
 !output/thesis.todo*.txt
 !output/wordcount.txt
+!output/wordcount.html
 
 output_anon/*
 !output_anon/thesis.pdf
