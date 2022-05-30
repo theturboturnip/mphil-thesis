@@ -30,19 +30,43 @@ Given the importance of vector processing to modern computing, and thus its impo
 
 \section{Future work}
 The stated purpose of this project was to enable future implementations of CHERI-RVV and CHERI Arm SVE.
-We've shown this is feasible, and we believe our research is enough to create an initial CHERI-RVV specification, but both could benefit from more research on capabilities-in-vectors.
+We've shown this is feasible, and we believe our research is enough to create an initial CHERI-RVV specification, but both could benefit from more research.
+% Now that we have shown this is feasible, building a useful specifications requires more work.
+%are a few more steps required to nail down the specifics.
 
-All architectures may benefit from more advanced vectorized capability manipulation, potentially accelerating CHERI-specific processes like CHERIvoke\cite{xiaCHERIvokeCharacterisingPointer2019}. \todomark{reference CHERIvoke in ch4 intro}
-Because these processes are still evolving, it may be wise to standardize the first version of CHERI-RVV based on this dissertation and only add new instructions as required.
-Once created, the standard can be implemented in CHERI-Clang\footnote{See \cref{chap:software:sec:chericlangchanges} for the other required changes to CHERI-Clang.} and added to existing CHERI-RISC-V processors\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}.
+% Even though the 
 
-More theoretically, other vector models could benefit from \emph{dereferencing} capabilities-in-vectors.
-Arm SVE has addressing modes that directly use vector elements as memory references, as do its predecessors and contemporaries.
-A draft specification of CHERI-x86 is in the works\cite[Chapter 6]{TR-951}, and existing x86 vector models like AVX have similar features.
-This may prove impractical, but this could be mitigated by e.g. replacing these addressing modes with variants of RVV's ``indexed'' mode.
-Once this problem is solved, CHERI will be able to match the memory access abilities of any vector ISA it needs to, making it that much easier for industry to adopt CHERI in the long term.
-% Once this problem is solved, CHERI support may be extended to any vector models where it would help,
-% Solving this problem may be the key to extending CHERI support to 
-% Regardless of the exact solution, we believe it is feasible to extend CHERI-support
+
+% Firstly, we would suggest standardizing a definition of CHERI-RVV based on this dissertation.
+% % This may not be the final version, e.g. some users may want extra instructions to facilitate hybrid execution mode like in  \cref{cheri_instructions}, but having one standard ensures tools and hardware can cooperate.
+% % This specification could be implemented on the CHERI-RISC-V Sail model\footnote{\gitrepo{CTSRD-CHERI/sail-cheri-riscv}{https://github.com/CTSRD-CHERI/sail-cheri-riscv}}, which is used for formal verification
+% CHERI-Clang then requires engineering work, as laid out in \cref{chap:software:sec:chericlangchanges}, and further work could add CHERI-RVV support to one of the preexisting CHERI-RISC-V cores\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}.
+% % This standard should then evolve
+
+The lowest-hanging fruit is capabilities-in-vectors.
+% Capabilities-in-vectors has multiple areas ripe for further research.
+% In terms of future theoretical work, capabilities-in-vectors is low-hanging fruit and has multiple potential research areas.
+CHERI-specific processes, such as CHERIvoke \cite{xiaCHERIvokeCharacterisingPointer2019}, may benefit from more advanced vectorized capability manipulation. \todomark{reference CHERIvoke in ch4 intro}
+Arm SVE includes addressing modes that use vector elements as memory references, and could benefit from dereferencing capabilities-in-vectors.
+These could end up being simple additions, or could prove unfeasible.
+% These may introduce extra complexity, as noted in \cref{chap:capinvec:eval}, and could prove unfeasible/too niche to include.
+% \todomark{final sentence?}
+% With these extra features, 
+% Even without these extra features our research is a substantial step forward for vectors on CHERI, and 
+
+Either way, we would suggest standardizing a definition of CHERI-RVV based on this dissertation.
+% This version could evolve based on future research, but 
+% This may not be the final version, e.g. some users may want extra instructions to facilitate hybrid execution mode like in  \cref{cheri_instructions}, but having one standard ensures tools and hardware can cooperate.
+% This specification could be implemented on the CHERI-RISC-V Sail model\footnote{\gitrepo{CTSRD-CHERI/sail-cheri-riscv}{https://github.com/CTSRD-CHERI/sail-cheri-riscv}}, which is used for formal verification
+This could then guide the engineering work for CHERI-Clang, as laid out in \cref{chap:software:sec:chericlangchanges}, and further work could add CHERI-RVV support to one of the preexisting CHERI-RISC-V cores\footnote{\url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}.
+Implementing Arm SVE vectorization could 
+% This standard should then evolve
+
+% In either case, an initial CHERI-RVV specification should be constructed.
+% This would guide engineering work on CHERI-Clang (see \cref{chap:software:sec:chericlangchanges}) and various CHERI-RISC-V implementations\footnote{\gitrepo{CTSRD-CHERI/sail-cheri-riscv}{https://github.com/CTSRD-CHERI/sail-cheri-riscv}, \url{https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html}}.
+% % Implementing this specification in CHERI-Clang, 
+
+% This is relevant for Arm SVE, as it includes addressing modes that use vector elements as memory references, and also to CHERI-specific operations such as CHERIvoke\cite{xiaCHERIvokeCharacterisingPointer2019} which may benefit from more advanced vectorized capability manipulation.
+% \todomark{future work - implementation?}
 
 \end{document}

@@ -52,7 +52,7 @@ Extra archetype-specific calculations are performed (e.g. computing \code{EVL = 
 
 \subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
 The initial motivation for this project was investigating the impact of capability checks on performance.
-Rather than check each element's access invidually, we determine a set of \enquote{fast-path} checks which count as checks for multiple elements at once.
+Rather than check each element's access individually, we determine a set of \enquote{fast-path} checks which count as checks for multiple elements at once.
 In the emulator, this is done by computing the \enquote{tight bounds} for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds.
 \cref{chap:hardware:sec:fastpath} describes methods for calculating the \enquote{tight bounds} for each access type, and ways that architectural complexity can be traded off to calculate \emph{wider} bounds.
 

@@ -56,7 +56,7 @@ The DDC is used to sandbox integer addressing modes.
 CHERI-RISC-V includes new instructions which use integer addressing, and allows legacy (i.e. integer addressed) code to function on CHERI systems without recompiling for CHERI-RISC-V.
 These instructions all use integer addresses relative to the DDC, and the DDC controls the permissions those instructions have.
 
-\subsection{Instruction changes}
+\subsection{Instruction changes}\label{cheri_instructions}
 TR-951\cite[Chapter 8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
 Many of the new instructions are unrelated to pre-existing instructions, and implement capability-specific operations like accessing fields of capability registers.
 The most relevant new instructions for our case are the various loads/stores.
