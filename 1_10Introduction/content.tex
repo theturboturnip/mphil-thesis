@@ -97,7 +97,7 @@ The goal of this project is to investigate the impact of, and the roadblocks for
 In particular, we focus on integrating RVV with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
 
 The investigation was carried out by designing and testing a CHERI-RVV emulator written in Rust, but that is only a single implementation.
-To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to prove nine hypotheses (\cref{tab:hypotheses}).
+To show that RVV can be integrated with CHERI-RISC-V for a wide range of processors, we use information gathered from the emulator to check nine hypotheses (\cref{tab:hypotheses}).
 \cref{hyp:hw_cap_as_vec_mem_ref,hyp:hw_cap_bounds_checks_amortized} consider basic feasibility and potential hardware performance issues.
 \cref{hyp:sw_vec_legacy,hyp:sw_pure_compat,hyp:sw_stack_vectors,hyp:sw_multiproc} ensure that vector software is compatible with potential CHERI-RVV software stacks.
 \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} considers capabilities-in-vectors: the conditions under which vector registers can hold capabilities, and vectorized instructions can manipulate them.

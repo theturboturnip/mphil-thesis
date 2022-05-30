@@ -56,8 +56,8 @@ Any manipulations that create capabilities, or potentially any manipulations tha
 \subsubsection*{Integrity}
 As stated before, capabilities-in-vectors cannot be dereferenced directly, so there is no impact on Integrity.
 
-\subsection{Verification and testing: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval}
-We constructed a second test program to verify that \code{vector\_memcpy} could be performed correctly with capabilities-in-vectors.
+\subsection{Testing and evaluation: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval}
+We constructed a second test program to ensure \code{vector\_memcpy} could be performed correctly with capabilities-in-vectors.
 It copies an array of \code{Element} structures that hold pointers to static \code{Base} structures.
 % \code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
 On CHERI platforms, even in Integer mode, capability pointers are used and copied.

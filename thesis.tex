@@ -30,6 +30,11 @@
 
 \begin{document}
 
+% in one-side mode, get a version of cleardoublepage that works
+% https://tex.stackexchange.com/a/102462
+\newcommand\cleartooddpage{\clearpage
+  \ifodd\value{page}\else\null\clearpage\fi}
+
 %% MPhil Guidelines
 % Two versions
 % Anonymised:
@@ -51,12 +56,13 @@
 \includepdf{0_2ThesisInfo/blind_project_cover.pdf}
 
 % \declarationpage equivalent
+\cleartooddpage
 \pagestyle{empty}
 \wordcountdata{}
 
 % \acknowledgementspage equivalent
 \pagebreak
-\clearpage%
+\cleartooddpage%
 \thispagestyle{empty}%
 \null%
 \pagebreak
@@ -65,23 +71,27 @@
 
 \camtitlepage{}
 
+\cleartooddpage
 \camdeclarationpage{}
 \wordcountdata{}
 \vfill\null
 
+\cleartooddpage
 \camacknowledgementspage{}
 
 \fi
 
 % Abstract and ToC
+\cleartooddpage
 \camabstractpage{}
+\cleartooddpage
 \camtocpage{}
 
 % Set chapter title format
 \ContentTitleFormat
 
 
-\clearpage
+\cleartooddpage
 \input{chapters}
 
 

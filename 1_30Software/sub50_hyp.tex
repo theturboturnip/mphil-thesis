@@ -78,8 +78,8 @@ The second condition can be upheld in two ways.
 First, if the OS only context switches and services interrupts while the vector hardware is in a complete state (i.e. not partially executing an instruction), then context switches and interrupts are completely transparent to the vector hardware and no changes need to be made.
 Secondly, if context switches and interrupts can actually interrupt vector instructions partway through, then they can only be cleanly resumed if the vector hardware supports precise traps for the exact instruction being executed.
 
-\subsection{Verification and testing: \code{vector\_memcpy}}\label{chap:software:eval}
-To verify the behaviour of the CHERI-RVV instructions, we developed a self-checking test program for the emulator to execute.
+\subsection{Testing and evaluation: \code{vector\_memcpy}}\label{chap:software:eval}
+To expose bugs in the CHERI-RVV instructions, we developed a self-checking test program for the emulator to execute.
 At first it was hand-written, but in order to test a wide range of \code{vtype}s we now generate it with a Python script.
 It consists of fifty-seven tests of different vector memory access archetypes under various configurations (\cref{tab:vectormemcpyschemes}).
 
@@ -97,7 +97,7 @@ These tests are run under \emph{harnesses}, which provide setup and self-checkin
 The Vanilla harness tests a simple \code{memcpy} between two arrays;
 Masked tests that every other element is copied, not all of them;
 Segmented tests a \code{memcpy} into four separate output arrays, each a different field of a four-field structure.
-There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test verifies that out-of-bounds exceptions are swallowed and \code{vl} is reduced accordingly.
+There is also a special test for fault-only-first: FoF loads are performed at the edge of mapped memory, and the test shows that out-of-bounds exceptions are swallowed and \code{vl} is reduced accordingly.
 All tests were successful when they ran, but some testbenches could not be built with some compilers.
 The full set of test results is available in \cref{chap:fullresults}.
 

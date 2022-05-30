@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 15019
-Words in text: 13923
+Sum count: 15017
+Words in text: 13921
 Words in headers: 227
 Words outside text (captions, etc.): 836
 Number of headers: 83
@@ -61,12 +61,12 @@ Subcounts:
   200+5+24 (1/0/0/0) Subsection: Adapting vector intrinsics to CHERI
   206+6+6 (1/0/0/0) Subsection: Storing scalable vectors on the stack
   1004+9+8 (4/0/0/0) Section: Evaluating hypotheses}\label{chap:software:sec:hypotheses
-  200+5+0 (1/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy}}\label{chap:software:eval
+  199+5+0 (1/0/0/0) Subsection: Testing and evaluation: \code{vector\_memcpy}}\label{chap:software:eval
   51+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   108+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
   369+3+98 (1/0/0/0) Section: Changing the emulator
   686+11+0 (8/0/2/0) Section: Evaluating hypotheses
-  109+6+0 (1/0/0/0) Subsection: Verification and testing: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval
+  108+6+0 (1/0/0/0) Subsection: Testing and evaluation: \code{vector\_memcpy\_pointers}}\label{chap:capinvec:eval
   93+1+6 (1/0/0/0) Chapter: Conclusion
   257+2+0 (1/0/0/0) Section: Evaluating hypotheses
   204+2+9 (1/0/0/0) Section: Future work
