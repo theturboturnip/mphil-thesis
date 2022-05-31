@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 14946
-Words in text: 13861
+Sum count: 14977
+Words in text: 13892
 Words in headers: 219
 Words outside text (captions, etc.): 833
 Number of headers: 81
@@ -63,7 +63,7 @@ Subcounts:
   1203+10+8 (4/0/0/0) Section: Testing and evaluation}\label{chap:software:sec:hypotheses}\label{chap:software:eval
   57+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   125+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
-  358+3+97 (1/0/0/0) Section: Changing the emulator
+  389+3+97 (1/0/0/0) Section: Changing the emulator
   787+12+0 (8/0/2/0) Section: Testing and evaluation}\label{chap:capinvec:eval
   93+1+6 (1/0/0/0) Chapter: Conclusion
   254+2+0 (1/0/0/0) Section: Evaluating hypotheses

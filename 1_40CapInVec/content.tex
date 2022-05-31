@@ -32,6 +32,8 @@ We set \code{ELEN = VLEN = CLEN = 128}\footnote{The tag bits are implicitly inst
 
 Two new memory access instructions were created to take advantage of this new element width, and the \code{vsetvl} family were adjusted to support 128-bit values.
 Similar to the CHERI-RISC-V \code{LC/SC} instructions, we implemented 128-bit unit-stride vector loads and stores, which took over officially-reserved encodings\footnote{The RVV spec mentions, but does not specify, potential encodings for 128-bit element widths and instructions (\cite[p10, p32]{specification-RVV-v1.0}, \cref{tab:capinvec:accesswidth}).} we expected official versions to use.
+We have not tested other types of access, but expect them to be noncontroversial.
+Indexed accesses require specific scrutiny, as they may be expected to use 128-bit offsets on 64-bit systems.
 The memory instructions had to be added to CHERI-Clang manually, and Clang already has support for setting \code{SEW=128} in the \code{vsetvl} family (\cref{tab:capinvec:vtypewidth}).
 These instruction changes affected inline assembly only, rather than adding vector intrinsics, because CHERI-Clang only supports inline assembly anyway.
 

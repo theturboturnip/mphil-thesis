@@ -1,5 +1,3 @@
 TODOs
 1
 2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
-2
-2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
