@@ -13,7 +13,7 @@ void *memcpy_vec(void *dst, void *src, size_t n) {
     vuint8m8_t vec_src;
     
     // Pass the vector length to intrinsics
-    vle8_v_u8m8(src, vl);
+    vec_src = vle8_v_u8m8(src, vl);
     vse8_v_u8m8(dst, vec_src, vl);
   }
   return save;
