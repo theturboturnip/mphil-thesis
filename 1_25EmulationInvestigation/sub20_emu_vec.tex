@@ -17,11 +17,11 @@ A separate decoding stage may technically not be necessary in hardware (especial
 It is then easy to define the checking and execution phases separately for each archetype, as the hardware would need to do.
 
 \subsubsection{Decoding phase}\label{chap:hardware:subsec:decoding}
-Decoding is split into two steps: finding the encoded \paramt{nf} and \paramt{eew} values, then interpreting them based on the encoded archetype.
+Decoding is split into two steps: finding the encoded \paramt{nf} and element widths, then interpreting them based on the encoded archetype.
 % Vector memory accesses are encoded under the F extension's Load and Store major opcodes, which already encodes an element width.
 % Vector memory access instructions are encoded similarly to the F extension's floating-point load/store instructions, which include an ``element width''.
-Vector memory accesses reuse instruction encodings from the F extension's floating-point load/store instructions, which include an ``element width''.
-The vector extension adds four extra ``element width'' values which imply the access is vectorized.
+Vector memory accesses reuse instruction encodings from the F extension's floating-point load/store instructions, which encode an ``element width'' in the \paramt{mew} and \paramt{width} bits (see \cref{fig:stupid}).
+The vector extension adds four extra width values which imply the access is vectorized (see \cref{tab:capinvec:accesswidth}).
 % This element width is used to differentiate between vector accesses and scalar floating-point accesses, where a vector access can have one of four widths (8, 16, 32, 64).
 If any of these values are found, the instruction is interpreted as a vector access and \paramt{nf} is extracted.
 % \paramt{nf} is encoded consistently in all vector memory access instructions
@@ -31,23 +31,17 @@ If a unit access is selected, the second argument field \paramt{umop} selects a 
 % Strided and indexed accesses just use their dedicated archetypes.
 Extra archetype-specific calculations are performed (e.g. computing \code{EVL = ceil(vl/8)} for bytemask accesses), and the relevant information is returned as a \code{DecodedMemOp} enum.
 
-% \todomark{diagram of floating point ld/st vs. vector ld/st}
-% \todomark{table of floating point ld/st, vector ld/st instructions}
-\todomark{appx - Decision tree for operation decoding?}
-
-\newcommand{\mcb}[2]{\multicolumn{#1}{|c|}{#2}}
-\begin{table}
-    % \begin{tabularx}{\textwidth}{@{}*{32}{p{\dimexpr(\textwidth-64\tabcolsep)/32\relax}}@{}}
-    \small\begin{tabularx}{\textwidth}{XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX}
-    % \small\begin{tabularx}{\textwidth}{p{}}
-                % \begin{tabular}{*{32}{p{3cm}}}
-            % 31&&29&28&27&26&25&24&&&&20&19&&&&15&14&&12&11&&&&7&6&&&&&&0 \\
+\begin{table}[t]
+    \centering
+    {\small\begin{tabular}{F@{}I@{}W@{}I@{}R@{}R@{}F@{}R@{}O}
+        \instbitrange{31}{29} & \multicolumn{1}{c}{\instbit{28}} & \instbitrange{27}{26} & \multicolumn{1}{c}{\instbit{25}} & \instbitrange{24}{20} & \instbitrange{19}{15} & \instbitrange{14}{12} & \instbitrange{11}{7} & \instbitrange{6}{0} \\
         \hline
-        \mcb{3}{nf} & mew & \mcb{2}{\paramt{mop}} & vm & \mcb{5}{\paramt{umop}/rs2/vs2} & \mcb{5}{rs1} & \mcb{3}{width} & \mcb{5}{vd} & \mcb{7}{Opcode} \\
+        \multicolumn{1}{|c|}{\paramt{nf}} & \multicolumn{1}{c|}{\paramt{mew}} & \multicolumn{1}{c|}{\paramt{mop}} & \multicolumn{1}{c|}{\scriptsize\code{vm}} & \multicolumn{1}{c|}{\paramt{umop}\scriptsize\code{/rs2/vs2}} & \multicolumn{1}{c|}{\scriptsize\code{rs1}} & \multicolumn{1}{c|}{\paramt{width}} & \multicolumn{1}{c|}{\scriptsize\code{vd}} & \multicolumn{1}{c|}{\scriptsize\code{opcode}} \\
         \hline
-    \end{tabularx}
-    \caption{Floating-point and Vector load/store encoding}
-    \todomark{fix}
+        % 3 & 1 & 2 & 1 & 5 & 5 & 3 & 5 & 7 \\
+    \end{tabular}
+    }
+    \caption{Relevant parameters of floating-point and vector load/store encoding}\label{fig:stupid}
 \end{table}
 
 \subsubsection{Fast-path checking phase}\label{chap:hardware:subsec:checking}
@@ -74,7 +68,7 @@ It can be found in \cref{appx:code:vector_mem_access}.
 The previously computed tight bounds are sanity-checked against these accesses, and the accesses are actually performed.
 
 \subsubsection{Integer vs. Capability encoding mode\label{chap:emu:rvv_int_mode}}
-As noted in \cref{chap:bg:subsec:cheriencodingmode} CHERI-RISC-V defines two execution modes that the program can switch between.
+As noted in \cref{chap:bg:subsec:cheriencodingmode}, CHERI-RISC-V defines two execution modes that the program can switch between.
 In Integer mode \enquote{address operands to existing RISC-V load and store opcodes contain integer addresses} which are implicitly dereferenced relative to the default data capability, and in Capability mode those opcodes are modified to use capability operands.
 
 Integer mode was included in the interests of maintaining compatibility with legacy code that hasn't been adapted to capabilities.

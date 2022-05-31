@@ -9,42 +9,6 @@ The obvious case is fault-only-first loads, where capability exceptions may be h
 Implementations may also choose to calculate wider bounds than accessed for the sake of simplicity, or even forego a fast-path check altogether.
 Thus, a fast-path check can have four outcomes depending on the circumstances.
 
-\begin{figure}[t]
-\begin{subtable}{0.5\textwidth}
-    \begin{tabular}{ll}
-        \toprule
-        Success & All accesses will succeed \\
-        \midrule
-        Failure & At least one access \emph{will}\\& raise an exception \\
-        \midrule
-        Likely-Failure & At least one access \emph{may} \\
-        \emph{or} Unchecked & raise an exception \\
-        \bottomrule
-    \end{tabular}
-    \caption{Possible fast-path outcomes}
-\end{subtable}%
-\hfill%
-\begin{subfigure}{0.45\textwidth}
-    \begin{algorithmic}
-        \If{can calculate range}
-            \If{range is within capability}
-                \State Success
-            \ElsIf{range is wide}
-                \State Likely-Failure
-            \ElsIf{fault-only-first}
-                \State Likely-Failure
-            \Else{}
-                \State Failure
-            \EndIf{}
-        \Else{}
-            \State Unchecked
-        \EndIf{}
-    \end{algorithmic}
-    \caption{Algorithm}
-\end{subfigure}
-\caption{Fast-path outcomes}
-\end{figure}
-
 A Success means no per-access capability checks are required.
 Likely-Failure and Unchecked results mean each access must be checked, to see if any of them actually raise an exception.
 Unfortunately, accesses still need to be checked under Failure, because both precise and imprecise traps need to report the offending element in \code{vstart}\footnote{In very particular cases, e.g. unmasked unit-strided accesses where \code{nf = 1}, the capability bounds could be used to calculate what the offending element must have been. We believe this is too niche of a use case to investigate further, particularly given the complexity of the resulting hardware.}.
@@ -54,6 +18,45 @@ In theory, a CHERI-RVV specification could relax the \code{vstart} requirement f
 In this case, only archetypes that produce Likely-Failure outcomes need the slow-path.
 However, it is likely that for complexity reasons all masked accesses will use wide ranges, thus producing Likely-Failure outcomes and requiring slow-paths for all archetypes anyway.
 Because the Likely-Failure and Failure cases require the slow-path anyway, computing the fast-path can only be worthwhile if Success is the common case.
+
+\begin{figure}[t]
+    \begin{subtable}{0.5\textwidth}
+        \begin{tabular}{ll}
+            \toprule
+            Success & All accesses will succeed \\
+            \midrule
+            Failure & At least one access \emph{will}\\& raise an exception \\
+            \midrule
+            Likely-Failure & At least one access \emph{may} \\
+            \emph{or} Unchecked & raise an exception \\
+            \bottomrule
+        \end{tabular}
+        \caption{Possible fast-path outcomes}
+    \end{subtable}%
+    \hfill%
+    \begin{subfigure}{0.45\textwidth}
+        {
+        \small
+        \begin{algorithmic}
+            % \If{can calculate range}
+                \If{range is within capability}
+                    \State Success
+                \ElsIf{range is wide}
+                    \State Likely-Failure
+                \ElsIf{fault-only-first}
+                    \State Likely-Failure
+                \Else{}
+                    \State Failure
+                \EndIf{}
+            % \Else{}
+                % \State Unchecked
+            % \EndIf{}
+        \end{algorithmic}
+        }
+        \caption{Algorithm}
+    \end{subfigure}
+    \caption{Fast-path outcomes}
+\end{figure}
 
 \subsection{Whole-access fast-paths}\label{chap:hardware:subsec:wholeaccessfastpath}
 It is technically possible to calculate a fast-path for the entirety of an access (see \cref{appx:fastpathfull}), but for some situations it may be equally/more expensive than checking each access.

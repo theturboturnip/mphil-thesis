@@ -2,6 +2,7 @@
 
 We tested the emulator using a set of test programs described in \cref{chap:software:eval,chap:capinvec:eval}, and found that all instructions were implemented correctly.
 
+\pagebreak
 \hypsubsection{hyp:hw_cap_as_vec_mem_ref}{Feasibility}
 This is true.
 All vector memory access instructions index the scalar general-purpose register file to read the base address, and CHERI-RVV implementations can simply use this index for the scalar capability register file instead.
