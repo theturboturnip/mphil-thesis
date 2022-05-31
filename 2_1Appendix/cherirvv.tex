@@ -1,20 +1,82 @@
 \chapter{CHERI-RVV changes from CHERI and RVV}
 
-\todomark{CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes}
+This appendix summarizes the differences between a CHERI-RVV ISA, as emulated by \code{riscv-v-lite}, and a CHERI-RISC-V ISA with the vanilla RVV extension.
 
-\todomark{CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.}
-\todomark{The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.}
+\section{Loading/storing with capabilities}
+All CHERI-RISC-V instructions are unchanged.
+The RVV memory access instructions (listed in \cref{chap:bg:sec:rvvmemory}) have their behaviour changed, and all other RVV memory access instructions are unchanged.
 
-\todomark{CHERI-RVV doesn't change CHERI behaviour}
+In capability mode, vector memory accesses are changed to use capabilities.
+The \code{rs1} field in the encoding for all memory access instructions is changed to \code{cs1}, which specifies the capability register holding the \emph{base capability}.
+In integer mode, the value held in register \code{rs1} is added to the DDC to create the \emph{base capability}.
+The base capability's \emph{cursor} is used as the base address for all accesses.
 
-\section{Capabilities-in-vectors}\label{appx:capinvec}
-\todomark{Adds unit load/store 128, element width 128}
+The behaviour of each vector memory access is unchanged, except for exception behaviour.
+A synchronous exception is raised on element \code{i} of width \code{eew} at address \code{addr} if
+\begin{itemize}
+    \item The base capability tag is not set.
+    \item The base capability is sealed.
+    \item The base capability does not have adequate permissions.
+    \begin{itemize}
+        \item e.g. \textsc{Permit\_Load} for loads,
+        \item[] \textsc{Permit\_Store} for stores.
+    \end{itemize}
+    \item \code{addr < base\_capability.base}.
+    \item \code{addr + eew > base\_capability.top}.
+\end{itemize}
+All other exceptions that would be raised by a vanilla RVV equivalent, e.g. unaligned access exceptions, are also raised.
+Fault-only-first loads silently swallow capability-related exceptions when \code{i > 0}, setting \code{vl} instead of taking a trap, just like all other synchronous exceptions.
+
+In a future version, it may be desirable for some capability exceptions to trap before any accesses are attempted.\todomark{Make sure this is made clear in main content}
+For example, passing a sealed, untagged, or permissionless capability to a memory access usually reflects a serious programming error, and should not be ignored in any case.
+The current emulator would ignore those errors if all elements were masked out, and would silently swallow them in fault-only-first.
+Element-specific exceptions, i.e. bounds violations, should still always be swallowed by fault-only-first.
+
+% \todomark{CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes}
+
+% \todomark{CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.}
+% \todomark{The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.}
+
+% \todomark{CHERI-RVV doesn't change CHERI behaviour}
+
+\section{Capabilities-in-vectors changes}\label{appx:capinvec}
+\code{vsetvl} instructions are modified to accept a \code{SEW} value mapping to 128-bit elements (\cref{tab:capinvec:vtypewidth}).
+The arithmetic RVV instructions implemented by the emulator, listed in \cref{rvvlite_arithmetic}, are modified to handle 128-bit elements.
+We have not investigated changing any other instructions, but believe it should be trivial to extend them.
+The RVV specification notes how some instructions would handle 128-bit elements, e.g. \cite[Chapter 13]{specification-RVV-v1.0}.
+
+The RVV memory access instructions are changed to support a new element width (\cref{tab:capinvec:accesswidth}).
+This should be supported in all instructions, but was only tested for unit loads and stores.
+Indeed, the only instructions added to CHERI-Clang were \code{vle128.v} and \code{vse128.v}.
+Memory access instructions of 128-bit elements are the only instructions that access vector registers in a capability context.
+
+Of the non-unit loads and stores, indexed memory accesses are potentially concerning.
+These accesses use offsets of the \code{vtype}-encoded width, so could try to use 128-bit offsets.
+Indexed memory accesses have not been tested with 128-bit offsets, and further work is required to decide how that case should be handled.\todomark{Make sure this is made clear in main content}
+
+% \todomark{Adds unit load/store 128, element width 128}
 
 \input{1_40CapInVec/encoding_tables}
 
+\begin{table}
+    \centering
+    \begin{tabular}{l}
+        \code{vmv.v.v} \\
+        \code{vmv.v.i} \\
+        \code{vmerge.vim} \\
+        \code{vmv<nr>r.v} \\
+        \code{vmseq.vi} \\
+        \code{vmsne.vi} \\
+        \code{vadd.v.i} \\
+    \end{tabular}
+    \caption{\code{riscv-v-lite} supported arithmetic instructions}\label{rvvlite_arithmetic}
+\end{table}
+
+
+\pagebreak
 \subsection{Relevant properties}\label{appx:capinvec:properties}
 
-This subsection summarizes the properties of the emulator described in \cref{chap:capinvec} than enable capabilities-in-vectors.
+This subsection summarizes the properties of the emulator described in \cref{chap:capinvec} that enable capabilities-in-vectors.
 These properties are not absolute requirements for all capability-in-vector implementations fulfilling \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip}, but can be used as a starting point.
 
 \begin{itemize}
@@ -27,7 +89,7 @@ These properties are not absolute requirements for all capability-in-vector impl
         \item $\code{VLEN} \ge \code{ELEN}$ (\cite[Chapter 2]{specification-RVV-v1.0})
         \item Larger \code{VLEN} could be supported, which must be a power-of-two\cite[Chapter 2]{specification-RVV-v1.0} and therefore will be a multiple of the capability length.
     \end{itemize}
-    \item The memory interface is identical to that used by the scalar processor, where each vector access is split into a set of sequential accesses less than 128 bits.
+    \item The memory interface is identical to that used by the scalar processor, where each vector access is split into a set of sequential accesses less than or equal to 128 bits.
     \begin{itemize}
         \item Therefore the safety properties for the scalar code still hold.
         \item Example: capabilities can only be stored through a capability with the \code{STORE\_CAP} permission.
@@ -37,6 +99,7 @@ These properties are not absolute requirements for all capability-in-vector impl
         \item This means it is impossible to set the tag bit on invalid capabilities.
         \item It also means all capability accesses are 128-bit aligned, and atomic.
     \end{itemize}
+    \pagebreak
     \item The only instruction that can place capabilities in a vector register is 128-bit element loads.
     \begin{itemize}
         \item There are no vectorized capability-to-capability or integer-to-capability instructions, such as \code{CSetBounds} or \code{CFromPtr}.

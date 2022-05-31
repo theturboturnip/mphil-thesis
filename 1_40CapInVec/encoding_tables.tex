@@ -1,25 +1,30 @@
 \begin{table}[h]
     \centering
-    \begin{tabularx}{3cm}{lYYY}
+    \begin{minipage}[c]{.49\textwidth}
+        \centering
+    \begin{tabular}{lx{0.5cm}x{0.5cm}x{0.5cm}}
         \multicolumn{1}{c}{SEW} & \multicolumn{3}{c}{\code{vsew[2:0]}} \\
+        \cmidrule(lr){2-4}
         8 & 0 & 0 & 0 \\
         16 & 0 & 0 & 1 \\
         32 & 0 & 1 & 0 \\
         64 & 0 & 1 & 1 \\
         128$^{\text{new}}$ & 1 & 0 & 0 \\
-    \end{tabularx}
-    \caption{Selected element width encoding}
+    \end{tabular}
+    \captionof{table}{Selected element width encoding}
     \label{tab:capinvec:vtypewidth}
-\end{table}
-\begin{table}[h]
+\end{minipage}\hfill
+\begin{minipage}[c]{.49\textwidth}
     \centering
-    \begin{tabularx}{4cm}{lYYYY}
-        & \code{mew} & \multicolumn{3}{c}{\code{width[2:0]}} \\
-        Vector 8b element & 0 & 0 & 0 & 0 \\
-        Vector 16b element & 0 & 1 & 0 & 1 \\
-        Vector 32b element & 0 & 1 & 1 & 0 \\
-        Vector 64b element & 0 & 1 & 1 & 1 \\
-        Vector 128b element & 1 & 0 & 0 & 0 \\
-    \end{tabularx}
-    \caption{Width encoding for vector loads and stores}\label{tab:capinvec:accesswidth}
+    \begin{tabular}{lcx{0.5cm}x{0.5cm}x{0.5cm}}
+        Access Type & \code{mew} & \multicolumn{3}{c}{\code{width[2:0]}} \\
+        \cmidrule(lr){2-2} \cmidrule(lr){3-5}
+        Vector(8) & 0 & 0 & 0 & 0 \\
+        Vector(16) & 0 & 1 & 0 & 1 \\
+        Vector(32) & 0 & 1 & 1 & 0 \\
+        Vector(64) & 0 & 1 & 1 & 1 \\
+        Vector(128)$^{\text{new}}$ & 1 & 0 & 0 & 0 \\
+    \end{tabular}
+    \captionof{table}{Width encoding for vector loads and stores}\label{tab:capinvec:accesswidth}
+\end{minipage}
 \end{table}

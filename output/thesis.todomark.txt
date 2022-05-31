@@ -1,17 +1,9 @@
 TODOs
 1
-2_1Appendix/code.tex- add preamble
+2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
 2
-2_1Appendix/cherirvv.tex- CHERI-RVV changes RVV instructions to use capabilities as address references in all places, no other behaviour changes
+2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
 3
-2_1Appendix/cherirvv.tex- CHERI-RVV treats capability out-of-bounds for an element as a synchronous exception, permission checks for a vector access are treated as a synchronous exception on element 0.
-4
-2_1Appendix/cherirvv.tex- The above means fault-only-first will silently swallow capability permission errors if element 0 is masked out.
-5
-2_1Appendix/cherirvv.tex- CHERI-RVV doesn't change CHERI behaviour
-6
-2_1Appendix/cherirvv.tex- Adds unit load/store 128, element width 128
-7
 2_1Appendix/artifacts.tex- artifacts appendix needs fixing
-8
+4
 2_1Appendix/artifacts.tex- make sure to redact online copies

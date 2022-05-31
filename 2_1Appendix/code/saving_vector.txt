@@ -1,14 +1,20 @@
 void some_other_function();
-const uint16_t* in;
-uint16_t* out;
 
-size_t copied_per_iter = vsetvl_e16m8(n);
-vuint16m8_t data = 
-    vle16_v_u16m8(in, copied_per_iter);
-some_other_function();
-vse16_v_u16m8(
-    out, data, copied_per_iter
-);
+void vector_memcpy(
+    size_t n, 
+    const uint16_t* in, 
+    uint16_t* out
+) {
+    size_t vl =
+    vsetvl_e16m8(n);
+
+    vuint16m8_t data = 
+    vle16_v_u16m8(in, vl);
+    some_other_function();
+    vse16_v_u16m8(
+    out, data, vl
+    );
+}
 
 # size_t copied_per_iter = vsetvl_e16m8(n);
 vsetvli s3, s2, e16, m8, ta, mu
@@ -18,11 +24,47 @@ vle16.v v8, (s1)
 
 # some_other_function();
 addi    a0, sp, 32
-vs8r.v  v8, (a0)          # Unknown-size Folded Spill
+vs8r.v  v8, (a0)      # Unknown-size Folded Spill
 call    some_other_function@plt
 
 # vse16_v_u16m8(...);
 vsetvli zero, s3, e16, m8, ta, mu
 addi    a0, sp, 32
-vl8re8.v        v8, (a0)  # Unknown-size Folded Reload
+vl8re8.v    v8, (a0)  # Unknown-size Folded Reload
 vse16.v v8, (s0)
+
+vector_memcpy:
+# Preamble
+    addi    sp, sp, -64
+    sd      ra, 56(sp)
+    sd      s0, 48(sp)
+    sd      s1, 40(sp)
+# Allocate stack for VLEN*8
+    csrr    a3, vlenb
+    slli    a3, a3, 3
+    sub     sp, sp, a3
+# size_t vl = vsetvl_e16m8(n);
+    vsetvli s1, a0, e16, m8, ta, mu
+# vuint16m8_t data = ...;
+    vle16.v v8, (a1)
+# Save data to stack
+    addi    a0, sp, 32
+    vs8r.v  v8, (a0)
+    mv      s0, a2
+# some_other_function();
+    call    some_other_function@plt
+# Reload data from stack
+    vsetvli zero, s1, e16, m8, ta, mu
+    addi    a0, sp, 32
+    vl8re8.v    v8, (a0)
+# vse16_v_u16m8(...);
+    vse16.v v8, (s0)
+# Postamble, deallocate VLEN*8
+    csrr    a0, vlenb
+    slli    a0, a0, 3
+    add     sp, sp, a0
+    ld      ra, 56(sp)
+    ld      s0, 48(sp)
+    ld      s1, 40(sp)
+    addi    sp, sp, 64
+    ret

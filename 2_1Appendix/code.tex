@@ -16,20 +16,21 @@ This a reproduction of \url{https://github.com/riscv-non-isa/rvv-intrinsic-doc/b
 \clearpage
 \pagebreak
 \section{C example --- Saving/restoring vector registers}
-\todomark{add preamble}
+This is an example of a compiler generating code to save/restore vector registers before/after calling another function.
+% Note the ``folded spill'' and ``folding reload'' comments, and the preamble/postamble measuring VLEN to allocate stack space.
+Generated from Clang 15 --- output availble from \url{https://godbolt.org/z/4xfMoxsT7}
+\vspace{-2em}
 \begin{figure}[h]
-    \caption{Clang 15: Saving/restoring vector registers\\Reproduced from \url{https://godbolt.org/z/4xfMoxsT7}}\label{example:saverestore}
+    \caption{Saving/restoring vector registers}\label{example:saverestore}
 
     \centering
-    \begin{subfigure}[t]{0.8\linewidth}
-        \inputframedminted[breaklines=true,firstline=1,lastline=11]{c}{./code/saving_vector.txt}
+    \begin{subfigure}[t]{0.45\linewidth}
         \caption{C code}
-    \end{subfigure}
-
-    \vspace{1em}
-    \begin{subfigure}[t]{0.8\linewidth}
-        \inputframedminted[breaklines=true,firstline=13,lastline=28]{asm}{./code/saving_vector.txt}
+        \inputframedminted[breaklines=true,firstline=1,lastline=17]{c}{./code/saving_vector.txt}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.55\linewidth}
         \caption{Generated assembly}
+        \inputframedminted[breaklines=true,firstline=36,lastline=70]{asm}{./code/saving_vector.txt}
     \end{subfigure}
 \end{figure}
 \clearpage
