@@ -100,5 +100,5 @@ This adds type safety, as the Rust compiler forces every usage of \code{SafeTagg
 The final hurdle was the capability relocations outlined in \cref{chap:bg:subsec:cherirelocs}.
 Because we're emulating a bare-metal platform, there is no operating system to do this step for us.
 A bare-metal C function has been written to perform the relocations\footnote{\gitfile{src/crt_init_globals.c}{CTSRD-CHERI/device-model}{https://github.com/CTSRD-CHERI/device-model/blob/88e5e8e744d57b88b0dbb8e3456ee0e69afc143b/src/crt_init_globals.c}}, which could be compiled into the emulated program.
-However, I wasn't sure how to find the addresses of the generated relocations in C, so I performed the relocations in Rust by examining the compiled ELF file before starting emulation.
-In future research it should be doable to perform the relocations entirely in bare-metal C.
+We decided it would be quicker to implement this in the simulator, but
+in the future we should be able to perform the relocations entirely in bare-metal C.

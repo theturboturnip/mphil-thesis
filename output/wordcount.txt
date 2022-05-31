@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 14964
-Words in text: 13879
+Sum count: 14946
+Words in text: 13861
 Words in headers: 219
 Words outside text (captions, etc.): 833
 Number of headers: 81
@@ -38,7 +38,7 @@ Subcounts:
   133+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
   67+3+10 (1/0/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   168+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
-  905+7+35 (3/1/1/0) Subsection: Emulating CHERI
+  887+7+35 (3/1/1/0) Subsection: Emulating CHERI
   815+14+27 (5/0/0/0) Subsection: Emulating vectors
   67+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
   224+3+52 (1/1/0/0) Subsection: Possible fast-path outcomes

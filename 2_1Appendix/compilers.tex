@@ -95,7 +95,7 @@ It is reproduced here in case it can be useful for other vector-agnostic program
 As of May 2022, the RISC-V GNU toolchain (hosted at \gitrepo{riscv-collab/riscv-gnu-toolchain}{https://github.com/riscv-collab/riscv-gnu-toolchain/}) does not support the vector extension or it's intrinsics.
 The \code{rvv-intrinsic} branch of this repository claimed to support vector intrinsics, but it was slightly outdated and has been deleted as of 17th May 2022.
 It referenced a repository for \code{glibc} that no longer exists as a submodule, which makes compilation impossible.
-I have archived the branch in my own repository (\redact{\gitrepo{theturboturnip/riscv-gnu-toolchain}{https://github.com/theturboturnip/riscv-gnu-toolchain}}) and fixed that issue.
+We have archived this branch online (\redact{\gitrepo{theturboturnip/riscv-gnu-toolchain}{https://github.com/theturboturnip/riscv-gnu-toolchain}}) and fixed that issue.
 This appendix describes how to build the toolchain.
 
 To build the full toolchain with intrinsic support, perform the following steps (derived by the author independently, then amended based on macOS instructions from~\footnote{\url{https://github.com/riscv-collab/riscv-gcc/issues/323}}):

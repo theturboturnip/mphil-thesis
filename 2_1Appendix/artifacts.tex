@@ -1,17 +1,41 @@
 \chapter{Artifacts}\label{appx:artifacts}
-\todomark{artifacts appendix needs fixing}
-\todomark{make sure to redact online copies}
-    \begin{tabular}{llll}
-    \toprule
-        Artifact & Resources  \\
-        \midrule
-        \code{riscv-v-lite} & \\
-        \hspace{1cm}Emulator & \redact{\gitrepo{theturboturnip/riscv-v-lite}{https://github.com/theturboturnip/riscv-v-lite}} \\ 
-         & \redact{\href{https://theturboturnip.github.io/files/doc/rsim/index.html}{Documentation}} \\
-        \code{rust-cheri-compressed-cap} & \\
-        \hspace{1cm}Rust wrapper for C capability library & \redact{\gitrepo{theturboturnip/cheri-compressed-cap}{https://github.com/theturboturnip/cheri-compressed-cap/tree/master/test/rust-cheri-compressed-cap}} \\
-        & \redact{\href{https://theturboturnip.github.io/files/doc/rust_cheri_compressed_cap/index.html}{Documentation}} \\
-        \code{llvm-project} & \\ 
-        \hspace{1cm}CHERI-Clang fork with Vector support & \redact{\gitrepo[cheri-vectors]{theturboturnip/llvm-project}{https://github.com/theturboturnip/llvm-project}} \\
-        \bottomrule
-    \end{tabular}
+% \todomark{artifacts appendix needs fixing}
+% \todomark{make sure to redact online copies}
+%     \begin{tabular}{llll}
+%     \toprule
+%         Artifact & Resources  \\
+%         \midrule
+%         \code{riscv-v-lite} & \\
+%         \hspace{1cm}Emulator & \\ 
+%          &  & \\
+%         \hspace{1cm}Rust wrapper for C capability library &  \\
+%         &  \\
+%         \code{llvm-project} & \\ 
+%         \hspace{1cm}CHERI-Clang fork with Vector support &  \\
+%         \bottomrule
+%     \end{tabular}
+
+\begin{itemize}
+    \item[] \code{riscv-v-lite}
+    \begin{itemize}
+        \item[] RISC-V ISA emulator and test programs, written from scratch.
+        \item[] Online source code: \redact{\gitrepo{theturboturnip/riscv-v-lite}{https://github.com/theturboturnip/riscv-v-lite}}
+        \item[] Online documentation: \redact{\href{https://theturboturnip.github.io/files/doc/rsim/index.html}{Documentation}}
+        \item[] Source code and documentation are also included with the submission.
+    \end{itemize}
+    \item[] \code{rust-cheri-compressed-cap}
+    \begin{itemize}
+        \item[] Rust wrapper for C capability library, written from scratch.
+        \item[] Online source code: \redact{\gitrepo{theturboturnip/cheri-compressed-cap}{https://github.com/theturboturnip/cheri-compressed-cap/tree/master/test/rust-cheri-compressed-cap}}
+        \item[] Online documentation: \redact{\href{https://theturboturnip.github.io/files/doc/rust_cheri_compressed_cap/index.html}{Documentation}}
+        \item[] Source code and documentation are also included with the submission.
+    \end{itemize}
+    \item[] CHERI-Clang fork
+    \begin{itemize}
+        \item[] LLVM-13-based compiler for CHERI, with changes to make it compatible with RVV.
+        \item[] Online source code: \redact{\gitrepo[cheri-vectors]{theturboturnip/llvm-project}{https://github.com/theturboturnip/llvm-project/tree/cheri-vectors}}
+        \item[] Source code is also included with the submission.
+        \item[] Online diff, to show our changes: \redact{\href{https://github.com/CTSRD-CHERI/llvm-project/compare/master...theturboturnip:cheri-vectors}{Diff of \code{cheri-vectors} vs. \code{master} on GitHub}}
+        \item[] An offline diff is also included with the submission as \code{VECTOR.diff}.
+    \end{itemize}
+\end{itemize}

@@ -3,7 +3,3 @@ TODOs
 2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
 2
 2_1Appendix/cherirvv.tex- Make sure this is made clear in main content
-3
-2_1Appendix/artifacts.tex- artifacts appendix needs fixing
-4
-2_1Appendix/artifacts.tex- make sure to redact online copies
