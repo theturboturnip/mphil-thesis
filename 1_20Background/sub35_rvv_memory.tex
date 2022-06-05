@@ -58,7 +58,7 @@ This principle extends to \code{LMUL > 1} (\cref{fig:RVV_mem_lmul_3seg}).
         \centering
         \begin{tabular}{llcccc}
             \toprule
-        & Mnmemonic & Data & Address & Stride & Masked \\
+        & Mnemonic & Data & Address & Stride & Masked \\
         \midrule
         Unit & \large\code{vlseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \textit{\small implicit} & \large\code{vm} \\
         Strided & \large\code{vlsseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \large\code{rs2,} & \large\code{vm} \\ 
@@ -175,7 +175,7 @@ If any synchronous exception or asynchronous interrupt occurs, regardless of the
         \centering
         \begin{tabular}{lcccc}
             \toprule
-        Mnmemonic & Data & Address & Indices & Masked \\
+        Mnemonic & Data & Address & Indices & Masked \\
         \midrule 
         \large\code{vl\param{<u|o>}xseg\param{<nf>}e\param{<eew>}.v} & \large\code{vd,} & \large\code{(rs1),} & \large\code{vs2,} & \large\code{vm} \\
         \bottomrule

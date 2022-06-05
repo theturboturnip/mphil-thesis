@@ -50,7 +50,7 @@ If the memory accesses are hitting the cache, a few extra cycles of bounds-check
 \code{memcpy} also raises the important question of how the vector model interacts with capabilities.
 In non-CHERI processors, \code{memcpy} will copy pointers around in memory without fuss.
 For a CHERI-enabled vector processor to support this, it would need to be able to load/store capabilities from vectors without violating any security guarantees.
-This may require more guarantees than otherwise necessary - for example, each vector register likely needs to be as large or larger than a single capability.
+This may add more constraints --- for example, each vector register likely needs to be at least as large as a single capability.
 
 % \todomark{rvv introduces vectors for RVV}
 % \todomark{rvv is scalable vector}
@@ -102,15 +102,15 @@ To show that RVV can be integrated with CHERI-RISC-V for a wide range of process
 \cref{hyp:sw_vec_legacy,hyp:sw_pure_compat,hyp:sw_stack_vectors,hyp:sw_multiproc} ensure that vector software is compatible with potential CHERI-RVV software stacks.
 \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} considers capabilities-in-vectors: the conditions under which vector registers can hold capabilities, and vectorized instructions can manipulate them.
 
-This document also examines current practical realities, such as the limitations of the current CHERI-RVV software stack, and explains how to compile/execute CHERI-RVV code on baremetal platforms.
+This document also examines current practical realities, such as the limitations of the current CHERI-RVV software stack, and explains how to compile/execute CHERI-RVV code on bare-metal platforms.
 The RVV and CHERI-RISC-V specifications are succinctly explained in \cref{chap:background}.
 
 % Along with testing these hypotheses, this document serves as a practical explanation of the following:
 % \begin{itemize}
 %     \item The changes to RISC-V required by CHERI-RISC-V
 %     \item The RISC-V-V vector model, and all memory-related instructions
-%     \item How to compile CHERI-RVV code for a baremetal platform (with no operating system)
-%     \item How to execute CHERI-RVV code compiled for a baremetal platform
+%     \item How to compile CHERI-RVV code for a bare-metal platform (with no operating system)
+%     \item How to execute CHERI-RVV code compiled for a bare-metal platform
 %     \item The limitations of the current CHERI-RVV software stack
 % \end{itemize}
 % \todomark{fill out this para more, have an actual end sentence}

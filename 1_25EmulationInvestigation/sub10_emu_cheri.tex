@@ -23,7 +23,7 @@ C doesn't have any standardized 128-bit types, but GCC and LLVM provide so-calle
 Although the x86-64 ABI does specify how 128-bit values should be stored and passed as arguments\cite{specification-x86-psABI-v1.0}, these rules do not seem consistently applied\footnote{See \url{https://godbolt.org/z/qj43jssr6} for an example.}.
 This causes great pain to anyone who needs to pass them across a language boundary.
 
-Rust explicitly warns against passing 128-bit values across FFI, and the Clang User's Manual even states that passing \code{i128} by value is incompatible with the Microsoft x64 calling convention\footnote{\gitfile[release/13.x]{clang/docs/UsersManual.rst:3384}{llvm/llvm-project}{https://github.com/llvm/llvm-project/blob/release/13.x/clang/docs/UsersManual.rst\#x86}}.
+Rust explicitly warns against passing 128-bit values across language boundaries, and the Clang User's Manual even states that passing \code{i128} by value is incompatible with the Microsoft x64 calling convention\footnote{\gitfile[release/13.x]{clang/docs/UsersManual.rst:3384}{llvm/llvm-project}{https://github.com/llvm/llvm-project/blob/release/13.x/clang/docs/UsersManual.rst\#x86}}.
 This could be resolved through careful examination: for example, on LLVM 128-bit values are passed to functions in two 64-bit registers\footnote{\gitfile[release/13.x]{clang/lib/CodeGen/TargetInfo.cpp:2811}{llvm/llvm-project}{https://github.com/llvm/llvm-project/blob/75e33f71c2dae584b13a7d1186ae0a038ba98838/clang/lib/CodeGen/TargetInfo.cpp\#L2811}}, which could be replicated in Rust by passing two 64-bit values.
 For convenience, we instead rely on the Rust and Clang compilers using compatible LLVM versions and having identical 128-bit semantics.
 

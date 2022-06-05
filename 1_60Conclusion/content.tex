@@ -24,7 +24,7 @@ We developed the \code{vector\_memcpy} test program to show that despite those l
 Through a limited investigation of capabilities-in-vectors, \cref{hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip} showed that a highly constrained implementation could enable a fully-functional vectorized \code{memcpy}, as demonstrated in the \code{vector\_memcpy\_pointers} test program, without violating CHERI security principles.
 It should be possible to extend the CHERI-RVV ISA with vector equivalents of existing CHERI scalar instructions, but we did not investigate this further.
 
-Overall, it is clear that scalable vector models can be adapted to CHERI without significant loss of functionality.
+Clearly, scalable vector models can be adapted to CHERI without significant loss of functionality.
 Most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, but any differences from RVV's model will require careful examination.
 Given the importance of vector processing to modern computing, and thus its importance to CHERI, we hope that this research paves the way for future vector-enabled CHERI processors.
 

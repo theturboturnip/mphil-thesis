@@ -63,7 +63,7 @@ This eliminates the need for a `cleanup loop' common in fixed-length vector prog
 \figinput[width=0.7\textwidth,pos=t]{1_20Background/figures/fig_RVV_vl}
 
 In a similar vein, \code{vstart} specifies \enquote{the index of the first element to be executed by a vector instruction}.
-Elements before \code{vstart} are known as the \emph{pre-start} and are not touched by executed instructions.
+Elements before \code{vstart} are known as the \emph{prestart} and are not touched by executed instructions.
 It is usually only set by the hardware whenever it is interrupted mid-instruction (see \cref{fig:RVV_vstart_trap} and \cref{chap:bg:subsec:vexceptions}) so that the instruction can be re-executed later without corrupting completed values.
 Whenever a vector instruction completes, \code{vstart} is reset to zero.
 

@@ -102,7 +102,7 @@ We turned our attention to fast-pathing smaller groups of elements.
 \subsection{$m$-element known-range fast-paths}
 A hardware implementation of a vector unit may be able to issue $m$ requests within a set range in parallel.
 For example, elements in the same cache line may be accessible all at once.
-In these cases, checking elements individually would either require $m$ parallel bounds checks, $m$ checks' worth of latency, or something inbetween.
+In these cases, checking elements individually would either require $m$ parallel bounds checks, $m$ checks' worth of latency, or something in-between.
 In this subsection we consider a fast-path check for $m$ elements. 
 
 % \todomark{pre-check: permissions}
