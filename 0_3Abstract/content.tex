@@ -8,10 +8,10 @@ CHERI has been adapted to multiple ISAs, including RISC-V and Arm, but not to an
 % While CHERI has been adapted to multiple ISAs, notably RISC-V and Armv8, it has not been adapted to scalable vector processing.
 
 Vector processing, where the same operation is performed on multiple elements of a ``vector'' in parallel, is used everywhere in modern computing from high-performance number-crunching to the humble \code{memcpy}.
-Arm SVE\cite{stephensARMScalableVector2017} and RISC-V V\cite{specification-RVV-v1.0} are new flagship vector extensions for Arm and RISC-V, which use a ``vector-length agnostic programming model'' to allow hardware implementations to choose their vector lengths.
+Arm SVE\cite{stephensARMScalableVector2017} and RISC-V V\cite{specification-RVV-v1.0} (a.k.a. RVV) are new flagship vector extensions for Arm and RISC-V, which use a ``vector-length agnostic programming model'' to allow hardware implementations to choose their vector lengths.
 These scalable vector models are intended to stay in use long into the future, and it is essential for CHERI to support them.
 
-This dissertation focuses on RISC-V V (a.k.a. RVV), presenting and evaluating a possible ``CHERI-RVV'' combination ISA by building and testing a reference implementation in Rust.
+This dissertation focuses on RVV, presenting and evaluating a possible ``CHERI-RVV'' combination ISA by building and testing a reference implementation in Rust.
 % \todomark{Vector memory instructions are ported to CHERI by replacing integer pointers with capabilities, in a way that maintains binary compatibility with legacy code.}
 % \todomark{The current CHERI compiler stack is examined to ensure CHERI-RVV will maintain source-code compatibility with legacy vector programs, just like regular CHERI with legacy scalar programs.}
 % \todomark{The concept of storing capabilities in vectors is examined in a limited context, to allow implementing CHERI-agnostic functions such as \code{memcpy} with vector instructions.}

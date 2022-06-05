@@ -50,7 +50,7 @@ If the memory accesses are hitting the cache, a few extra cycles of bounds-check
 \code{memcpy} also raises the important question of how the vector model interacts with capabilities.
 In non-CHERI processors, \code{memcpy} will copy pointers around in memory without fuss.
 For a CHERI-enabled vector processor to support this, it would need to be able to load/store capabilities from vectors without violating any security guarantees.
-This may add more constraints --- for example, each vector register likely needs to be at least as large as a single capability.
+This may require more constraints --- for example, each vector register likely needs to be at least as large as a single capability.
 
 % \todomark{rvv introduces vectors for RVV}
 % \todomark{rvv is scalable vector}
