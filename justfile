@@ -33,7 +33,7 @@ final: build-all
     mkdir -p ./submission/
     cp ./output/thesis.pdf ./submission/sws35-project.pdf
     cp ./output_anon/thesis.pdf ./submission/2095J.pdf
-    # TODO generate source code, check its anonymised
+    cp ./code_docs_tested.zip ./submission/2095J-sourcecode.zip
 
 
 rebuild: clean build-all

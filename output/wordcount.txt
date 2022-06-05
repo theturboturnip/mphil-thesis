@@ -63,7 +63,7 @@ Subcounts:
   1203+10+8 (4/0/0/0) Section: Testing and evaluation}\label{chap:software:sec:hypotheses}\label{chap:software:eval
   57+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   125+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
-  389+3+97 (1/0/0/0) Section: Changing the emulator
+  389+3+97 (1/0/0/0) Section: Extending the emulator
   787+12+0 (8/0/2/0) Section: Testing and evaluation}\label{chap:capinvec:eval
   93+1+6 (1/0/0/0) Chapter: Conclusion
   254+2+0 (1/0/0/0) Section: Evaluating hypotheses
