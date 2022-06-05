@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 14971
-Words in text: 13886
+Sum count: 14962
+Words in text: 13877
 Words in headers: 219
 Words outside text (captions, etc.): 833
 Number of headers: 81
@@ -49,7 +49,7 @@ Subcounts:
   149+6+20 (1/0/0/0) Subsection: Atomicity of accesses/General memory model
   110+6+25 (1/0/0/0) Subsection: Relaxed access ordering and precise traps
   422+3+0 (1/0/1/0) Section: Testing and evaluation
-  50+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
+  48+4+0 (1/0/0/0) Chapter: The CHERI-RVV software stack\label{chap:software}
   65+3+0 (1/0/0/0) Section: Compiling vector code}\label{chap:software:sec:compilersupport
   96+2+33 (1/0/0/0) Subsection: Available compilers
   76+2+0 (1/0/0/0) Subsection: Automatic vectorization
@@ -63,7 +63,7 @@ Subcounts:
   1203+10+8 (4/0/0/0) Section: Testing and evaluation}\label{chap:software:sec:hypotheses}\label{chap:software:eval
   57+4+0 (1/0/0/0) Section: Recommended changes for CHERI-Clang}\label{chap:software:sec:chericlangchanges
   125+1+0 (1/0/0/0) Chapter: Capabilities-in-vectors\label{chap:capinvec}
-  389+3+97 (1/0/0/0) Section: Extending the emulator
+  382+3+97 (1/0/0/0) Section: Extending the emulator
   787+12+0 (8/0/2/0) Section: Testing and evaluation}\label{chap:capinvec:eval
   93+1+6 (1/0/0/0) Chapter: Conclusion
   250+2+0 (1/0/0/0) Section: Evaluating hypotheses

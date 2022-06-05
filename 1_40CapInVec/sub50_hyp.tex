@@ -3,7 +3,7 @@ We constructed a second test program to ensure \code{memcpy} could be performed 
 It copies an array of \code{Element} structures that hold pointers to static \code{Base} structures.
 % \code{vector\_memcpy\_pointers} tests the behaviour of \code{memcpy} with capabilities-in-vectors, by copying an array of data structures that hold pointers to static data.
 On CHERI platforms, even in Integer mode, capability pointers are used and copied.
-The first test simply copies the data and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
+The first test simply copies the data, and tests that all the copied pointers still work, which succeeds on all compilers/architectures.
 The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers.
 The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
 
@@ -36,7 +36,7 @@ Integrity is not affected by how a capability is stored, as long as the other pr
 \pagebreak
 \hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}\label{chap:capinvec:hyp_load_store}
 For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements.
-They must require all accesses be \code{CLEN}-aligned, or at least only load valid caps from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
+They must require all accesses be \code{CLEN}-aligned, or at least only load valid capabilities from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
 TR-951 states that capability memory accesses must be atomic\cite[Section 11.3]{TR-951}.
 This applies to vectors, even in ways that don't apply to scalar accesses.
 
