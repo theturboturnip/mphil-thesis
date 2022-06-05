@@ -3,7 +3,7 @@
 
 \chapter{The CHERI-RVV software stack\label{chap:software}}
 This chapter explores the current state of the CHERI-RVV software stack: mainstream compiler support for vanilla RVV (\cref{chap:software:sec:compilersupport}) and the modifications required to bring support to CHERI-Clang (\cref{chap:software:sec:chericlang}).
-The software hypotheses are tested with this knowledge (\cref{chap:software:sec:hypotheses}), and we recommend a set of changes to bring CHERI-Clang support to par with other compilers (\cref{chap:software:sec:chericlangchanges}).
+The software hypotheses are tested with this knowledge (\cref{chap:software:sec:hypotheses}), and we recommend a set of changes to bring CHERI-Clang support up to par  (\cref{chap:software:sec:chericlangchanges}).
 % First, the available compiler support for vanilla RVV is explored and briefly compared to Arm SVE .
 % that translates to CHERI-Clang and what changes were necessary to implement capabilities, and 
 
@@ -51,7 +51,7 @@ With these, the general strip-mining loop is easy to construct:
 
 \subsection{Inline assembly}
 If a compiler doesn't supply complete intrinsics, or if the programmer desires even more control, inline assembly may be used.
-The programmer gives a string of handwritten assembly code to the compiler, which is parsed and directly inserted into the output code.
+The programmer gives a string of handwritten assembly code to the compiler, which is parsed and directly inserted into the output.
 The compiler still has to understand the instruction, but it doesn't need intrinsics to be present (or functional\footnote{As described later, CHERI-Clang crashes when intrinsics are used, so we use inline assembly instead.}).
 % We used this for CHERI-Clang programs, as it could not use intrinsics without crashing.
 
@@ -109,7 +109,7 @@ Intrinsics are also supported, and seem to cover all of the SVE instructions, bu
 Arm SVE intrinsics do not directly map to available instructions, but aim to \enquote{provide a regular interface and leave the compiler to pick the best mapping to SVE instructions}, while RVV intrinsics (at least for memory) tend to map 1:1 to existing instructions.
 Arm's approach gives more flexibility for future extensions, as the same intrinsics could be compiled to new instructions with newer compilers.
 
-Arm SVE also supports inline assembly, but the experience is notably worse than for RVV.
+Arm SVE also supports inline assembly, but the experience is noticeably worse than for RVV.
 The two standout issues are a lack of register allocation and the use of condition code flags for branching.
 Unlike RVV, the intrinsic types for vector values cannot be referenced in inline assembly\cite{stephensARMScalableVector2017}, so all vector registers must be allocated and tracked by the programmer.
 Arm SVE's equivalent of \code{vsetvl}, the \code{while} family\cite{armltdARMLanguageExtensions2020}, do not return the number of updated elements, and instead set the condition flags based on how many elements are updated.
@@ -174,7 +174,7 @@ CHERI-Clang would try to return them by saving them to the stack, but this had i
 If a program uses more data than can fit in registers, or calls a function which may overwrite important register values, the compiler will save those register values to memory on the stack.
 Because vector registers are temporary, and thus may be overwritten by called functions, they must also be saved/restored from the stack (see \cref{example:saverestore}).
 This also applies to multiprocessing systems where a process can be paused, have the state saved, and resume later.
-RVV provides the whole-register memory access instructions explicitly to make this process easy\cite[Section 7.9]{specification-RVV-v1.0}.
+RVV provides the whole-register memory access instructions explicitly to make this process easy\cite[Section~7.9]{specification-RVV-v1.0}.
 
 CHERI-Clang contains an LLVM IR pass\footnote{\gitfile{llvm/lib/CodeGen/CheriBoundAllocas.cpp}{CTSRD-CHERI/llvm-project}{https://github.com/CTSRD-CHERI/llvm-project/blob/master/llvm/lib/CodeGen/CheriBoundAllocas.cpp}} which enforces strict bounds on so-called ``stack capabilities'' (capabilities pointing to stack-allocated data), which by definition requires knowing the size of the data ahead of time.
 This pass assumes all stack-allocated data has a static size, and crashes when dynamically-sized types e.g. scalable vectors are allocated.

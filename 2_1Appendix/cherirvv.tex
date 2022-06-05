@@ -43,7 +43,7 @@ Element-specific exceptions, i.e. bounds violations, should still always be swal
 \code{vsetvl} instructions are modified to accept a \code{SEW} value mapping to 128-bit elements (\cref{tab:capinvec:vtypewidth}).
 The arithmetic RVV instructions implemented by the emulator, listed in \cref{rvvlite_arithmetic}, are modified to handle 128-bit elements.
 We have not investigated changing any other instructions, but believe it should be trivial to extend them.
-The RVV specification notes how some instructions would handle 128-bit elements, e.g. \cite[Chapter 13]{specification-RVV-v1.0}.
+The RVV specification notes how some instructions would handle 128-bit elements, e.g.~\cite[Chapter~13]{specification-RVV-v1.0}.
 
 The RVV memory access instructions are changed to support a new element width (\cref{tab:capinvec:accesswidth}).
 This should be supported in all instructions, but was only tested for unit loads and stores.
@@ -86,8 +86,8 @@ These properties are not absolute requirements for all capability-in-vector impl
     \end{itemize}
     \item \code{VLEN} = 128(+1) i.e. the length of a capability.
     \begin{itemize}
-        \item $\code{VLEN} \ge \code{ELEN}$ (\cite[Chapter 2]{specification-RVV-v1.0})
-        \item Larger \code{VLEN} could be supported, which must be a power-of-two\cite[Chapter 2]{specification-RVV-v1.0} and therefore will be a multiple of the capability length.
+        \item $\code{VLEN} \ge \code{ELEN}$ (\cite[Chapter~2]{specification-RVV-v1.0})
+        \item Larger \code{VLEN} could be supported, which must be a power-of-two\cite[Chapter~2]{specification-RVV-v1.0} and therefore will be a multiple of the capability length.
     \end{itemize}
     \item The memory interface is identical to that used by the scalar processor, where each vector access is split into a set of sequential accesses less than or equal to 128 bits.
     \begin{itemize}

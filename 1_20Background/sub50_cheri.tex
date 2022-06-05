@@ -14,10 +14,10 @@ The rest of this dissertation assumes capabilities are 128-bits long for simplic
 \begin{figure}[b]
     \centering
     \includegraphics[width=0.8\textwidth]{./figures/cheri_compressed_cap.png}
-    \caption{128-bit compressed capability representation --- from \cite{TR-941}}\label{cheri:compressedcap}
+    \caption{128-bit compressed capability representation --- from~\cite{TR-941}}\label{cheri:compressedcap}
 \end{figure}
 
-A CHERI implementation has to enforce three security properties about its capabilities\cite[Section 1.2.1]{TR-951}:
+A CHERI implementation has to enforce three security properties about its capabilities\cite[Section~1.2.1]{TR-951}:
 \begin{itemize}
     \item Provenance --- Capabilities must always be derived from valid manipulations of other capabilities.
     \item Integrity --- Corrupted capabilities cannot be dereferenced.
@@ -57,7 +57,7 @@ CHERI-RISC-V includes new instructions which use integer addressing, and allows 
 These instructions all use integer addresses relative to the DDC, and the DDC controls the permissions those instructions have.
 
 \subsection{Instruction changes}\label{cheri_instructions}
-TR-951\cite[Chapter 8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
+TR-951\cite[Chapter~8]{TR-951} specifies a suite of new instructions, as well as a set of modifications to pre-existing instructions.
 Many of the new instructions are unrelated to pre-existing instructions, and implement capability-specific operations like accessing fields of capability registers.
 The most relevant new instructions for our case are the various loads/stores.
 
@@ -135,7 +135,7 @@ Hybrid mode allows programs to be gradually ported to CHERI, making it very easy
 Any extensions to the model (e.g. CHERI-RVV) should try and retain this property.
 
 \subsection{Capability relocations\label{chap:bg:subsec:cherirelocs}}
-\emph{Summarizes~\cite[Section 4.4, Appendix C]{TR-949}}
+\emph{Summarizes~\cite[Section~4.4, Appendix C]{TR-949}}
 
 Binary applications compiled in pure-capability mode require some ``global'' capabilities to exist at startup, e.g. the capability which points to the \code{main()} function.
 It would be a security risk to synthesize these capabilities from thin air, or to allow the binary file itself to contain tag bits.

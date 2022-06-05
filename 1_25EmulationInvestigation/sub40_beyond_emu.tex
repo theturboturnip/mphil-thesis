@@ -14,13 +14,13 @@ Implementations are allowed to handle vector accesses that are not aligned to th
 This support is independent of misaligned scalar access support, so if e.g. misaligned 64-bit scalar accesses are allowed, misaligned vector accesses of 64-bit elements do \emph{not} have to be allowed.
 
 Changing the emulator to allow misaligned accesses of integer data would not have any impact on CHERI correctness.
-Capability loads/stores must be aligned to \code{CLEN}\cite[Section 3.5.2]{TR-951}, and an implementation cannot change this.
+Capability loads/stores must be aligned to \code{CLEN}\cite[Section~3.5.2]{TR-951}, and an implementation cannot change this.
 Writing misaligned integer values across a \code{CLEN} boundary would need to make sure to zero the tag bit on both regions, but this applies to scalar implementations as much as vector ones.
 Alignment only impacts CHERI-RVV to the extent that it impacts capabilities-in-vectors (\cref{chap:capinvec:hyp_load_store}).
 
 \subsection{Atomicity of accesses/General memory model}
 Vector memory instructions are specified to follow the RISC-V Weak Memory Ordering model\cite{specification-RVV-v1.0}\footnote{Behaviour under the Total Store Ordering extension hasn't been defined.}, although this model hasn't been fully explained in terms of vectors yet.
-RVWMO defines a global order of \enquote{memory operations}: atomic operations that are either loads, stores, or both\cite[Chapter 14]{specification-RISCV-vol1-20191213}.
+RVWMO defines a global order of \enquote{memory operations}: atomic operations that are either loads, stores, or both\cite[Chapter~14]{specification-RISCV-vol1-20191213}.
 The RVWMO spec assumes all memory instructions create exactly one memory operation but calls out that once the vector model is formalized, vector accesses may be defined to create multiple operations.
 
 The RVV spec states \enquote{vector misaligned memory accesses follow the same rules for atomicity as scalar misaligned memory accesses}, i.e. that misaligned accesses may be decomposed into multiple memory operations of any granularity\footnote{e.g. each byte could be written in a separate access.}.

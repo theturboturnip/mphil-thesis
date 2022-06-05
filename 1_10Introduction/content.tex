@@ -33,7 +33,7 @@ However, before computing arithmetic, the vectors must be populated with data.
 % \todomark{vectorized memory accesses required for vectorized arithmetic}
 Modern vector implementations all provide vector load/store instructions to access a whole vector's worth of memory.
 These range from simple contiguous accesses (where all elements are next to each other), to complex indexed accesses (where each element loads from a different location based on another vector).
-They can also have per-element semantics, e.g. ``elements must be loaded in order, so if one element fails the preceding elements are still valid''\cite[Section 7.7]{specification-RVV-v1.0}.
+They can also have per-element semantics, e.g. ``elements must be loaded in order, so if one element fails the preceding elements are still valid''\cite[Section~7.7]{specification-RVV-v1.0}.
 % \todomark{Necessary for CHERI support in order for CHERI performance to be competitive}
 If CHERI CPUs want to benefit from vector processing's increased performance and throughput, they must support those instructions at some level.
 But adding CHERI's bounds-checking to the mix may affect these semantics, and could impact performance (e.g. checking each element's access in turn may be slow).

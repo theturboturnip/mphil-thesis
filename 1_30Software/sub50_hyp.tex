@@ -101,11 +101,11 @@ Placing variable-length structures on the stack is possible as long as the lengt
 This isn't exclusive to CHERI --- to push and pop values on the stack, the stack pointer must be incremented or decremented by the size of the value.
 Because the length already has to be measured, and CHERI-RISC-V supports setting capability bounds from runtime-computed values, it's entirely possible to correctly set tight bounds for capabilities pointing to variable-length vectors on the stack.
 
-% Arm SVE explicitly defines a ``sizeless type'' in the C language extensions \cite{} that may be stored on the stack, so this will need to be implemented for 
+% Arm SVE explicitly defines a ``sizeless type'' in the C language extensions~\cite{} that may be stored on the stack, so this will need to be implemented for 
 % \todomark{Note: Arm Language C extensions https://developer.arm.com/documentation/100987/0000/ defines the concept of a sizeless type, which may be stored on the stack. Would be a good base for RVV?}
 
 \pagebreak
-A minor complication is presented by a note in TR-949\cite[Section 3.8.2]{TR-949} concerning ``re-materializing bounded stack variables''.
+A minor complication is presented by a note in TR-949\cite[Section~3.8.2]{TR-949} concerning ``re-materializing bounded stack variables''.
 This section implies LLVM can try to re-create a pointer-to-stack at any time with minimal cost, but this may not be able to apply to vectors.
 Measuring the bounds requires measuring \code{VLMAX} by changing \code{vl}, which could then require saving/restoring the old value.
 This is only a performance issue, and in the worst case we can just say pointers-to-stack-vectors are not re-materializable, so it isn't a dealbreaker.

@@ -2,7 +2,7 @@
 %---------------------------------
 %---------------------------------
 \section{RVV memory instructions\label{chap:bg:sec:rvvmemory}}
-\emph{Summarizes \cite[Sections 7-9]{specification-RVV-v1.0}}
+\emph{Summarizes~\cite[Sections~7-9]{specification-RVV-v1.0}}
 
 RVV defines three broad categories of memory access instructions, which can be further split into five archetypes with different semantics.
 This section summarizes each archetype, their semantics, their assembly mnemonics, and demonstrates how they map memory accesses to vector elements.
@@ -116,7 +116,7 @@ There are no ordering guarantees, other than those required by precise vector tr
 % EXCEPTION HANDLING
 \subsubsection*{Exception Handling}
 If any element within segment $i$ triggers a synchronous exception, \code{vstart} is set to $i$ and a precise or imprecise trap is triggered.
-Load instructions may overwrite active segments past the segment index at which the trap is reported, but not past \code{EVL}.\cite[Section 7.7]{specification-RVV-v1.0}
+Load instructions may overwrite active segments past the segment index at which the trap is reported, but not past \code{EVL}.\cite[Section~7.7]{specification-RVV-v1.0}
 Upon entering a trap, it is implementation-defined how much of the faulting segment's accesses are performed.
 
 \subsection{Unit fault-only-first loads}\label{chap:bg:sec:rvv:fof}
@@ -232,7 +232,7 @@ Otherwise, segment ordering is not guaranteed.
 % EXCEPTION HANDLING
 \subsubsection*{Exception Handling}
 If any element within segment $i$ triggers a synchronous exception, \code{vstart} is set to $i$ and a precise or imprecise trap is triggered.
-Load instructions may overwrite active segments past the segment index at which the trap is reported, but not past \code{EVL}\cite[Section 7.7]{specification-RVV-v1.0}.
+Load instructions may overwrite active segments past the segment index at which the trap is reported, but not past \code{EVL}\cite[Section~7.7]{specification-RVV-v1.0}.
 Upon entering a trap, it is implementation-defined how much of the faulting segment's accesses are performed.
 
 \pagebreak

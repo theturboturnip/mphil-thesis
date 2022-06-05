@@ -37,7 +37,7 @@ Integrity is not affected by how a capability is stored, as long as the other pr
 \hypsubsection{hyp:cap_in_vec_load_store}{Sending capabilities between vectors and memory}\label{chap:capinvec:hyp_load_store}
 For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements.
 They must require all accesses be \code{CLEN}-aligned, or at least only load valid capabilities from aligned addresses, because tag bits only apply to \code{CLEN}-aligned regions.
-TR-951 states that capability memory accesses must be atomic\cite[Section 11.3]{TR-951}.
+TR-951 states that capability memory accesses must be atomic\cite[Section~11.3]{TR-951}.
 This applies to vectors, even in ways that don't apply to scalar accesses.
 
 Individual element accesses for a vector access must be atomic relative to each other.
@@ -65,7 +65,7 @@ In theory, it's possible to do more complex transformations, which can be proven
 With this method, all pre-existing scalar capability manipulations can become vector manipulations, but the utility seems limited.
 For example, instructions for creating capabilities or manipulating bounds en masse don't have an obvious use case.
 If more transformations are added they should be considered carefully, rather than creating vector equivalents for all scalar manipulations.
-For example, revocation as described in \cite{xiaCHERIvokeCharacterisingPointer2019} may benefit from a vector equivalent to \code{CLoadTags}.
+For example, revocation as described in~\cite{xiaCHERIvokeCharacterisingPointer2019} may benefit from a vector equivalent to \code{CLoadTags}.
 
 \subsubsection*{Provenance \& Monotonicity}
 Because the only possible manipulations clear the tag bit, it's impossible to create or change capabilities, so Provenance and Monotonicity cannot be violated.
