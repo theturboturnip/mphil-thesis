@@ -1,7 +1,7 @@
 File: chapters.tex
 Encoding: ascii
-Sum count: 14977
-Words in text: 13892
+Sum count: 14971
+Words in text: 13886
 Words in headers: 219
 Words outside text (captions, etc.): 833
 Number of headers: 81
@@ -11,7 +11,7 @@ Number of math displayed: 2
 Subcounts:
   text+headers+captions (#headers/#floats/#inlines/#displayed)
   298+1+14 (1/0/0/0) Chapter: Introduction\label{wc:start}\label{chap:intro}
-  388+1+19 (1/0/0/0) Section: Motivation
+  385+1+19 (1/0/0/0) Section: Motivation
   350+3+2 (1/0/0/0) Section: Hypotheses and Aims
   84+1+0 (1/0/0/0) Chapter: Background\label{chap:background}
   181+1+0 (1/0/0/0) Section: RISC-V}\label{chap:bg:sec:riscv
@@ -38,7 +38,7 @@ Subcounts:
   133+2+0 (1/0/0/0) Subsection: Capability relocations\label{chap:bg:subsec:cherirelocs}
   67+3+10 (1/0/0/0) Chapter: Hardware emulation investigation\label{chap:hardware}
   168+3+12 (1/0/0/0) Section: Developing the emulator}\label{chap:software:sec:emu
-  887+7+35 (3/1/1/0) Subsection: Emulating CHERI
+  888+7+35 (3/1/1/0) Subsection: Emulating CHERI
   815+14+27 (5/0/0/0) Subsection: Emulating vectors
   67+2+0 (1/0/0/0) Section: Fast-path calculations\label{chap:hardware:sec:fastpath}
   224+3+52 (1/1/0/0) Subsection: Possible fast-path outcomes
@@ -66,6 +66,6 @@ Subcounts:
   389+3+97 (1/0/0/0) Section: Extending the emulator
   787+12+0 (8/0/2/0) Section: Testing and evaluation}\label{chap:capinvec:eval
   93+1+6 (1/0/0/0) Chapter: Conclusion
-  254+2+0 (1/0/0/0) Section: Evaluating hypotheses
+  250+2+0 (1/0/0/0) Section: Evaluating hypotheses
   204+2+9 (1/0/0/0) Section: Future work
 
