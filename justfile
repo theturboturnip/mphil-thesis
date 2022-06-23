@@ -13,6 +13,11 @@ clean:
     @mkdir -p ./submission/
     rm -rf ./submission/*
 
+text:
+    @mkdir -p ./output_RISE/
+    pandoc -t plain RISE/RISE_cutdown.md -o output_RISE/content.txt
+    wc -c output_RISE/content.txt
+
 build-results:
     #!/usr/bin/env sh
     (cd ./1_50Evaluation/data && python3 ./generate_latex.py)

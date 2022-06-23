@@ -1,0 +1,292 @@
+% TODO - try oneside - is that legal for theses?
+% It is! the example does it
+\documentclass[a4paper,mphil,oneside]{cam-thesis}
+\usepackage{luacode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some custom packages
+%%
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Math operators
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Fonts (like different typewriter fonts etc.)
+%%
+%\RequirePackage[scaled=.87]{couriers}
+%\RequirePackage[T1]{fontenc}
+%\renewcommand\rmdefault{psb}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Overwrite section numbering style - don't number subsubsections
+%% cam-thesis.cls uses 3 for both, so this code should go there, but I haven't investigated the guidelines to see if it's ok
+% \setcounter{secnumdepth}{2} % chapters, sections, subsections numbered
+% \setcounter{tocdepth}{2}    % chapters, sections, subsections in TOC
+% NOTE - reversed the above because I needed to refer to a sububsection lol
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Style (Changing the visual style of chapter headings and stuff.)
+%%
+\RequirePackage{titlesec}
+% [Fixes issue #34 (see https://github.com/cambridge/thesis/issues/34). Solution from: http://tex.stackexchange.com/questions/299969/titlesec-loss-of-section-numbering-with-the-new-update-2016-03-15
+\RequirePackage{etoolbox}
+\makeatletter
+\patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@hang}{\noindent}{}{}{}
+\makeatother
+% end of issue #34 fix]
+\newcommand{\PreContentTitleFormat}{\titleformat{\chapter}[display]{\scshape\Large}
+{\Large\filleft\MakeUppercase{\chaptertitlename} \Huge\thechapter}
+{1ex}
+{}
+[\vspace{1ex}\titlerule]}
+\newcommand{\ContentTitleFormat}{\titleformat{\chapter}[display]{\scshape\huge}
+{\Large\filleft\MakeUppercase{\chaptertitlename} \Huge\thechapter}
+{1ex}
+{\titlerule\vspace{1ex}\filright}
+[\vspace{1ex}\titlerule]}
+\newcommand{\PostContentTitleFormat}{\PreContentTitleFormat}
+\PreContentTitleFormat
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% References (special style etc.)
+%%
+\usepackage{turnipcite}
+\bibliography{thesis}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Theorems, definitions, and examples
+%%
+\RequirePackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+%% Support for `Examples` (provides a counter for examples, the possibility to
+%% label and reference them etc.)
+%%
+\newtheorem{example}{Example}[chapter]
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Captions: This makes captions of figures use a boldfaced small font. 
+%%
+\RequirePackage[small,bf]{caption}
+% center multiline captions
+\captionsetup{format=hang,justification=centering}
+
+% Add equation captioning
+\DeclareCaptionType{mycapequ}[][List of equations]
+\captionsetup[mycapequ]{labelformat=empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Subcaption (note: this must be included after the `caption` package). 
+%%
+\RequirePackage{subcaption}
+\RequirePackage{adjustbox}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% cleverref
+%%
+\usepackage[capitalize,nameinlink]{cleveref}
+% Compatibility with hyperrref
+% https://tex.stackexchange.com/a/485979
+\usepackage{crossreftools}
+
+
+%%%
+%% Hypothesis counter and labels
+\newcounter{hypI} % hyp counter
+\setcounter{hypI}{0}
+% Representation of hyp counter: H-<hypI>
+\renewcommand{\thehypI}{H-\arabic{hypI}}
+\newcommand{\newhyp}{%
+    \refstepcounter{hypI}% Step hypothesis counter
+    \thehypI% Print hypothesis counter
+}
+\crefname{hypI}{Hypothesis}{Hypotheses}
+
+% \begin{luacode*}
+% hypothesis_text = {}
+% function add_hypothesis(code, text)
+%     hypothesis_text[code] = text
+% end
+% function get_hypothesis(code)
+%     text = hypothesis_text[code]
+%     if text == nil then
+%         error("Hypothesis code " + code + " doesn't have associated text")
+%     end
+%     return text
+% end
+% \end{luacode*}
+\newcommand{\sethyptext}[2]{\luadirect{add_hypothesis(\luastring{#1}, \luastring{#2})}}
+\newcommand{\gethyptext}[1]{\luadirect{tex.sprint(get_hypothesis(\luastring{#1}))}}
+
+% Arg 1: hypothesis label
+% Arg 2: summary
+\newcommand{\hypsubsection}[2]{
+\subsection*{\cref*{#1} - #2}
+\addcontentsline{toc}{subsection}{Hypothesis \ref*{#1} - #2}
+\begin{quote}\textit{\gethyptext{#1}}\end{quote}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Content commands
+%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Glossary entries
+%%
+% \newglossaryentry{pi}{
+%     name={\ensuremath{\pi}},
+%     sort={pi},
+%     description={ratio of the circumference of a circle to the diameter}
+% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Custom formatting commands
+% \RequirePackage{relsize}
+\newcommand{\code}[1]{{\texttt{#1}}}
+% parameter to an assembly instruction
+\newcommand{\param}[1]{\textbf{\textcolor{Blue}{#1}}}
+% Use instead of \param when not inside \code
+\newcommand{\paramt}[1]{\code{\param{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Tables
+
+% Pretty tables
+\usepackage{booktabs}
+
+% Tables with evenly spaced columns
+\usepackage{tabularx}
+% Y = X but centered
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\usepackage{array}
+% x = p but centered
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+% RISC-V ISA docs insturction bits
+\newcommand{\instbit}[1]{\mbox{\scriptsize #1}}
+\newcommand{\instbitrange}[2]{~\instbit{#1} \hfill \instbit{#2}~}
+\newcolumntype{I}{>{\centering\arraybackslash}p{0.18in}}
+% Two-bit centered column.
+\newcolumntype{W}{>{\centering\arraybackslash}p{0.36in}}
+% Three-bit centered column.
+\newcolumntype{F}{>{\centering\arraybackslash}p{0.54in}}
+% Four-bit centered column.
+\newcolumntype{Y}{>{\centering\arraybackslash}p{0.72in}}
+% Five-bit centered column.
+\newcolumntype{R}{>{\centering\arraybackslash}p{0.9in}}
+% Six-bit centered column.
+\newcolumntype{S}{>{\centering\arraybackslash}p{1.08in}}
+% Seven-bit centered column.
+\newcolumntype{O}{>{\centering\arraybackslash}p{1.26in}}
+% Eight-bit centered column.
+\newcolumntype{E}{>{\centering\arraybackslash}p{1.44in}}
+% Ten-bit centered column.
+\newcolumntype{T}{>{\centering\arraybackslash}p{1.8in}}
+% Twelve-bit centered column.
+\newcolumntype{M}{>{\centering\arraybackslash}p{2.2in}}
+% Sixteen-bit centered column.
+\newcolumntype{K}{>{\centering\arraybackslash}p{2.88in}}
+% Twenty-bit centered column.
+\newcolumntype{U}{>{\centering\arraybackslash}p{3.6in}}
+% Twenty-bit centered column.
+\newcolumntype{L}{>{\centering\arraybackslash}p{3.6in}}
+% Twenty-five-bit centered column.
+\newcolumntype{J}{>{\centering\arraybackslash}p{4.5in}}
+
+% multirow
+\usepackage{multirow}
+
+% Long tables
+\usepackage{longtable}
+% For putting table rows in a macro instead of \input-ing them directly??
+\usepackage{catchfile}
+
+% For notes in tables, which reset their numbering after each usage
+\usepackage[restart]{parnotes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% git file ref
+
+% Arg 1: branch
+% Arg 2: file:line
+% Arg 3: repository
+% Arg 4: permalink
+\newcommand{\gitfile}[4][]{\href{#4}{\texttt{#2} in \texttt{#3}\ifstrempty{#1}{}{ (\texttt{#1})} on GitHub}}
+
+% Arg 1 [optional]: branch
+% Arg 2: repository
+% Arg 3: link
+\newcommand{\gitrepo}[3][]{\href{#3}{\texttt{#2}\ifstrempty{#1}{}{ (\texttt{#1})} on Github}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% rotating table
+\usepackage{rotating}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% subfiles for chapters, include a fix for minted
+% THIS ONLY WORKS FOR \inputminted, NOT \begin{minted}
+\usepackage{minted}
+\usepackage{subfiles}
+\usepackage{xpatch}
+\usemintedstyle{pastie}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Inclde PDF
+\usepackage{pdfpages}
+
+
+%% Code frames
+\usepackage{mdframed} %nice frames
+\definecolor{light-gray}{gray}{0.98} %the shade of grey that stack exchange uses
+
+\newcommand{\inputframedminted}[3][]{%
+\begin{mdframed}[backgroundcolor=light-gray]
+\inputminted[#1]{#2}{#3}
+\end{mdframed}
+}
+
+%% Pseudocode
+\usepackage{algpseudocode}
+
+%% Inline lists
+\usepackage[inline]{enumitem}
+
+%% Get last page
+\usepackage{lastpage}
+
+%% Count pages between
+\usepackage{refcount}
+\newcommand{\pagedifference}[2]{%
+  \number\numexpr\getpagerefnumber{#2}-\getpagerefnumber{#1}+1\relax}
+
+%% Redaction
+\newcommand{\redact}[1]{#1}
+
+\begin{document}
+\input{chapters}
+\end{document}
+

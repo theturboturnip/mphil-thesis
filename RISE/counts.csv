@@ -1,0 +1,59 @@
+title, text words, header words, caption words
+Chapter: Introduction, 298, 1, 14
+Section: Motivation, 385, 1, 19
+Section: Hypotheses and Aims, 350, 3, 2
+Chapter: Background, 84, 1, 0
+Section: RISC-V, 181, 1, 0
+Section: A brief history of vector processing, 164, 6, 0
+Section: The RVV vector model, 134, 4, 14
+Subsection: vtype, 416, 1, 10
+Subsection: vl and vstart, 227, 6, 14
+Subsection: Masking --- Active/inactive elements, 93, 4, 50
+Subsection: Exception handling, 728, 10, 41
+Subsection: Summary, 72, 1, 5
+Section: Previous RVV implementations, 177, 3, 2
+Section: RVV memory instructions, 98, 3, 0
+Subsection: Segmented accesses, 115, 2, 32
+Subsection: Unit and Strided accesses, 154, 7, 17
+Subsection: Unit fault-only-first loads, 159, 3, 17
+Subsection: Indexed accesses, 153, 5, 25
+Subsection: Unit whole-register accesses, 61, 3, 6
+Subsection: Unit bytemask accesses, 84, 3, 5
+Section: CHERI, 294, 1, 47
+Subsection: CHERI-RISC-V ISA, 296, 2, 0
+Subsection: Instruction changes, 132, 2, 0
+Subsection: Capability and Integer encoding mode, 141, 5, 22
+Subsection: Pure-capability and Hybrid compilation modes, 123, 5, 14
+Subsection: Capability relocations, 133, 2, 0
+Chapter: Hardware emulation investigation, 67, 3, 10
+Section: Developing the emulator, 168, 3, 12
+Subsection: Emulating CHERI, 888, 7, 35
+Subsection: Emulating vectors, 815, 14, 27
+Section: Fast-path calculations, 67, 2, 0
+Subsection: Possible fast-path outcomes, 224, 3, 52
+Subsection: Whole-access fast-paths, 184, 2, 10
+Subsection: $m$-element known-range fast-paths, 537, 3, 23
+Section: Going beyond the emulator, 97, 4, 0
+Subsection: Misaligned accesses, 124, 2, 0
+Subsection: Atomicity of accesses/General memory model, 149, 6, 20
+Subsection: Relaxed access ordering and precise traps, 110, 6, 25
+Section: Testing and evaluation, 422, 3, 0
+Chapter: The CHERI-RVV software stack, 48, 4, 0
+Section: Compiling vector code, 65, 3, 0
+Subsection: Available compilers, 96, 2, 33
+Subsection: Automatic vectorization, 76, 2, 0
+Subsection: Vector intrinsics, 140, 2, 0
+Subsection: Inline assembly, 287, 2, 37
+Subsection: RVV vs. Arm SVE, 309, 4, 43
+Section: Compiling vector code with CHERI-Clang, 63, 5, 0
+Subsection: Adapting vector assembly instructions to CHERI, 181, 6, 0
+Subsection: Adapting vector intrinsics to CHERI, 197, 5, 24
+Subsection: Storing scalable vectors on the stack, 209, 6, 6
+Section: Testing and evaluation, 1203, 10, 8
+Section: Recommended changes for CHERI-Clang, 57, 4, 0
+Chapter: Capabilities-in-vectors, 125, 1, 0
+Section: Extending the emulator, 381, 3, 97
+Section: Testing and evaluation, 787, 12, 0
+Chapter: Conclusion, 93, 1, 6
+Section: Evaluating hypotheses, 250, 2, 0
+Section: Future work, 204, 2, 9
