@@ -70,7 +70,7 @@ interacts with capabilities. In non-CHERI processors, `memcpy` will copy
 pointers around in memory without fuss. For a CHERI-enabled vector
 processor to support this, it would need to be able to load/store
 capabilities from vectors without violating any security guarantees.
-This may require more constraints --- for example, each vector register
+This may require more constraints - for example, each vector register
 likely needs to be at least as large as a single capability.
 
 To explore this topic, we chose to focus on the RISC-V Vector
@@ -257,7 +257,7 @@ and return the number of elements that will be processed in this
 iteration. This value is saved in a register for the program to use, and
 also saved in the internal `vl` CSR.
 
-### `vl` and `vstart` --- Prestart, body, tail {#chap:bg:subsec:vlvstart}
+### `vl` and `vstart` - Prestart, body, tail {#chap:bg:subsec:vlvstart}
 
 The first CSR is the Vector Length `vl`, which holds the number of
 elements that could be updated from a vector instruction. The program
@@ -295,7 +295,7 @@ so it would never set `vstart` during an arithmetic instruction, so it
 could raise an exception if `vstart` was nonzero for an arithmetic
 instruction.
 
-### Masking --- Active/inactive elements {#chap:bg:subsec:rvvmasking}
+### Masking - Active/inactive elements {#chap:bg:subsec:rvvmasking}
 
 Most vector instructions allow for per-element *masking* (see
 [\[fig:RVV_mask_example\]](#fig:RVV_mask_example){reference-type="ref"
@@ -490,19 +490,19 @@ size. For example, on 64-bit RISC-V a standard capability is 128-bits
 long. The rest of this dissertation assumes capabilities are 128-bits
 long for simplicity.
 
-![128-bit compressed capability representation ---
+![128-bit compressed capability representation -
 from [@TR-941]](./figures/cheri_compressed_cap.png){#cheri:compressedcap
 width="80%"}
 
 A CHERI implementation has to enforce three security properties about
 its capabilities[@TR-951 Section 1.2.1]:
 
--   Provenance --- Capabilities must always be derived from valid
+-   Provenance - Capabilities must always be derived from valid
     manipulations of other capabilities.
 
--   Integrity --- Corrupted capabilities cannot be dereferenced.
+-   Integrity - Corrupted capabilities cannot be dereferenced.
 
--   Monotonicity --- Capabilities cannot increase their rights.
+-   Monotonicity - Capabilities cannot increase their rights.
 
 Integrity is enforced by tagging registers and memory. Every 128-bit
 register and aligned 128-bit region of memory has an associated tag bit,
@@ -712,7 +712,7 @@ capability-addressed memory (see
 reference="fig:emulatormemory"}). Similarly, a merged capability
 register file type was created that exposed integer-mode and
 capability-mode accesses. This layered approach meant code for basic
-RV64I operations did not need to be modified to handle CHERI at all ---
+RV64I operations did not need to be modified to handle CHERI at all -
 simply passing the integer-mode memory and register file would perform
 all relevant checks.
 
