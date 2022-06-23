@@ -3,7 +3,7 @@ bibliography:
 - thesis.bib
 ---
 
-# Introduction[]{#wc:start label="wc:start"}[]{#chap:intro label="chap:intro"}
+# Introduction
 
 Since 2010, the Cambridge Computer Lab (in association with SRI) has
 been developing the CHERI[^1] architecture extension, which improves the
@@ -56,8 +56,7 @@ instructions at some level. But adding CHERI's bounds-checking to the
 mix may affect these semantics, and could impact performance (e.g.
 checking each element's access in turn may be slow).
 
-[]{#vectorized_memcpy label="vectorized_memcpy"}Vector memory access
-performance is more critical than one may initially assume, because
+Vector memory access performance is more critical than one may initially assume, because
 vectors are used for more than just computation. A prime example is
 `memcpy`: for `x86_64`, `glibc` includes multiple versions of the
 function[^3] taking advantage of vector platforms, then selects one to
@@ -115,65 +114,9 @@ considers capabilities-in-vectors: the conditions under which vector
 registers can hold capabilities, and vectorized instructions can
 manipulate them.
 
-This document also examines current practical realities, such as the
-limitations of the current CHERI-RVV software stack, and explains how to
-compile/execute CHERI-RVV code on bare-metal platforms. The RVV and
-CHERI-RISC-V specifications are succinctly explained in
-[\[chap:background\]](#chap:background){reference-type="ref"
-reference="chap:background"}.
+TODO Hypothesis table?
 
-::: {#tab:hypotheses}
-  --------------------------------------------------------------------------------------------------------------------------
-  *Hardware Hypotheses ---                                   
-  [\[chap:hardware\]](#chap:hardware){reference-type="ref"   
-  reference="chap:hardware"}*                                
-  ---------------------------------------------------------- ---------------------------------------------------------------
-  H- []{#hyp:hw_cap_as_vec_mem_ref                           It is possible to use CHERI capabilities as memory references
-  label="hyp:hw_cap_as_vec_mem_ref"}                         in all vector instructions.
-
-  H- []{#hyp:hw_cap_bounds_checks_amortized                  The capability bounds checks for vector elements within a known
-  label="hyp:hw_cap_bounds_checks_amortized"}                range (e.g. a cache line) can be performed in a single check,
-                                                             amortizing the cost.
-
-  *Software Hypotheses ---                                   
-  [\[chap:software\]](#chap:software){reference-type="ref"   
-  reference="chap:software"}*                                
-
-  H- []{#hyp:sw_vec_legacy label="hyp:sw_vec_legacy"}        Vector code can be compiled in legacy forms (with integer
-                                                             addressing) and function correctly on CHERI with no source code
-                                                             changes.
-
-  H- []{#hyp:sw_pure_compat label="hyp:sw_pure_compat"}      Legacy vector code can be compiled into a pure-capability form
-                                                             with no changes.
-
-  H- []{#hyp:sw_stack_vectors label="hyp:sw_stack_vectors"}  Vector code that saves/restores variable-length vectors to/from
-                                                             the stack can be compiled on CHERI-RVV with no source code
-                                                             changes.
-
-  H- []{#hyp:sw_multiproc label="hyp:sw_multiproc"}          CHERI-vector code can run correctly in multiprocessing systems,
-                                                             where execution may be paused and resumed on interrupts or
-                                                             context switches.
-
-  *Capabilities-in-Vectors ---                               
-  [\[chap:capinvec\]](#chap:capinvec){reference-type="ref"   
-  reference="chap:capinvec"}*                                
-
-  H- []{#hyp:cap_in_vec_storage                              It is possible for vector registers to hold capabilities to
-  label="hyp:cap_in_vec_storage"}                            enable copying without violating CHERI security principles.
-
-  H- []{#hyp:cap_in_vec_load_store                           It is possible for vector memory accesses to load and store
-  label="hyp:cap_in_vec_load_store"}                         capabilities from vector registers without violating CHERI
-                                                             security principles.
-
-  H- []{#hyp:cap_in_vec_manip label="hyp:cap_in_vec_manip"}  It is possible for vector instructions to manipulate
-                                                             capabilities in vector registers without violating CHERI
-                                                             security principles.
-  --------------------------------------------------------------------------------------------------------------------------
-
-  : Project Hypotheses
-:::
-
-# Background[]{#chap:background label="chap:background"}
+# Background
 
 This chapter describes RISC-V
 ([2.1](#chap:bg:sec:riscv){reference-type="ref"
