@@ -176,7 +176,8 @@ vector length for their power/timing targets, while guaranteeing
 consistent execution of programs on arbitrarily-sized vectors. RVV uses
 a scalable vector model.
 
-## The RVV vector model {#chap:bg:sec:rvv:vector_model}
+## The RVV vector model
+TODO What parts of this are necessary
 
 *Summarizes [@specification-RVV-v1.0 Sections 1-6, 17]*
 
@@ -436,7 +437,7 @@ used in a single configuration:
 
 -   Overall, 21 elements are active
 
-## Previous RVV implementations[]{#chap:bg:rvvend label="chap:bg:rvvend"}
+## Previous RVV implementations
 
 Academia and industry have implemented RVV even before v1.0 was
 released. The scalable vector model allows great diversity:
@@ -465,271 +466,6 @@ heterogeneous vector processors to a scalar core. Both were produced
 from the Barcelona Supercomputing Center under the European Processor
 Initiative. It seems that adoption of RVV will continue, making it a
 good choice for adapting to CHERI.
-
-## RVV memory instructions[]{#chap:bg:sec:rvvmemory label="chap:bg:sec:rvvmemory"}
-
-*Summarizes [@specification-RVV-v1.0 Sections 7-9]*
-
-RVV defines three broad categories of memory access instructions, which
-can be further split into five archetypes with different semantics. This
-section summarizes each archetype, their semantics, their assembly
-mnemonics, and demonstrates how they map memory accesses to vector
-elements.
-
-For the most part, memory access instructions handle their operands as
-described in [2.3](#chap:bg:sec:rvv:vector_model){reference-type="ref"
-reference="chap:bg:sec:rvv:vector_model"}. `EEW` and `EMUL` are usually
-derived from the instruction encoding, rather than reading the `vtype`
-CSR. In a few cases the Effective Vector Length `EVL` is different from
-the `vl` CSR, so for simplicity all instructions are described in terms
-of `EVL`.
-
-### Segmented accesses {#segmented-accesses .unnumbered}
-
-Three of the five archetypes (unit/strided, fault-only-first, and
-indexed) support *segmented* access. This is used for unpacking
-contiguous structures of $1 \le {\texttt{nf}} \le 8$ *fields* and
-placing each field in a separate vector. In these instructions, the
-values of `vl`, `vstart`, and the mask register are interpreted in terms
-of segments.
-
-[\[fig:RVV_mem_unit\]](#fig:RVV_mem_unit){reference-type="ref"
-reference="fig:RVV_mem_unit"} demonstrates a common example: the
-extraction of separate R, G, and B components from a color. Without
-segmentation, i.e. $n = 1$, each consecutive memory address maps to a
-consecutive element in a single vector register group. With
-segmentation, elements are grouped into segments of $n > 1$ fields,
-where each field is mapped to a different vector register group. This
-principle extends to `LMUL > 1`
-([\[fig:RVV_mem_lmul_3seg\]](#fig:RVV_mem_lmul_3seg){reference-type="ref"
-reference="fig:RVV_mem_lmul_3seg"}).
-
-### Unit and Strided accesses {#chap:bg:sec:rvv:unitstrideaccess}
-
-::: subtable
-            Mnemonic                Data    Address      Stride     Masked
-  --------- ---------------------- ------- ---------- ------------ --------
-  Unit      `vlseg<nf>e<eew>.v`     `vd,`   `(rs1),`   *implicit*    `vm`
-  Strided   `vlsseg<nf>e<eew>.v`    `vd,`   `(rs1),`     `rs2,`      `vm`
-:::
-
-::: subtable
-0.5
-
-  ----------- ----------------------
-  Masked?     `vm == 0`
-  `EEW`       `<eew>`
-  `EVL`       `vl`
-  `EMUL`      `VLEN * <eew> / EVL`
-  `NFIELDS`   `<nf>`
-  ----------- ----------------------
-:::
-
-![Example of a segmented strided access\
-`EEW=8-bits`, `nf=3`,
-`stride=4`,`EVL=4`](Figures/RVV_mem_strided_3seg.pdf){#fig:RVV_mem_strided_3seg
-width="\\textwidth"}
-
-This archetype moves active elements of `nf` vector register groups
-to/from contiguous segments of memory, where the start of each segment
-is separated by `stride` bytes.
-
--   Unit-stride instructions tightly pack segments, i.e.
-    `stride = nf * eew / 8`.
-
--   Strided instructions read `stride` from register `rs2`.
-
-    -   `stride` may be positive, negative, or zero.
-
--   These instructions don't do anything if `vstart >= EVL`.
-
-Strided accesses where `rs2` is register `x0` may perform fewer than
-`EVL` memory accesses. Otherwise, even if `stride = 0`, implementations
-must appear to perform all accesses.
-
-#### Ordering {#ordering .unnumbered}
-
-There are no ordering guarantees, other than those required by precise
-vector traps (if used).
-
-#### Exception Handling {#exception-handling .unnumbered}
-
-If any element within segment $i$ triggers a synchronous exception,
-`vstart` is set to $i$ and a precise or imprecise trap is triggered.
-Load instructions may overwrite active segments past the segment index
-at which the trap is reported, but not past
-`EVL`.[@specification-RVV-v1.0 Section 7.7] Upon entering a trap, it is
-implementation-defined how much of the faulting segment's accesses are
-performed.
-
-### Unit fault-only-first loads {#chap:bg:sec:rvv:fof}
-
-::: subtable
-  Mnemonic                 Data    Address    Masked
-  ----------------------- ------- ---------- --------
-  `vlseg<nf>e<eew>ff.v`    `vd,`   `(rs1),`    `vm`
-:::
-
-::: subtable
-  ----------- ----------------------
-  Masked?     `vm == 0`
-  `EEW`       `<eew>`
-  `EVL`       `vl`
-  `EMUL`      `VLEN * <eew> / EVL`
-  `NFIELDS`   `<nf>`
-  ----------- ----------------------
-:::
-
-This archetype is equivalent to a unit load in all respects but
-exception handling. If any access in segment 0 raises an exception[^11],
-`vl` is not modified and the trap is taken as usual. If any access in
-any active segment $> 0$ raises an exception, the trap is not taken,
-`vl` is reduced to the index of the offending segment, and the
-instruction finishes. If an asynchronous interrupt is encountered at any
-point, the trap is taken and `vstart` is set as usual.
-
-This archetype is intended for "loops with data-dependent exit
-conditions", and is commonly used for string operations. The
-specification uses it in a `strcmp` example ([@specification-RVV-v1.0
-Section A.9]).
-
-Similar to plain loads, if an exception is encountered the instruction
-is allowed to update segments past the offender (but not past the
-original `vl`). If any synchronous exception or asynchronous interrupt
-occurs, regardless of the segment index, it is implementation-defined
-how much of the faulting segment's accesses are performed.
-
-### Indexed accesses {#rvv:indexedmem}
-
-::: subtable
-  Mnemonic                     Data    Address    Indices   Masked
-  --------------------------- ------- ---------- --------- --------
-  `vl<u|o>xseg<nf>e<eew>.v`    `vd,`   `(rs1),`   `vs2,`     `vm`
-:::
-
-::: subtable
-0.5
-
-  Masked?          `vm == 0`
-  ---------------- ----------------------
-  Element `EEW`    `vtype.SEW`
-  Element `EMUL`   `vtype.LMUL`
-  Ordered?         `<u|o>`
-  Index Vector     `vs2`
-  Index `EEW`      `<eew>`
-  Index `EMUL`     `VLEN * <eew> / EVL`
-  `NFIELDS`        `<nf>`
-  `EVL`            `vl`
-:::
-
-![Example of a segmented indexed access\
-`EEW=8-bits`,
-`nf=3`](Figures/RVV_mem_index_3seg.pdf){#fig:RVV_mem_index_3seg
-width="\\textwidth"}
-
-This archetype moves elements of `nf` vector register groups to/from
-contiguous segments of memory, where each segment is offset by an index
-(in bytes) taken from another vector.
-
--   The start of each segment is defined by `address + index_vector[i]`.
-
--   These instructions don't do anything if `vstart >= EVL`.
-
--   Indexed segment loads may not overwrite the index vector[^12].
-
-#### Ordering {#ordering-1 .unnumbered}
-
-Accesses within each segment are not ordered relative to each other. If
-the ordered variant of this instruction is used, then the segments must
-be accessed in order (i.e. 17, 53, 8, 44 for
-[2.2](#fig:RVV_mem_index_3seg){reference-type="ref"
-reference="fig:RVV_mem_index_3seg"}). Otherwise, segment ordering is not
-guaranteed.
-
-#### Exception Handling {#exception-handling-1 .unnumbered}
-
-If any element within segment $i$ triggers a synchronous exception,
-`vstart` is set to $i$ and a precise or imprecise trap is triggered.
-Load instructions may overwrite active segments past the segment index
-at which the trap is reported, but not past
-`EVL`[@specification-RVV-v1.0 Section 7.7]. Upon entering a trap, it is
-implementation-defined how much of the faulting segment's accesses are
-performed.
-
-### Unit whole-register accesses
-
-::: subtable
-0.5
-
-  Mnemonic               Data    Address
-  --------------------- ------- ---------
-  `vl<nreg>re<eew>.v`    `vd,`   `(rs1)`
-:::
-
-::: subtable
-0.5
-
-  ----------- ------------------------
-  Masked?     False
-  Registers   `<nreg>`
-  `EEW`       `<eew>`
-  `EVL`       `NFIELDS * VLEN / EEW`
-  `EMUL`      1
-  ----------- ------------------------
-:::
-
-This archetype moves the contents of `nreg` vector registers to/from a
-contiguous range in memory. Equivalent to a unit-stride access where
-`EVL` equals the total number of elements in `nreg` registers.
-
--   `nreg` must be a power of two.
-
--   These instructions don't support segmented access.
-
--   These instructions don't do anything if `vstart >= EVL`.
-
-Ordering and exception handling are identical to unit-stride accesses
-([2.5.1](#chap:bg:sec:rvv:unitstrideaccess){reference-type="ref"
-reference="chap:bg:sec:rvv:unitstrideaccess"}).
-
-### Unit bytemask accesses
-
-::: subtable
-0.5
-
-  Mnemonic    Data    Address
-  ---------- ------- ---------
-  `vlm.v`     `vd,`   `(rs1)`
-:::
-
-::: subtable
-0.5
-
-  --------- --------------
-  Masked?   False
-  `EEW`     8-bits
-  `EVL`     `ceil(vl/8)`
-  `EMUL`    1
-  --------- --------------
-:::
-
-This archetype moves the contents of a mask register to/from a
-contiguous range of memory. It transfers at least `vl` bits, one bit for
-each element that could be used in subsequent vector instructions. This
-will always fit in a single vector register (see
-[2.3.3](#chap:bg:subsec:rvvmasking){reference-type="ref"
-reference="chap:bg:subsec:rvvmasking"}), hence `EMUL = 1` in all cases.
-
--   These instructions operate as if the tail-agnostic setting of
-    `vtype` is true.
-
--   These instructions don't support segmented access.
-
--   These instructions don't do anything if `vstart >= EVL`.
-
-Ordering and exception handling are identical to unit-stride accesses
-([2.5.1](#chap:bg:sec:rvv:unitstrideaccess){reference-type="ref"
-reference="chap:bg:sec:rvv:unitstrideaccess"}).
 
 ## CHERI {#chap:bg:sec:cheri}
 
@@ -825,60 +561,9 @@ those instructions have.
 
 ### Instruction changes {#cheri_instructions}
 
-TR-951[@TR-951 Chapter 8] specifies a suite of new instructions, as well
-as a set of modifications to pre-existing instructions. Many of the new
-instructions are unrelated to pre-existing instructions, and implement
-capability-specific operations like accessing fields of capability
-registers. The most relevant new instructions for our case are the
-various loads/stores.
+TODO simplify, include in Capability and Integer?
 
-CHERI-RISC-V adds new instructions for loading integer and capability
-data, either via capabilities or using integer addressing through the
-DDC ([2.1](#tab:new_cheri_instrs){reference-type="ref"
-reference="tab:new_cheri_instrs"}). These instructions are intended for
-hybrid-capability code (see
-[2.6.4](#cheri_purecap_hybrid){reference-type="ref"
-reference="cheri_purecap_hybrid"}, [@TR-951 p151]), so are more limited
-and don't support immediate offsets. The behaviour of basic RISC-V
-load/store opcodes changes to either use capabilities as memory
-references or use integer addressing via the DDC, depending on the
-encoding mode. If any instruction tries to dereference an invalid
-capability, it raises a synchronous exception.
-
-::: {#tab:new_cheri_instrs}
-  Name                  Direction   Data type   Address calculation
-  -------------------- ----------- ------------ -------------------------
-  L\[BHWD\]\[U\].CAP      Load       Integer    via capability register
-  L\[BHWD\]\[U\].DDC      Load       Integer    via DDC
-  LC.CAP                  Load      Capability  via capability register
-  LC.DDC                  Load      Capability  via DDC
-  S\[BHWD\].CAP           Store      Integer    via capability register
-  S\[BHWD\].DDC           Store      Integer    via DDC
-  SC.CAP                  Store     Capability  via capability register
-  SC.DDC                  Store     Capability  via DDC
-
-  : New CHERI load/store instructions
-:::
-
-::: {#tab:legacy_cheri_instrs}
-  ---------------- ----------- ------------ ---------------------------
-  Name              Direction   Data type       Address calculation
-                                             (Capability/Integer mode)
-  \[C\]LC             Load      Capability      via capability/DDC
-  \[C\]SC             Store     Capability      via capability/DDC
-  L\[BWHD\]\[U\]      Load       Integer        via capability/DDC
-  S\[BWHD\]           Store      Integer        via capability/DDC
-  FL\[WDQ\]           Load        Float         via capability/DDC
-  FS\[WDQ\]           Store       Float         via capability/DDC
-  LR                  Load       Integer        via capability/DDC
-  SC                  Store      Integer        via capability/DDC
-  AMO                  ---       Integer        via capability/DDC
-  ---------------- ----------- ------------ ---------------------------
-
-  : Preexisting RISC-V load/store instructions modified by CHERI-RISC-V
-:::
-
-### Capability and Integer encoding mode[]{#chap:bg:subsec:cheriencodingmode label="chap:bg:subsec:cheriencodingmode"}
+### Capability and Integer encoding mode
 
 CHERI-RISC-V specifies two encoding modes, selected using a flag in the
 PCC `flags` field. *Capability mode* modifies the behaviour of
@@ -898,47 +583,11 @@ to dereference and inspect capability registers, but all other
 instructions access registers in an integer context i.e. ignoring the
 upper bits and tag from merged register files.
 
-### Pure-capability and Hybrid compilation modes {#cheri_purecap_hybrid}
+### Pure-capability and Hybrid compilation modes
 
-CHERI-Clang[^16], the main CHERI-enabled compiler, supports two ways to
-compile CHERI-RISC-V which map to the different encoding modes.
+TODO note this somewhere in software area
 
-*Pure-capability* mode treats all pointers as capabilities, and emits
-pre-existing RISC-V instructions that expect to be run in capability
-mode[^17].
-
-*Hybrid* mode treats pointers as integer addresses, dereferenced
-relative to the DDC, unless they are annotated with `__capability`. This
-mode emits pre-existing RISC-V instructions that take integer operands,
-and uses capabilities through the new instructions. All capabilities in
-hybrid mode are created manually by the program by copying and shrinking
-the DDC.
-
-Hybrid mode allows programs to be gradually ported to CHERI, making it
-very easy to adopt on legacy/large codebases. Any extensions to the
-model (e.g. CHERI-RVV) should try and retain this property.
-
-### Capability relocations[]{#chap:bg:subsec:cherirelocs label="chap:bg:subsec:cherirelocs"}
-
-*Summarizes [@TR-949 Section 4.4, Appendix C]*
-
-Binary applications compiled in pure-capability mode require some
-"global" capabilities to exist at startup, e.g. the capability which
-points to the `main()` function. It would be a security risk to
-synthesize these capabilities from thin air, or to allow the binary file
-itself to contain tag bits.
-
-Instead, CHERI ELF binaries contain a set of requested "relocations"
-(the `__cap_relocs` section) which instruct the runtime environment to
-create capabilities with specific permissions and bounds in specific
-places. This process uses the normal CHERI capability instructions, so
-any invalid requests will cause a program crash, maintaining security.
-Further complexity is introduced with dynamic linking, and in the future
-these relocations may change format, both described in TR-949[@TR-949],
-but the above description is sufficient to understand the rest of this
-paper.
-
-# Hardware emulation investigation[]{#chap:hardware label="chap:hardware"}
+# Hardware emulation investigation
 
 In order to experiment with integrating CHERI and RVV, we implemented a
 RISC-V emulator in the Rust programming language named `riscv-v-lite`.
@@ -963,7 +612,7 @@ conclusions drawn about CHERI-RVV.
   : `riscv-v-lite` supported architectures
 :::
 
-## Developing the emulator {#chap:software:sec:emu}
+## Developing the emulator
 
 Each architecture is simulated in the same way. A `Processor` struct
 holds the register file and memory, and a separate `ProcessorModules`
@@ -1241,7 +890,7 @@ may make incremental adoption more difficult, and in the future we
 should examine existing vanilla RVV programs to determine if it's worth
 adding those instructions.
 
-## Fast-path calculations[]{#chap:hardware:sec:fastpath label="chap:hardware:sec:fastpath"}
+## Fast-path calculations
 
 A fast-path check can be performed over various sets of elements. The
 emulator chooses to perform a single fast-path check for each vector
@@ -1290,57 +939,7 @@ the fast-path can only be worthwhile if Success is the common case.
   *or* Unchecked   raise an exception
 :::
 
-::: algorithmic
-Success Likely-Failure Likely-Failure Failure
-:::
-
-### Whole-access fast-paths {#chap:hardware:subsec:wholeaccessfastpath}
-
-It is technically possible to calculate a fast-path for the entirety of
-an access (see
-[\[appx:fastpathfull\]](#appx:fastpathfull){reference-type="ref"
-reference="appx:fastpathfull"}), but for some situations it may be
-equally/more expensive than checking each access. For example, the
-bounds for masked accesses depend on finding the minimum and maximum
-active indices, which in hardware may require a linear scan. Indexed
-accesses require finding the minimum/maximum offset values, which likely
-requires an expensive parallel reduction over all/some elements. In
-these cases hardware implementations could defer to the slow-path on all
-masked/indexed accesses, or for masked accesses use the wider, unmasked
-bounds and generate Likely-Failure outcomes. Unit and strided accesses
-are much easier to handle.
-
-Arbitrarily strided accesses (which may have positive, negative, or
-zero-valued strides) are relatively simple to calculate. After
-calculating the segment width (i.e.
-$\text{number of fields} * \text{element width}$) the full bounds just
-depends on the sign of the stride
-([\[eq:tightboundsstrided\]](#eq:tightboundsstrided){reference-type="ref"
-reference="eq:tightboundsstrided"}). Unit-stride accesses simplify this
-further, because the stride is equal to the segment width and guaranteed
-to be positive
-([\[eq:tightboundsunit\]](#eq:tightboundsunit){reference-type="ref"
-reference="eq:tightboundsunit"}).
-
-::: mycapequ
-$$\label{eq:tightboundsstrided}
-{\texttt{base}}{}\ +\ \begin{cases}
-        {\texttt{[{\texttt{vstart}}{} * {\texttt{stride}}, ({\texttt{evl}}{} - 1) * {\texttt{stride}} + {\texttt{nf}} * {\texttt{eew}})}} & {\texttt{stride}} \ge 0 \\
-            
-        {\texttt{[({\texttt{evl}}{} - 1) * {\texttt{stride}}, {\texttt{vstart}}{} * {\texttt{stride}} + {\texttt{nf}} * {\texttt{eew}})}} & {\texttt{stride}} < 0
-    \end{cases}$$
-:::
-
-::: mycapequ
-$$\label{eq:tightboundsunit}
-    {\texttt{base}}{}\ +\ {\texttt{[{\texttt{vstart}}{} * {\texttt{nf}} * {\texttt{eew}}, {\texttt{evl}}{} * {\texttt{nf}} * {\texttt{eew}})}}$$
-:::
-
-Ultimately, the potential up-front latency seemed like a dealbreaker for
-this approach. We turned our attention to fast-pathing smaller groups of
-elements.
-
-### $m$-element known-range fast-paths
+### m-element known-range fast-paths
 
 A hardware implementation of a vector unit may be able to issue $m$
 requests within a set range in parallel. For example, elements in the
@@ -1401,83 +1000,6 @@ check per cycle) to save on logic. Particularly if other parts of the
 system rely on constraining the addresses accessed in each cycle, a
 fast-path check can take advantage of those constraints.
 
-## Going beyond the emulator
-
-The emulator is a single example of a conformant CHERI-RVV
-implementation, and does not exercise every part of the specification.
-Four properties stand out:
-
--   The emulator assumes all element accesses are naturally aligned, but
-    the spec allows misaligned accesses.
-
--   The emulator doesn't consider multiple hardware threads, essentially
-    assuming all accesses are atomic.
-
--   Segments/elements are always accessed in order, despite the spec not
-    enforcing ordering
-
--   Imprecise traps are used for all exceptions - precise trap behaviour
-    is not explored.
-
-This section notes how relaxed access ordering and precise exceptions
-may affect the hardware in ways not previously explored.
-
-### Misaligned accesses
-
-Implementations are allowed to handle vector accesses that are not
-aligned to the size of the element. This support is independent of
-misaligned scalar access support, so if e.g. misaligned 64-bit scalar
-accesses are allowed, misaligned vector accesses of 64-bit elements do
-*not* have to be allowed.
-
-Changing the emulator to allow misaligned accesses of integer data would
-not have any impact on CHERI correctness. Capability loads/stores must
-be aligned to `CLEN`[@TR-951 Section 3.5.2], and an implementation
-cannot change this. Writing misaligned integer values across a `CLEN`
-boundary would need to make sure to zero the tag bit on both regions,
-but this applies to scalar implementations as much as vector ones.
-Alignment only impacts CHERI-RVV to the extent that it impacts
-capabilities-in-vectors
-([\[chap:capinvec:hyp_load_store\]](#chap:capinvec:hyp_load_store){reference-type="ref"
-reference="chap:capinvec:hyp_load_store"}).
-
-### Atomicity of accesses/General memory model
-
-Vector memory instructions are specified to follow the RISC-V Weak
-Memory Ordering model[@specification-RVV-v1.0][^33], although this model
-hasn't been fully explained in terms of vectors yet. RVWMO defines a
-global order of "memory operations": atomic operations that are either
-loads, stores, or both[@specification-RISCV-vol1-20191213 Chapter 14].
-The RVWMO spec assumes all memory instructions create exactly one memory
-operation but calls out that once the vector model is formalized, vector
-accesses may be defined to create multiple operations.
-
-The RVV spec states "vector misaligned memory accesses follow the same
-rules for atomicity as scalar misaligned memory accesses", i.e. that
-misaligned accesses may be decomposed into multiple memory operations of
-any granularity[^34]. This is the only mention of atomicity in that
-document.
-
-Again, atomicity of integer data doesn't really impact the fusion of
-CHERI and RVV, as long as tag bits are correctly zeroed on all integer
-writes. However, it does impact capabilities-in-vectors
-([\[chap:capinvec:hyp_load_store\]](#chap:capinvec:hyp_load_store){reference-type="ref"
-reference="chap:capinvec:hyp_load_store"}).
-
-### Relaxed access ordering and precise traps
-
-Ordering is only enforced insofar as it is observable. The only
-instructions that are forced to perform their accesses in order are
-indexed-ordered accesses, which can be used to write to e.g. I/O regions
-where order matters, and instructions that trigger precise traps.
-Precise traps require `vstart` to be set to a value such that all
-elements before `vstart` have completed their accesses, and all accesses
-on/after `vstart` have not completed or are idempotent.
-
-If a vector memory access instruction is 1. not indexed-ordered and 2.
-guaranteed not to trigger a precise trap[^35] then it may execute out of
-order. This does not affect CHERI-RVV in any way.
-
 ## Testing and evaluation
 
 We tested the emulator using a set of test programs described in
@@ -1535,201 +1057,16 @@ Picking the right one for the job is highly dependent on the existing
 implementation, and indeed an implementation may decide that parallel
 per-element checks is better than a fast-path.
 
-# The CHERI-RVV software stack[]{#chap:software label="chap:software"}
+# The CHERI-RVV software stack
 
-This chapter explores the current state of the CHERI-RVV software stack:
-mainstream compiler support for vanilla RVV
-([4.1](#chap:software:sec:compilersupport){reference-type="ref"
-reference="chap:software:sec:compilersupport"}) and the modifications
-required to bring support to CHERI-Clang
-([4.2](#chap:software:sec:chericlang){reference-type="ref"
-reference="chap:software:sec:chericlang"}). The software hypotheses are
-tested with this knowledge
-([4.3](#chap:software:sec:hypotheses){reference-type="ref"
-reference="chap:software:sec:hypotheses"}), and we recommend a set of
-changes to bring CHERI-Clang support up to par
-([4.4](#chap:software:sec:chericlangchanges){reference-type="ref"
-reference="chap:software:sec:chericlangchanges"}).
+TODO Many compilers compile vectorized code
+TODO Clang is the main testing ground for both RVV and CHERI, we focus on it for CHERI-RVV
 
-## Compiling vector code {#chap:software:sec:compilersupport}
-
-Modern compilers provide many ways to generate vectorized code. While
-this support is very advanced for well established vector models, like
-x86-64 AVX, newer vector models like RVV don't have as many options. It
-can even be difficult to get the compiler to generate any vector
-instructions at all. This section examines support across the Clang and
-GCC compilers for various vectorization methods on RVV.
-
-### Available compilers
-
-Compiler support for RVV varies. On Clang 13 and other LLVM-13-based
-compilers, version 0.1(?[^36]) of the vector specification is supported
-as an experimental extension. Clang/LLVM 14 and up support RVV v1.0.
-
-GCC is an interesting case --- there is a version based on RISC-V GCC
-10.1 that partially supports RVV (see
-[\[compilerdifferences\]](#compilerdifferences){reference-type="ref"
-reference="compilerdifferences"}), but it was left untouched for a year
-and deleted as of 17th May 2022. GCC RVV support has also been
-deprioritized in favour of LLVM[^37]. See
-[\[appx:building_rvv_gcc_toolchain\]](#appx:building_rvv_gcc_toolchain){reference-type="ref"
-reference="appx:building_rvv_gcc_toolchain"} for more information on
-finding and building this version, and
-[\[tab:rvv_cmdline_nocheri\]](#tab:rvv_cmdline_nocheri){reference-type="ref"
-reference="tab:rvv_cmdline_nocheri"} for the required command-line
-arguments to enable RVV.
-
-### Automatic vectorization
-
-Compilers with auto-vectorization can automatically create vectorized
-code from a scalar program. For example, a scalar loop over an array
-that increments each element could be converted to a vectorized loop
-that increments multiple elements at once. Clang and GCC support
-auto-vectorization in Arm SVE, explored further in
-[4.1.5](#chap:soft:compiling:armsve){reference-type="ref"
-reference="chap:soft:compiling:armsve"}, but don't yet support it for
-RVV. Arm SVE and RVV are quite similar, so there shouldn't be anything
-blocking auto-vectorization for RVV, it just requires engineering
-effort.
-
-### Vector intrinsics {#chap:software:subsec:vectorintrinsics}
-
-"Intrinsics" are functions defined by the compiler that can invoke
-low-level functionality and instructions directly for a specific
-architecture. When automatic vectorization is not available, intrinsics
-are the next best thing --- they aren't portable across different ISAs,
-but present a familiar high-level interface (function calls) that gives
-fine-grained control over instructions. The compiler then handles
-low-level decisions like register allocation under the hood, and
-sometimes may provide extra functionality for ease of use.
-
-RVV has a comprehensive set of vector
-intrinsics[@specification-RVV-intrinsics]. With these, the general
-strip-mining loop is easy to construct:
-
-1.  Use a `vsetvl` intrinsic to get the vector length for this
-    iteration.
-
-2.  Allocate vector registers by declaring variables with vector types
-    (e.g. `vuint32m8_t` represents 8 registers worth of 32-bit unsigned
-    integers).
-
-3.  Pass the vector length to the computation/memory intrinsics, which
-    operate on the vector variables.
-
-[\[example:rvv\]](#example:rvv){reference-type="ref"
-reference="example:rvv"} contains an example.
-
-### Inline assembly
-
-If a compiler doesn't supply complete intrinsics, or if the programmer
-desires even more control, inline assembly may be used. The programmer
-gives a string of handwritten assembly code to the compiler, which is
-parsed and directly inserted into the output. The compiler still has to
-understand the instruction, but it doesn't need intrinsics to be present
-(or functional[^38]).
-
-Inline assembly can interact with C code and variables through a
-template syntax. The programmer inserts a placeholder in the assembly
-code with a corresponding expression, noting how the expression is
-stored using a "constraint". For our purposes, constraints enforce that
-a value is either in a register or in memory.
-
-Using the constraint, the compiler determines how the expression's value
-is stored, and inserts a reference to it in the assembly string. Because
-this is done before the assembly string is parsed, and isn't immediately
-type-checked against the assembly instruction, it can lead to some
-difficult errors.
-
-Clang and GCC support inline assembly for RVV quite well, and even
-allows the intrinsic vector types to be referenced by assembly templates
-(thus making the compiler do register allocation instead of the
-programmer). The only caveat is that *memory* constraints are not
-supported by RVV memory accesses. None of the vector memory access
-instructions support address offsets, unlike their scalar counterparts.
-Clang always treats the memory constraint as an offset access, even when
-that offset is zero, so it adds an offset to the assembly string
-([\[subfig:inline_asm_vector_memory\]](#subfig:inline_asm_vector_memory){reference-type="ref"
-reference="subfig:inline_asm_vector_memory"}) making it invalid. To get
-around this, one must use the pointer itself with a *register*
-constraint
-([\[subfig:inline_asm_vector_ptr_reg\]](#subfig:inline_asm_vector_ptr_reg){reference-type="ref"
-reference="subfig:inline_asm_vector_ptr_reg"}).
-
-::: mdframed
-``` {.c gobble="4" firstline="6" lastline="6"}
-```
-:::
-
-::: mdframed
-``` {.c gobble="4" firstline="7" lastline="10"}
-```
-:::
-
-::: mdframed
-``` {.c gobble="4" firstline="20" lastline="23"}
-```
-:::
-
-::: mdframed
-``` {.c gobble="4" firstline="32" lastline="35"}
-```
-:::
-
-Broadly speaking, inline assembly supports more RVV instructions than
-intrinsics do. It is used extensively in the testbench code for the
-evaluation
-([\[chap:software:eval\]](#chap:software:eval){reference-type="ref"
-reference="chap:software:eval"}) alongside intrinsics where possible.
-
-### RVV vs. Arm SVE {#chap:soft:compiling:armsve}
-
-Arm SVE uses a similar model to RVV, where the vector length may scale
-between 128 and 2048[^39] and the instructions are designed to be
-totally agnostic across different
-platforms[@stephensARMScalableVector2017]. Arm have released a C
-language extension to support SVE development
-([@armltdARMLanguageExtensions2020]), supported by the Arm Compiler for
-Embedded[^40], Clang, and GCC. They support all of the previously
-examined vectorization types.
-
-Auto-vectorization is supported, and the main focus of the user guide
-([@armltdArmCompilerScalable2019]) is helping the compiler decide
-whether to auto-vectorize. Intrinsics are also supported, and seem to
-cover all of the SVE instructions, but take a slightly different
-approach to RVV. Arm SVE intrinsics do not directly map to available
-instructions, but aim to "provide a regular interface and leave the
-compiler to pick the best mapping to SVE instructions", while RVV
-intrinsics (at least for memory) tend to map 1:1 to existing
-instructions. Arm's approach gives more flexibility for future
-extensions, as the same intrinsics could be compiled to new instructions
-with newer compilers.
-
-Arm SVE also supports inline assembly, but the experience is noticeably
-worse than for RVV. The two standout issues are a lack of register
-allocation and the use of condition code flags for branching. Unlike
-RVV, the intrinsic types for vector values cannot be referenced in
-inline assembly[@stephensARMScalableVector2017], so all vector registers
-must be allocated and tracked by the programmer. Arm SVE's equivalent of
-`vsetvl`, the `while` family[@armltdARMLanguageExtensions2020], do not
-return the number of updated elements, and instead set the condition
-flags based on how many elements are updated. Because there is no way to
-branch based on the condition flags in C, the programmer must manually
-insert a label for the top of the loop, and a branch to that label,
-which is more error prone than the RVV method. See
-[\[example:armsvec\]](#example:armsvec){reference-type="ref"
-reference="example:armsvec"} for examples of Arm SVE code with
-auto-vectorization, intrinsics, and inline ASM.
-
-::: mdframed
-``` {.c gobble="4" firstline="43" lastline="46"}
-```
-:::
-
-::: mdframed
-``` {.c gobble="4" firstline="57" lastline="67"}
-```
-:::
+TODO Three methods of vectorization
+TODO auto-vectorization (not supported)
+TODO intrinsics (supported)
+TODO inline assembly (supported)
+TODO Arm SVE supports all three, but focuses on auto-vectorization and intrinsics.
 
 ## Compiling vector code with CHERI-Clang {#chap:software:sec:chericlang}
 
@@ -1821,207 +1158,9 @@ possibilities are investigated further in the next section.
 
 ## Testing and evaluation {#chap:software:sec:hypotheses}
 
-[]{#chap:software:eval label="chap:software:eval"} We developed a
-self-checking test program for the emulator to execute, which helped
-gather information for the hypotheses and find bugs in the compiler and
-emulator. Initially it was hand-written, but in order to test a wide
-range of `vtype`s we began generating it with a Python script. It
-consists of fifty-seven tests of different vector memory access
-archetypes under various configurations
-([4.1](#tab:vectormemcpyschemes){reference-type="ref"
-reference="tab:vectormemcpyschemes"}).
+TODO summarize testing and evaluation
 
-The test code uses intrinsics wherever the compiler supports them (see
-[\[compilerdifferences\]](#compilerdifferences){reference-type="ref"
-reference="compilerdifferences"}), and falls back to inline assembly
-otherwise. Inline assembly uses the preprocessor macro from
-[\[subfig:inline_asm_vector_portable\]](#subfig:inline_asm_vector_portable){reference-type="ref"
-reference="subfig:inline_asm_vector_portable"} to handle CHERI and
-non-CHERI platforms.
-
-The tests are run inside *harnesses*, which provide setup and
-self-checking code for common cases: The Vanilla harness tests a simple
-`memcpy` between two arrays; Masked tests that every other element is
-copied, not all of them; Segmented tests a `memcpy` into four separate
-output arrays, each a different field of a four-field structure. There
-is also a special test for fault-only-first: FoF loads are performed at
-the edge of mapped memory, and the test shows that out-of-bounds
-exceptions are swallowed and `vl` is reduced accordingly. All tests were
-successful when they ran, but some testbenches could not be built with
-some compilers. The full set of test results is available in
-[\[chap:fullresults\]](#chap:fullresults){reference-type="ref"
-reference="chap:fullresults"}.
-
-::: {#tab:vectormemcpyschemes}
-  Test Scheme                   Harness      Compilers
-  --------------------------- ----------- ----------------
-  Unit Stride                   Vanilla         All
-  Strided                       Vanilla         All
-  Indexed                       Vanilla         All
-  Whole Register                Vanilla         All
-  Fault-only-First              Vanilla         All
-  Unit Stride (Masked)          Masked          All
-  Bytemask Load                 Masked     `llvm-15` only
-  Unit Stride (Segmented)      Segmented        All
-  Fault-only-First Boundary       ---           All
-
-  : `vector_memcpy` test schemes and harnesses
-:::
-
-### [\[hyp:sw_vec_legacy\]](#hyp:sw_vec_legacy){reference-type="ref" reference="hyp:sw_vec_legacy"} - Compiling/running legacy code in integer mode {#hypsw_vec_legacy---compilingrunning-legacy-code-in-integer-mode .unnumbered}
-
-This is true for CHERI-RVV, when running the compiled programs in
-integer mode, as long as the programs only access memory within the DDC.
-
-All vanilla RVV instructions have counterparts with identical encodings
-and behaviour in CHERI-RVV integer mode, assuming the accessed addresses
-are all accessible through the DDC. There are no changes to instruction
-behaviour that require the compiler's handling of them to change, so a
-non-CHERI compiler and an integer-mode-CHERI compiler can always produce
-the same vector instructions from the same code. This does not apply to
-capability-mode-CHERI, because integer addressing is not supported in
-capability-mode-CHERI-RVV.
-
-All legacy vector programs should produce equivalent binaries when
-compiled for integer-mode-CHERI. On top of that, all binaries compiled
-for vanilla RVV platforms should produce the same results when run on an
-equivalent integer-mode-CHERI-RVV platform. Both claims assume the
-program doesn't perform out-of-bounds accesses relative to the DDC.
-
-### [\[hyp:sw_pure_compat\]](#hyp:sw_pure_compat){reference-type="ref" reference="hyp:sw_pure_compat"} - Converting legacy code to pure-capability code {#hypsw_pure_compat---converting-legacy-code-to-pure-capability-code .unnumbered}
-
-This is true for CHERI-RVV, but cannot be done in practice yet.
-Engineering effort is required to support this in CHERI-Clang. Because
-this argument concerns source code, all three ways to generate CHERI-RVV
-instructions must be examined.
-
-#### Inline Assembly --- Unlikely {#inline-assembly-unlikely .unnumbered}
-
-For GCC-style inline assembly, it is currently impossible for
-integer-addressed RVV source code to be recompiled in pure-capability
-mode without modification. Integer-addressed RVV uses general-purpose
-registers for the base address, but pure-capability instructions require
-capability registers instead. The base address register can either be
-specified directly, so must be changed to a capability register; or
-specified using template syntax and an "r" constraint, which must be
-changed to a "C" constraint
-([\[fig:inlineasm,fig:inlineasmcheri\]](#fig:inlineasm,fig:inlineasmcheri){reference-type="ref"
-reference="fig:inlineasm,fig:inlineasmcheri"}). Using a preprocessor
-macro (e.g.
-[\[subfig:inline_asm_vector_portable\]](#subfig:inline_asm_vector_portable){reference-type="ref"
-reference="subfig:inline_asm_vector_portable"}) could make code portable
-between non-CHERI and CHERI, but this is still a source code change.
-
-In theory, one could change the behaviour of inline assembly to
-automatically convert general purpose registers/constraints to
-capability versions in specific circumstances. However, this can have
-wide-reaching ramifications, potentially making code more difficult to
-understand, or even breaking existing code.
-
-#### Intrinsics --- Yes {#intrinsics-yes .unnumbered}
-
-The current specification for RVV intrinsics uses pointer types for all
-base addresses[@specification-RVV-intrinsics]. In pure-capability
-compilers all pointers should be treated as capabilities instead of
-integers, including those in intrinsics. All RVV memory intrinsics have
-equivalent RVV instructions, which all use capabilities in
-pure-capability mode, so changing the intrinsics to match is valid.
-
-Assuming all base address pointers are created in a valid manner (e.g.
-through `malloc` or monotonic decrease, and not through integer
-literals), the conversion to pure-capability should make them all valid
-capabilities which are compatible with the intrinsics. Therefore
-well-behaved code using RVV intrinsics should be compilable in
-pure-capability mode without changes.
-
-This is not currently the case for CHERI-Clang, as RVV memory access
-intrinsics are broken, but this can be fixed with engineering effort.
-
-#### Auto-vectorization --- Yes {#auto-vectorization-yes .unnumbered}
-
-All vanilla RVV instructions have counterparts with identical encodings
-and behaviour in CHERI-RVV pure-capability mode, assuming the base
-addresses can be converted to valid capabilities. Any scalar code that
-can be
-
-::: enumerate*
-compiled in scalar pure-capability mode[^43], and
-
-auto-vectorized by a legacy RVV compiler,
-:::
-
-must have an equivalent pure-capability vectorized form. This form could
-be acquired by performing the auto-vectorization in legacy mode,
-ensuring all base addresses are available as capabilities, then making
-the vector instructions use those capabilities. Therefore a
-pure-capability compiler can always auto-vectorize CHERI-compliant
-scalar code if some legacy compiler can also auto-vectorize it.
-
-This is not currently possible for CHERI-Clang, as RVV
-auto-vectorization is not implemented yet. Similar models (e.g. Arm SVE)
-already have auto-vectorization, so RVV auto-vectorization (and thus
-CHERI-RVV auto-vectorization) should be possible.
-
-### [\[hyp:sw_stack_vectors\]](#hyp:sw_stack_vectors){reference-type="ref" reference="hyp:sw_stack_vectors"} - Saving vectors on the stack {#hypsw_stack_vectors---saving-vectors-on-the-stack .unnumbered}
-
-This is true in theory, but not yet supported by CHERI-Clang in
-practice. Placing variable-length structures on the stack is possible as
-long as the length can be known at runtime (and as long as the stack has
-space, of course). This isn't exclusive to CHERI --- to push and pop
-values on the stack, the stack pointer must be incremented or
-decremented by the size of the value. Because the length already has to
-be measured, and CHERI-RISC-V supports setting capability bounds from
-runtime-computed values, it's entirely possible to correctly set tight
-bounds for capabilities pointing to variable-length vectors on the
-stack.
-
-A minor complication is presented by a note in TR-949[@TR-949
-Section 3.8.2] concerning "re-materializing bounded stack variables".
-This section implies LLVM can try to re-create a pointer-to-stack at any
-time with minimal cost, but this may not be able to apply to vectors.
-Measuring the bounds requires measuring `VLMAX` by changing `vl`, which
-could then require saving/restoring the old value. This is only a
-performance issue, and in the worst case we can just say
-pointers-to-stack-vectors are not re-materializable, so it isn't a
-dealbreaker. Further investigation of this issue is left as future work.
-
-### [\[hyp:sw_multiproc\]](#hyp:sw_multiproc){reference-type="ref" reference="hyp:sw_multiproc"} - Running CHERI-RVV code in a multiprocessing system {#hypsw_multiproc---running-cheri-rvv-code-in-a-multiprocessing-system .unnumbered}
-
-This requires two conditions: an OS must be able to save and restore
-vector state, and the vector hardware must support resuming from an
-interrupted state. The first condition is easy to fulfil by extending
-the previous hypothesis. If it is possible to save variable-length
-vectors on the stack, given their length is known at runtime, it must
-also be possible to save their data on the heap. Some OSs might need to
-make changes to their "current process state" structure to support
-variable-length data, and they would also need to allocate space for the
-`vtype` value, but it is certainly possible.
-
-The second condition can be upheld in two ways. First, if the OS only
-context switches and services interrupts while the vector hardware is in
-a complete state (i.e. not partially executing an instruction), then
-context switches and interrupts are completely transparent to the vector
-hardware and no changes need to be made. Secondly, if context switches
-and interrupts can actually interrupt vector instructions partway
-through, then they can only be cleanly resumed if the vector hardware
-supports precise traps for the exact instruction being executed.
-
-## Recommended changes for CHERI-Clang {#chap:software:sec:chericlangchanges}
-
--   Build on current work to make all RVV memory access instructions and
-    pseudoinstructions CHERI-compatible.
-
--   Make RVV memory access intrinsics take capabilities as arguments
-    when compiled in pure-capability mode.
-
--   Make the CheriBoundAllocas IR pass handle scalable vectors by
-    finding the length at runtime, and investigate re-materialization of
-    those pointers.
-
--   Bring up CHERI-enabled auto-vectorization in parallel with vanilla
-    auto-vectorization.
-
-# Capabilities-in-vectors[]{#chap:capinvec label="chap:capinvec"}
+# Capabilities-in-vectors
 
 Implementing `memcpy` correctly for CHERI systems requires copying the
 tag bits as well as the data. As it stands, any vectorized `memcpy`
@@ -2484,3 +1623,5 @@ it that much easier for industry to adopt CHERI in the long term.
     required changes to CHERI-Clang.
 
 [^50]: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html>
+
+TODO need bibliograpgy
