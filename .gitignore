@@ -26,3 +26,4 @@ thesis-class/*
 !thesis-class/License
 
 _minted-thesis
+output_RISE/content.html

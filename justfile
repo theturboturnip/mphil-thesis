@@ -15,7 +15,8 @@ clean:
 
 text:
     @mkdir -p ./output_RISE/
-    pandoc --citeproc -t plain RISE/RISE_cutdown.md -o output_RISE/content.txt
+    pandoc -N --citeproc RISE/RISE_cutdown.md -o output_RISE/content.html
+    pandoc -t plain output_RISE/content.html -o output_RISE/content.txt
     wc -c output_RISE/content.txt
 
 build-results:
