@@ -145,229 +145,34 @@ consistent execution of programs on arbitrarily-sized vectors. RVV uses
 a scalable vector model.
 
 ## The RVV vector model
-TODO What parts of this are necessary
-
-*Summarizes [@specification-RVV-v1.0 Sections 1-6, 17]*
-
 RVV defines thirty-two vector registers, each of an
 implementation-defined constant width `VLEN`. These registers can be
 interpreted as *vectors* of *elements*. The program can configure the
 size of elements, and the implementation defines a maximum width `ELEN`.
-[\[fig:RVV_simple_widths\]](#fig:RVV_simple_widths){reference-type="ref"
-reference="fig:RVV_simple_widths"} shows a simple example.
 
-RVV also adds some state that defines how the vector registers are used
-(see
-[\[fig:RVV_added_state\]](#fig:RVV_added_state){reference-type="ref"
-reference="fig:RVV_added_state"}). These are stored in RISC-V Control
-and Status Registers (CSRs), which the program can read. `vtype`
-([2.3.1](#chap:bg:subsec:vtype){reference-type="ref"
-reference="chap:bg:subsec:vtype"}) defines how the vector registers are
-split into elements. `vstart` and `vl`
-([2.3.2](#chap:bg:subsec:vlvstart){reference-type="ref"
-reference="chap:bg:subsec:vlvstart"}) divides the elements into three
-disjoint subsets: *prestart*, the *body*, and the *tail*. Masked
-accesses ([2.3.3](#chap:bg:subsec:rvvmasking){reference-type="ref"
-reference="chap:bg:subsec:rvvmasking"}) further divide the *body* into
-*active* and *inactive* elements. This section also describes the vector
-exception model
-([2.3.4](#chap:bg:subsec:vexceptions){reference-type="ref"
-reference="chap:bg:subsec:vexceptions"}).
+RVV instructions operate on *groups* of vector registers.
+The implementation stores two variables, `vstart` and `vl`, which define the start and length of the "body" section within the vector.
+Instructions only operate on body elements, and some allow elements within the body to be masked out and ignored.
 
-### `vtype` {#chap:bg:subsec:vtype}
 
-The `vtype` CSR contains two key fields that describe how vector
-instructions interpret the contents of vector registers. The first is
-the Selected Element Width (`SEW`), which is self-explanatory. It can be
-8, 16, 32, or 64. 128-bit elements are referenced a few times throughout
-but haven't been formally specified (see [@specification-RVV-v1.0 p10,
-p32]).
+### Exception handling
 
-The second field is the Vector Register Group Multiplier (`LMUL`).
-Vector instructions don't just operate over a single register, but over
-a register *group* as defined by this field. For example, if `LMUL=8`
-then each instruction would operate over 8 register's worth of elements.
-These groups must use aligned register indices, so if `LMUL=4` all
-vector register operands should be multiples of 4 e.g. `v0`, `v4`, `v8`
-etc. In some implementations this may increase throughput, which by
-itself is beneficial for applications.
+If synchronous exceptions (e.g. invalid memory access) or asynchronous interrupts
+are encountered while executing a vector instruction, RVV defines two ways
+to trap them.
+In both cases, the PC of the instruction is saved in a register "*epc".
 
-However, the true utility of `LMUL` lies in widening/narrowing
-operations (see
-[\[fig:RVV_LMUL_widening\]](#fig:RVV_LMUL_widening){reference-type="ref"
-reference="fig:RVV_LMUL_widening"}). For example, an 8-by-8-bit
-multiplication can produce 16-bit results. Because the element size
-doubles, the number of vector registers required to hold the same number
-of elements also doubles. Doubling `LMUL` after such an operation allows
-subsequent instructions to handle all the results at once. At the start
-of such an operation, fractional `LMUL` (1/2, 1/4, or 1/8) can be used
-to avoid subsequent results using too many registers.
+If the instruction should be resumed after handling the trap, e.g. in the case of demand paging,
+the implementation may use a "precise trap".
+The implementation must complete all instructions up to "*epc", and no instructions after that,
+and save the index of the offending vector element in "vstart".
+Within the instruction, all vector elements before "vstart" must have committed their results, and all other elements must either
+1) not have committed results, or
+2) be idempotent e.g. repeatable without changing the outcome.
 
-`vtype` also encodes two flags: mask-agnostic and tail-agnostic. If
-these are set, the implementation is *allowed* to overwrite any
-masked-out or tail elements with all 1s.
-
-Most vector instructions will interpret their operands using `vtype`,
-but this is not always the case. Some instructions (such as memory
-accesses) use different Effective Element Widths (`EEW`) and Effective
-LMULs (`EMUL`) for their operands. In the case of memory accesses, the
-`EEW` is encoded in the instruction bits and the `EMUL` is calculated to
-keep the number of elements consistent. Another example is
-widening/narrowing operations, which by definition have to interpret the
-destination registers differently from the sources.
-
-Programs update `vtype` through the `vsetvl` family of instructions.
-These are designed for a "stripmining" paradigm, where each iteration of
-a loop processes some elements until all elements are processed.
-`vsetvl` instructions take a requested `vtype` and the number of
-remaining elements to process (the Application Vector Length or `AVL`),
-and return the number of elements that will be processed in this
-iteration. This value is saved in a register for the program to use, and
-also saved in the internal `vl` CSR.
-
-### `vl` and `vstart` - Prestart, body, tail {#chap:bg:subsec:vlvstart}
-
-The first CSR is the Vector Length `vl`, which holds the number of
-elements that could be updated from a vector instruction. The program
-updates this value through fault-only-first loads
-([2.5.2](#chap:bg:sec:rvv:fof){reference-type="ref"
-reference="chap:bg:sec:rvv:fof"}) and more commonly `vsetvl`
-instructions.
-
-In the simple case, `vl` is equal to the total available elements (see
-[\[fig:RVV_vl_full\]](#fig:RVV_vl_full){reference-type="ref"
-reference="fig:RVV_vl_full"}). It can also be fewer (see
-[\[fig:RVV_vl_short\]](#fig:RVV_vl_short){reference-type="ref"
-reference="fig:RVV_vl_short"}), in which case vector instructions will
-not write to elements in the "tail" (i.e. elements past `vl`). This
-eliminates the need for a 'cleanup loop' common in fixed-length vector
-programs.
-
-In a similar vein, `vstart` specifies "the index of the first element to
-be executed by a vector instruction". Elements before `vstart` are known
-as the *prestart* and are not touched by executed instructions. It is
-usually only set by the hardware whenever it is interrupted
-mid-instruction (see
-[\[fig:RVV_vstart_trap\]](#fig:RVV_vstart_trap){reference-type="ref"
-reference="fig:RVV_vstart_trap"} and
-[2.3.4](#chap:bg:subsec:vexceptions){reference-type="ref"
-reference="chap:bg:subsec:vexceptions"}) so that the instruction can be
-re-executed later without corrupting completed values. Whenever a vector
-instruction completes, `vstart` is reset to zero.
-
-The program *can* set `vstart` manually, but it may not always work. If
-an implementation couldn't arrive at the value itself, then it is
-allowed to reject it. The specification gives an example where a vector
-implementation never takes interrupts during an arithmetic instruction,
-so it would never set `vstart` during an arithmetic instruction, so it
-could raise an exception if `vstart` was nonzero for an arithmetic
-instruction.
-
-### Masking - Active/inactive elements {#chap:bg:subsec:rvvmasking}
-
-Most vector instructions allow for per-element *masking* (see
-[\[fig:RVV_mask_example\]](#fig:RVV_mask_example){reference-type="ref"
-reference="fig:RVV_mask_example"}). When masking is enabled, register
-`v0` acts as the 'mask register', where each bit corresponds to an
-element in the vector[^7]. If the mask bit is 0, that element is
-*active* and will be used as normal. If the mask bit is 1, that element
-will be *inactive* and not written to (or depending on the mask-agnostic
-setting, overwritten with 1s). When masking is disabled, all elements
-are *active*.
-
-### Exception handling {#chap:bg:subsec:vexceptions}
-
-*Summarizes [@specification-RVV-v1.0 Section 17]*
-
-During the execution of a vector instruction, two events can prevent an
-instruction from fully completing: a synchronous exception in the
-instruction itself, or an asynchronous interrupt from another part of
-the system. Implementations may choose to wait until an instruction
-fully completes before handling asynchronous interrupts, making it
-unnecessary to pause the instruction halfway through, but synchronous
-exceptions cannot be avoided in this way (particularly where page fault
-exceptions must be handled transparently).
-
-The RVV specification defines two modes for 'trapping' these events,
-which implementations may choose between depending on the context (e.g.
-the offending instruction), and notes two further modes which may be
-used in further extensions. All modes start by saving the PC of the
-trapping instruction to a CSR `*epc`.
-
-#### Imprecise vector traps
-
-Imprecise traps are intended for events that are not recoverable, where
-"reporting an error and terminating execution is the appropriate
-response". They do not impose any extra requirements on the
-implementation. For example, an implementation that executes
-instructions out-of-order does not need to guarantee that instructions
-older than `*epc` have completed, and is allowed to have completed
-instructions newer than `*epc`.
-
-If the trap was triggered by a synchronous exception, the `vstart` CSR
-must be updated with the element that caused it. The specification calls
-out synchronous exceptions in particular, but does not mention
-asynchronous interrupts. It's likely that imprecise traps for
-asynchronous interrupts should also set `vstart`, but this issue has
-been raised with the authors for further clarification[^8]. The
-specification also states "There is no support for imprecise traps in
-the current standard extensions", meaning that the other standard RISC-V
-exceptions do not use and have not considered imprecise traps.
-
-#### Precise vector traps
-
-Precise vector traps are intended for instructions that can be resumed
-after handling the interrupting event. This means the architectural
-state (i.e. register values) when starting the trap could be saved and
-reloaded before continuing execution. Therefore it must look like
-instructions were completed in-order, even if the implementation is
-out-of-order:
-
--   Instructions older than `*epc` must have completed (committed all
-    results to the architectural state)
-
--   Instructions newer than `*epc` must **not** have altered
-    architectural state.
-
-On a precise trap, regardless of what caused it, the `vstart` CSR must
-be set to the element index on which the trap was taken. The
-save-and-reload expectation then add two constraints on the trapping
-instruction's execution:
-
--   Operations affecting elements preceding `vstart` must have committed
-    their results
-
--   Operations affecting elements at or following `vstart` must either
-
-    -   not have committed results or otherwise affected architectural
-        state
-
-    -   be *idempotent* i.e. produce exactly the same result when
-        repeated.
-
-The idempotency option gives implementations a lot of leeway. Some
-instructions, such as indexed segment loads
-([2.5.3](#rvv:indexedmem){reference-type="ref"
-reference="rvv:indexedmem"}), are specifically prohibited from
-overwriting their inputs to make them idempotent. If an instruction is
-idempotent, an implementation is even allowed to repeat operations on
-elements *preceding* `vstart`. However for memory accesses the
-idempotency depends on the memory being accessed. For example, reading
-or writing a memory-mapped I/O region may not be idempotent.
-
-Another memory-specific issue is that of *demand-paging*, where the OS
-needs to step in and move virtual memory pages into physical memory for
-an instruction to use. This use-case is specifically called out by the
-specification for precise traps. Usually, this is triggered by some
-element of a vector memory access raising a synchronous exception,
-invoking a precise trap, and writing the "Machine Trap Value" scalar
-register with the offending address[@specification-RISCV-vol2-20211203
-Section 3.1.21]. `vstart` must be set to an element at (or before[^9])
-the one that demanded the page, because that element must perform the
-access after reloading. If an implementation sets `vstart` to the
-offending element, because operations preceding `vstart` must have
-completed, any elements that could potentially trigger demand-paging
-*must* wait for the preceding elements to complete.
+In other cases "imprecise traps" may be used, which allow instructions after "*epc" and vector elements after "vstart" to commit their results.
+"vstart" must still be recorded, however.
+   
 
 ## Previous RVV implementations
 

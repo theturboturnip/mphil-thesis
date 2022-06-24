@@ -15,9 +15,10 @@ clean:
 
 text:
     @mkdir -p ./output_RISE/
-    pandoc -N --citeproc RISE/RISE_cutdown.md -o output_RISE/content.html
-    pandoc -t plain output_RISE/content.html -o output_RISE/content.txt
-    wc -c output_RISE/content.txt
+    pandoc --wrap=none -N --citeproc RISE/RISE_cutdown.md -o output_RISE/content.html
+    pandoc --wrap=none -t plain output_RISE/content.html -o output_RISE/content.txt
+    wc -c output_RISE/content.txt | tee output_RISE/bytecount.txt
+    head -c 30200 output_RISE/content.txt > output_RISE/content_30k.txt
 
 build-results:
     #!/usr/bin/env sh
