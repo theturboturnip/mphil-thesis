@@ -1,6 +1,8 @@
 ---
 bibliography:
 - thesis.bib
+csl:
+- din-1505-2-alphanumeric.csl
 ---
 
 # Introduction
@@ -1463,8 +1465,6 @@ RVV's "indexed" mode. Once this problem is solved, CHERI will be able to
 match the memory access abilities of any vector ISA it needs to, making
 it that much easier for industry to adopt CHERI in the long term.
 
-[]{#wc:end label="wc:end"}
-
 [^1]: Capability Hardware Enhanced RISC Instructions
 
 [^2]: This is a SIMD (Single Instruction Multiple Data) paradigm.
@@ -1623,5 +1623,3 @@ it that much easier for industry to adopt CHERI in the long term.
     required changes to CHERI-Clang.
 
 [^50]: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html>
-
-TODO need bibliograpgy
