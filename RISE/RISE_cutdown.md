@@ -7,100 +7,115 @@ csl:
 
 # Introduction
 
-Since 2010, the Cambridge Computer Lab (in association with SRI) has
-been developing the CHERI[^1] architecture extension, which improves the
-security of any given architecture by checking all memory accesses in
-hardware. The core impact of CHERI, on a hardware level, is that memory
-can no longer be accessed directly through raw addresses, but must pass
-through a *capability*[@TR-941]. Capabilities are unforgeable tokens
+The CHERI[^1] architecture extension improves computer
+security by checking all memory accesses in
+hardware.
+Under CHERI, memory cannot be accessed with integer addresses, but must pass
+through a *capability*[@TR-941] - unforgeable tokens
 that grant fine-grained access to ranges of memory. Instead of
 generating them from scratch, capabilities must be *derived* from
-another capability with greater permissions. For example, a capability
+another capability with greater permissions.
+<!-- For example, a capability
 giving read-write access to an array of structures can be used to create
-a sub-capability granting read-only access to a single element. This
+a sub-capability granting read-only access to a single element. -->
+This
 vastly reduces the scope of security violations through spatial errors
 (e.g. buffer overflows[@szekeresSoKEternalWar2013]), and creates
 interesting opportunities for software
 compartmentalization[@watsonCHERIHybridCapabilitySystem2015].
 
 Industry leaders have recognized the value CHERI provides. Arm Inc have
-manufactured the Morello System-on-Chip, based on their Neoverse N1 CPU,
-which incorporates CHERI capabilities into the Armv8.2 ISA. While this
+manufactured the Morello System-on-Chip
+<!-- , based on their Neoverse N1 CPU, -->
+which incorporates CHERI into the Armv8.2 ISA. 
+<!-- While this
 represents a great step forward, there are still elements on the SoC
 that haven't fully embraced CHERI (e.g. the GPU), and architecture
-extensions that haven't been investigated in the context of CHERI. One
-such example is Arm's Scalable Vector Extension (introduced in Armv8.2
-but not included in Neoverse N1), which is designed to remain in use
+extensions that haven't been investigated in the context of CHERI. -->
+However some features haven't fully embraced CHERI, such as 
+Arm's Scalable Vector Extension (SVE)
+<!-- (introduced in Armv8.2
+but not included in Neoverse N1) -->
+, which is designed to remain in use
 well into the future[@stephensARMScalableVector2017]. Supporting this
-and other scalable vector ISAs in CHERI is essential to CHERI's
+and other scalable vector ISAs is essential to CHERI's
 long-term relevance.
 
-In the context of modern computer architecture, vector processing is the
+<!-- In the context of modern computer architecture, vector processing is the
 practice of dividing a large hardware register into a *vector* of
 multiple *elements* and executing the same operation on each element in
 a single instruction[^2]. This data-level parallelism can drastically
 increase throughput, particularly for arithmetic-heavy programs.
 However, before computing arithmetic, the vectors must be populated with
-data.
+data. -->
 
 ## Motivation
 
-Modern vector implementations all provide vector load/store instructions
+<!-- Modern vector implementations all provide vector load/store instructions
 to access a whole vector's worth of memory. These range from simple
-contiguous accesses (where all elements are next to each other), to
-complex indexed accesses (where each element loads from a different
-location based on another vector). They can also have per-element
+contiguous accesses, to
+complex indexed accesses. They can also have per-element
 semantics, e.g. "elements must be loaded in order, so if one element
 fails the preceding elements are still valid"[@specification-RVV-v1.0
 Section 7.7]. If CHERI CPUs want to benefit from vector processing's
 increased performance and throughput, they must support those
 instructions at some level. But adding CHERI's bounds-checking to the
 mix may affect these semantics, and could impact performance (e.g.
-checking each element's access in turn may be slow).
+checking each element's access in turn may be slow). -->
+Modern vector implementations all provide vector load/store instructions.
+Vector-enabled CHERI CPUs must support those instructions, 
+<!-- For CHERI CPUs  to benefit from vector processing's performance and throughput,
+they must support those
+instructions, -->
+but adding CHERI's bounds-checking for each vector element could impact performance.
+<!-- (e.g. checking each element's access in turn may be slow). -->
 
-Vector memory access performance is more critical than one may initially assume, because
-vectors are used for more than just computation. A prime example is
-`memcpy`: for `x86_64`, `glibc` includes multiple versions of the
+Vector memory access performance is critical, because
+vectors aren't just used for computation.
+For example, `glibc` uses vector memory accesses to implement `memcpy` where available.
+<!-- includes multiple versions of the
 function[^3] taking advantage of vector platforms, then selects one to
-use at runtime[^4]. These implementations are written in assembly and
-heavily optimized. If the memory accesses are hitting the cache, a few
-extra cycles of bounds-checking for each access could actually make a
-noticeable difference.
+use at runtime[^4]. -->
+These implementations are written in assembly and
+heavily optimized. If they hit the cache, extra cycles of bounds-checking for each access could make a difference.
 
-`memcpy` also raises the important question of how the vector model
-interacts with capabilities. In non-CHERI processors, `memcpy` will copy
-pointers around in memory without fuss. For a CHERI-enabled vector
-processor to support this, it would need to be able to load/store
-capabilities from vectors without violating any security guarantees.
-This may require more constraints - for example, each vector register
-likely needs to be at least as large as a single capability.
-
-To explore this topic, we chose to focus on the RISC-V Vector
-extension[@specification-RVV-v1.0] (shortened to RVV throughout). As of
-November 2021 this has been ratified by RISC-V International[^5], and
-will be RISC-V's standard vector instruction set moving forward. This
-has two key benefits. Studying RVV will allow reference "CHERI-RVV"
+`memcpy` also raises the important question of how vectors
+interact with capabilities. In non-CHERI processors, `memcpy` will copy
+pointers around in memory. An equivalent CHERI-enabled vector
+memcpy would need to load/store
+capabilities from vectors without violating security guarantees.
+<!-- This may require more constraints - for example, each vector register
+likely needs to be at least as large as a single capability. -->
+<!-- 
+To explore this topic, we focus on the RISC-V Vector
+extension[@specification-RVV-v1.0] (shortened to RVV throughout). This has been ratified by RISC-V International and
+will be RISC-V's standard vector ISA moving forward.
+Studying RVV will allow reference "CHERI-RVV"
 implementations to be built for the CHERI project's open-source RISC-V
-cores[^6], which don't currently support vector processing. Secondly,
-RVV is a *scalable* vector model, where the length of each vector is
-implementation-dependent. This has more potential roadblocks than a
-fixed-length vector model, and investigating them here will make life
-easier if Arm wish to integrate their Scalable Vector Extension with
-CHERI later down the road.
+cores[^6].
+RVV is also a *scalable* vector model, where the length of each vector is
+implementation-dependent, which has more potential roadblocks than a
+fixed-length vector model. Investigating them here will make it
+easier for Arm to combine the Scalable Vector Extension with
+CHERI. -->
 
-## Hypotheses and Aims
+<!-- ## Hypotheses and Aims -->
 
 The goal of this project is to investigate the impact of, and the
 roadblocks for, integrating a scalable vector architecture with CHERI's
-memory protection system. In particular, we focus on integrating RVV
+memory protection system. Specifically we focus on integrating the RISC-V Vector
+extension[@specification-RVV-v1.0] (RVV)
 with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV
 implementation and informing the approach for a future CHERI Arm SVE
 implementation.
 
+TODO something something hypotheses
+
+<!-- 
 The investigation was carried out by designing and testing a CHERI-RVV
 emulator written in Rust, but that is only a single implementation. To
 show that CHERI-RVV is viable for a wide range of processors,
-we test nine hypotheses (see TODO).
+we test nine hypotheses (see TODO). -->
 
 # Background
 
