@@ -121,9 +121,7 @@ capability in bits, defined by CHERI relative to `XLEN`; and `VLEN` and
 The extensions of most relevance to this project are the "V" vector
 extension (RVV, specified in [@specification-RVV-v1.0]) and the CHERI
 extension (specified in [@TR-951]). RVV has recently been officially
-ratified, and is the de facto vector extension for RISC-V. The following
-sections summarize the vector extension, how it accesses memory, and
-previous implementations in academia.
+ratified, and is the de facto vector extension for RISC-V.
 
 ## A brief history of vector processing
 
@@ -390,17 +388,12 @@ capabilities contain[^13]:
     point to
 
 A great deal of work has gone into compressing capabilities down into a
-reasonable size (see [@woodruffCHERIConcentratePractical2019],
-[2.3](#cheri:compressedcap){reference-type="ref"
-reference="cheri:compressedcap"}), and using the magic of floating-point
+reasonable size (see [@woodruffCHERIConcentratePractical2019]),
+and using the magic of floating-point
 all of this data has been reduced to just 2x the architectural register
 size. For example, on 64-bit RISC-V a standard capability is 128-bits
 long. The rest of this dissertation assumes capabilities are 128-bits
 long for simplicity.
-
-![128-bit compressed capability representation -
-from [@TR-941]](./figures/cheri_compressed_cap.png){#cheri:compressedcap
-width="80%"}
 
 A CHERI implementation has to enforce three security properties about
 its capabilities[@TR-951 Section 1.2.1]:
@@ -442,8 +435,7 @@ The new general-purpose capability registers are each of size
 capabilities. While there is always a logical distinction between the
 pre-existing *integer* registers `x0-x31` and the *capability* registers
 `cx0-cx31`, the architecture may store them in a Split or Merged
-register file.[]{#chap:bg:subsec:cherimergedreg
-label="chap:bg:subsec:cherimergedreg"} A Split register file stores the
+register file. A Split register file stores the
 integer registers separately from capability registers, so programs can
 manipulate them independently. A Merged register file stores thirty-two
 registers of length `CLEN`, using the full width for the capability
@@ -499,9 +491,8 @@ TODO note this somewhere in software area
 
 In order to experiment with integrating CHERI and RVV, we implemented a
 RISC-V emulator in the Rust programming language named `riscv-v-lite`.
-The emulator can partially emulate four unprivileged[^18] RISC-V ISAs
-([3.1](#tab:emu_arches){reference-type="ref"
-reference="tab:emu_arches"}), and was also used as the base for
+The emulator supports the Multiply, CSR, Vector, and CHERI extensions,
+and was also used as the base for
 capabilities-in-vectors research
 ([\[chap:capinvec\]](#chap:capinvec){reference-type="ref"
 reference="chap:capinvec"}). This chapter explores the development of
@@ -509,18 +500,9 @@ the emulator, the implementation of CHERI support (including
 supplementary libraries), the addition of vector support, and the
 conclusions drawn about CHERI-RVV.
 
-::: {#tab:emu_arches}
-   Architecture                        Extensions
-  -------------- --------------------- ----------------------------------------
-      32-bit     `rv32imv`             Multiply, CSR, Vector
-      64-bit     `rv64imv`             Multiply, CSR, Vector
-      64-bit     `rv64imvxcheri`       Multiply, CSR, Vector, CHERI
-      64-bit     `rv64imvxcheri-int`   Multiply, CSR, Vector, CHERI (Integer)
-
-  : `riscv-v-lite` supported architectures
-:::
-
 ## Developing the emulator
+
+TODO condense
 
 Each architecture is simulated in the same way. A `Processor` struct
 holds the register file and memory, and a separate `ProcessorModules`
