@@ -109,7 +109,12 @@ with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV
 implementation and informing the approach for a future CHERI Arm SVE
 implementation.
 
-TODO something something hypotheses
+The full dissertation addresses nine hypotheses, but for the sake of brevity we examine four here:
+1. It is possible to use CHERI capabilities as memory references in all vector instructions.
+2. The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost.
+3. Legacy vector code can be compiled into a pure-capability form with no changes.
+4. It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.
+
 
 <!-- 
 The investigation was carried out by designing and testing a CHERI-RVV
@@ -344,10 +349,9 @@ architectures, and can scale up to support many different new modules.
 Manipulating CHERI capabilities securely and correctly is a must for any
 CHERI-enabled emulator. Capability encoding logic is not trivial by any
 means, so the `cheri-compressed-cap` C library was re-used rather than
-implementing it from scratch. Rust has decent interoperability
-with C, but some of the particulars of this library caused issues.
+implementing it from scratch. There were a few issues with implementing Rust/C interoperation, which are addressed in the dissertation.
 
-#### `rust-cheri-compressed-cap`
+<!-- #### `rust-cheri-compressed-cap`
 
 `cheri-compressed-cap` provides two versions of the library by default,
 for 64-bit and 128-bit capabilities, which are generated from a common
@@ -374,7 +378,7 @@ lengths pulled from a `CompressedCapability`. For example, the 64-bit
 capability structure holds a 32-bit address, and the 128-bit capability
 a 64-bit address.
 
-<!-- 128-bit capabilities can cover a 64-bit address range, and thus can have
+128-bit capabilities can cover a 64-bit address range, and thus can have
 a length of $2^{64}$. Storing this length requires 65-bits, so all math
 in `cheri_compressed_cap_common.h` uses 128-bit length values. C doesn't
 have any standardized 128-bit types, but GCC and LLVM provide so-called
@@ -391,9 +395,7 @@ This could be resolved through careful examination: for example, on LLVM
 128-bit values are passed to functions in two 64-bit registers[^22],
 which could be replicated in Rust by passing two 64-bit values. For
 convenience, we instead rely on the Rust and Clang compilers using
-compatible LLVM versions and having identical 128-bit semantics. -->
-
-<!-- In some cases, the C library uses 128-bit type -->
+compatible LLVM versions and having identical 128-bit semantics.
 
 The CHERI-RISC-V documentation contains formal specifications of all
 new CHERI instructions.
@@ -403,7 +405,7 @@ Chapter 8.2]). The `rust-cheri-compressed-cap` library also defines
 those helper functions, so the formal definitions can be ported directly into the emulator.
 
 The above work is available online[^25], and includes documentation for
-all C functions[^26] (which were not previously documented).
+all C functions[^26] (which were not previously documented). -->
 
 #### Integrating into the emulator
 
