@@ -11,50 +11,17 @@ CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000
 LoC[^48]). Developing these artifacts provided enough information to
 make conclusions for the initial hypotheses.
 
-## Evaluating hypotheses
-
-[\[hyp:hw_cap_as_vec_mem_ref\]](#hyp:hw_cap_as_vec_mem_ref){reference-type="ref"
-reference="hyp:hw_cap_as_vec_mem_ref"} showed that all memory references
-can be replaced with capabilities in all RVV instructions while
-maintaining functionality.
-[\[hyp:hw_cap_bounds_checks_amortized\]](#hyp:hw_cap_bounds_checks_amortized){reference-type="ref"
-reference="hyp:hw_cap_bounds_checks_amortized"} then alleviated
-performance concerns by showing it was possible to combine the required
-capability checks for all vector accesses, amortizing the overall cost
-of checking, although with varying practical benefit.
-
-On the software side
-[\[hyp:sw_vec_legacy,hyp:sw_pure_compat\]](#hyp:sw_vec_legacy,hyp:sw_pure_compat){reference-type="ref"
-reference="hyp:sw_vec_legacy,hyp:sw_pure_compat"} showed that non-CHERI
-vectorized code could be run on CHERI systems, and even recompiled for
-pure-capability platforms with no source code changes, but that
-CHERI-Clang's current state adds some practical limitations. We
-developed the `vector_memcpy` test program to show that despite those
-limitations, it's possible to write correct CHERI-RVV code on current
-compilers.
-[\[hyp:sw_stack_vectors,hyp:sw_multiproc\]](#hyp:sw_stack_vectors,hyp:sw_multiproc){reference-type="ref"
-reference="hyp:sw_stack_vectors,hyp:sw_multiproc"} address the pausing
-and resuming of vector code, specifically saving and restoring
-variable-length architectural state, concluding that it is entirely
-possible but requires software adjustments.
-
-Through a limited investigation of capabilities-in-vectors,
-[\[hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip\]](#hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip){reference-type="ref"
-reference="hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip"}
-showed that a highly constrained implementation could enable a
-fully-functional vectorized `memcpy`, as demonstrated in the
-`vector_memcpy_pointers` test program, without violating CHERI security
-principles. It should be possible to extend the CHERI-RVV ISA with
-vector equivalents of existing CHERI scalar instructions, but we did not
-investigate this further.
-
-Clearly, scalable vector models can be adapted to CHERI without
+Based on the hypotheses examined in this write-up and the original dissertation,
+scalable vector models can be adapted to CHERI without
 significant loss of functionality. Most of the hypotheses are general
 enough to cover other scalable models, e.g. Arm SVE, but any differences
 from RVV's model will require careful examination. Given the importance
 of vector processing to modern computing, and thus its importance to
 CHERI, we hope that this research paves the way for future
 vector-enabled CHERI processors.
+
+## Testing
+TODO mention testing!!
 
 ## Future work
 
@@ -81,6 +48,8 @@ mitigated by e.g. replacing these addressing modes with variants of
 RVV's "indexed" mode. Once this problem is solved, CHERI will be able to
 match the memory access abilities of any vector ISA it needs to, making
 it that much easier for industry to adopt CHERI in the long term.
+
+TODO below is 700 words
 
 [^1]: Capability Hardware Enhanced RISC Instructions
 
