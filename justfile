@@ -13,9 +13,10 @@ clean:
     @mkdir -p ./submission/
     rm -rf ./submission/*
 
-text:
+rise:
     @mkdir -p ./output_RISE/
-    pandoc --wrap=none -N --citeproc RISE/RISE_cutdown.md -o output_RISE/content.html
+    cat RISE/1_intro.md RISE/2_bg.md RISE/3_hw.md RISE/4_sw.md RISE/5_capinvec.md RISE/6_concl.md > output_RISE/RISE_cutdown.md
+    pandoc --wrap=none -N --citeproc output_RISE/RISE_cutdown.md -o output_RISE/content.html
     pandoc --wrap=none -t plain output_RISE/content.html -o output_RISE/content.txt
     wc -c output_RISE/content.txt | tee output_RISE/bytecount.txt
     head -c 30200 output_RISE/content.txt > output_RISE/content_30k.txt

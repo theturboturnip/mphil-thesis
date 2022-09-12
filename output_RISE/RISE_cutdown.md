@@ -122,6 +122,7 @@ emulator written in Rust, but that is only a single implementation. To
 show that CHERI-RVV is viable for a wide range of processors,
 we test nine hypotheses (see TODO). -->
 
+
 # Background
 
 TODO - something here?
@@ -311,6 +312,7 @@ New CHERI instructions may still be used
 to dereference and inspect capability registers, but all other
 instructions access registers in an integer context i.e. ignoring the
 upper bits and tag from merged register files.
+
 
 # Hardware emulation investigation
 
@@ -709,6 +711,7 @@ Picking the right one for the job is highly dependent on the existing
 implementation, and indeed an implementation may decide that parallel
 per-element checks is better than a fast-path.
 
+
 # The CHERI-RVV software stack
 
 This chapter, being less relevant to RISE/hardware security, has been greatly condensed.
@@ -822,6 +825,7 @@ possibilities are investigated further in the next section. -->
 ## Testing and evaluation {#chap:software:sec:hypotheses}
 
 TODO summarize testing and evaluation
+
 
 # Capabilities-in-vectors
 
@@ -1007,6 +1011,7 @@ require more scrutiny.
 
 As stated before, capabilities-in-vectors cannot be dereferenced
 directly, so there is no impact on Integrity.
+
 
 # Conclusion
 
