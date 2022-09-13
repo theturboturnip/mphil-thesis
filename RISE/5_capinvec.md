@@ -51,7 +51,7 @@ accesses, vectorized capability accesses are atomic and 128-bit aligned.
 
 ## The Hypothesis
 
-** It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles. **
+*It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.*
 
 We considered this from three perspectives, checking they each fulfil Provenance, Monotonicity, and Integrity.
 

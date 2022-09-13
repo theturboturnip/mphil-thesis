@@ -139,7 +139,7 @@ In other cases "imprecise traps" may be used, which allow instructions after "*e
 
 ## The Hypothesis
 
-** It is possible to use CHERI capabilities as memory references in all vector instructions. **
+*It is possible to use CHERI capabilities as memory references in all vector instructions.*
 
 This is entirely true - all RVV memory instructions take the index of a "base address register" in the scalar register file, and it is trivial to index into the capability register file instead.
 This can be applied to other ISAs wherever memory references are accessed through a scalar register file, e.g. all Arm Morello scalar instructions and most of Arm SVE's memory instructions.

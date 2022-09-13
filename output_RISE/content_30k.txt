@@ -89,7 +89,7 @@ In other cases “imprecise traps” may be used, which allow instructions after
 
 2.3 The Hypothesis
 
-** It is possible to use CHERI capabilities as memory references in all vector instructions. **
+It is possible to use CHERI capabilities as memory references in all vector instructions.
 
 This is entirely true - all RVV memory instructions take the index of a “base address register” in the scalar register file, and it is trivial to index into the capability register file instead. This can be applied to other ISAs wherever memory references are accessed through a scalar register file, e.g. all Arm Morello scalar instructions and most of Arm SVE’s memory instructions. Notably Arm SVE’s u64base addressing mode, which uses a vector directly as a set of 64-bit integer addresses[19], is not as simple to port to CHERI.
 
@@ -123,7 +123,7 @@ Vector instructions are executed by a Vector ISA module, which stores all regist
 
 To support both CHERI and non-CHERI execution pointers are separated into an address and a provenance⁷. The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory. When using capabilities, provenance is defined in terms of the base register e.g. “the provenance is provided by capability register X”, or defined by the DDC in integer mode⁸. On non-CHERI platforms the vector unit doesn’t check provenance.
 
-TODO fixup The initial motivation for this project was investigating the impact of capability checks on performance. Rather than check each element’s access individually, we determine a set of “fast-path” checks which count as checks for multiple elements at once. In the emulator, this is done by computing the “tight bounds” for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds. [chap:hardware:sec:fastpath] describes methods for calculating the “tight bounds” for each access type, and ways that architectural complexity can be traded off to calculate wider bounds.
+TODO fixup as an intro to fast-paths The initial motivation for this project was investigating the impact of capability checks on performance. Rather than check each element’s access individually, we determine a set of “fast-path” checks which count as checks for multiple elements at once. In the emulator, this is done by computing the “tight bounds” for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds. [chap:hardware:sec:fastpath] describes methods for calculating the “tight bounds” for each access type, and ways that architectural complexity can be traded off to calculate wider bounds.
 
 3.3 Fast-path calculations
 
@@ -178,7 +178,7 @@ TODO this is really short lol
 
 3.6 The Hypothesis
 
-** Legacy vector code can be compiled into a pure-capability form with no changes. **
+Legacy vector code can be compiled into a pure-capability form with no changes.
 
 This is true for CHERI-RVV, but cannot be done in practice yet. Engineering effort is required to support this in CHERI-Clang. Because this argument concerns source code, all three ways to generate CHERI-RVV instructions must be examined.
 
@@ -220,7 +220,7 @@ A new CHERI-specific vector register file was created, where each register is a 
 
 3.8 The Hypothesis
 
-** It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles. **
+It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.
 
 We considered this from three perspectives, checking they each fulfil Provenance, Monotonicity, and Integrity.
 
@@ -272,4 +272,4 @@ JOANNOU, ALEXANDRE ; WOODRUFF, JONATHAN ; KOVACSICS, ROBERT ; MOORE, SIMON W. ; 
 
 [MGDK19]
 
-MEMARIAN, KAYVAN ; GOMES, VICTOR B. F. ; DAVIS, BROOKS ; KELL, STEPHEN ; RICHARDSON, ALEXANDER ; WATSON, ROBERT N. M. ; SEWELL, PETER: Exploring C Semantics and Pointer Provenan
+MEMARIAN, KAYVAN ; GOMES, VICTOR B. F. ; DAVIS, BROOKS ; KELL, STEPHEN ; RICHARDSON, ALEXANDER ; WATSON, ROBERT N. M. ; SEWELL, PETER: Exploring C Semantics and Pointer 

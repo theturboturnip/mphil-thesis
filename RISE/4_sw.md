@@ -25,7 +25,7 @@ TODO this is really short lol
 
 ## The Hypothesis
 
-** Legacy vector code can be compiled into a pure-capability form with no changes. **
+*Legacy vector code can be compiled into a pure-capability form with no changes.*
 
 This is true for CHERI-RVV, but cannot be done in practice yet.
 Engineering effort is required to support this in CHERI-Clang. Because

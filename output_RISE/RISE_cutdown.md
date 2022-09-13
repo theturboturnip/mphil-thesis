@@ -206,7 +206,7 @@ In other cases "imprecise traps" may be used, which allow instructions after "*e
 
 ## The Hypothesis
 
-** It is possible to use CHERI capabilities as memory references in all vector instructions. **
+*It is possible to use CHERI capabilities as memory references in all vector instructions.*
 
 This is entirely true - all RVV memory instructions take the index of a "base address register" in the scalar register file, and it is trivial to index into the capability register file instead.
 This can be applied to other ISAs wherever memory references are accessed through a scalar register file, e.g. all Arm Morello scalar instructions and most of Arm SVE's memory instructions.
@@ -277,10 +277,7 @@ enough to hold a capability. `ELEN` is also 128-bits, which isn't
 supported by the specification, but is required for
 capabilities-in-vectors
 ([\[chap:capinvec\]](#chap:capinvec){reference-type="ref"
-reference="chap:capinvec"}). 
-<!-- Scaling `VLEN` and `ELEN` any higher would
-require the creation and integration of new types that were more than
-128-bits long. -->
+reference="chap:capinvec"}).
 
 To support both CHERI and non-CHERI execution pointers are separated
 into an address and a *provenance*[^28]. The vector unit retrieves an
@@ -291,7 +288,7 @@ of the base register e.g. "the provenance is provided by capability
 register X", or defined by the DDC in integer mode[^29]. On non-CHERI
 platforms the vector unit doesn't check provenance.
 
-TODO fixup
+TODO fixup as an intro to fast-paths
 The initial motivation for this project was investigating the impact of
 capability checks on performance. Rather than check each element's
 access individually, we determine a set of "fast-path" checks which
@@ -417,7 +414,7 @@ TODO this is really short lol
 
 ## The Hypothesis
 
-** Legacy vector code can be compiled into a pure-capability form with no changes. **
+*Legacy vector code can be compiled into a pure-capability form with no changes.*
 
 This is true for CHERI-RVV, but cannot be done in practice yet.
 Engineering effort is required to support this in CHERI-Clang. Because
@@ -502,7 +499,7 @@ accesses, vectorized capability accesses are atomic and 128-bit aligned.
 
 ## The Hypothesis
 
-** It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles. **
+*It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.*
 
 We considered this from three perspectives, checking they each fulfil Provenance, Monotonicity, and Integrity.
 
