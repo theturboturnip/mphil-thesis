@@ -12,29 +12,20 @@ Vector memory access performance is critical, because vectors aren’t just used
 
 memcpy also raises the important question of how vectors interact with capabilities. In non-CHERI processors, memcpy will copy pointers around in memory. An equivalent CHERI-enabled vector memcpy would need to load/store capabilities from vectors without violating security guarantees.
 
-The goal of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI’s memory protection system. Specifically we focus on integrating the RISC-V Vector extension[Xyz21] (RVV) with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
+The goal of this project is to investigate the impact of, and the roadblocks for, integrating a scalable vector architecture with CHERI’s memory protection system. Specifically we focus on integrating the RISC-V Vector extension[Xyz21a] (RVV) with the CHERI-RISC-V ISA, with the aim of enabling a future CHERI-RVV implementation and informing the approach for a future CHERI Arm SVE implementation.
 
-The full dissertation addresses nine hypotheses, but for the sake of brevity we examine four here: 1. It is possible to use CHERI capabilities as memory references in all vector instructions. 2. The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost. 3. Legacy vector code can be compiled into a pure-capability form with no changes. 4. It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.
+The full dissertation addresses nine hypotheses, but for the sake of brevity we examine four here. Sections 2-5 each cover one hypothesis in order, and Section 6 concludes.
+
+1.  It is possible to use CHERI capabilities as memory references in all vector instructions.
+2.  The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost.
+3.  Legacy vector code can be compiled into a pure-capability form with no changes.
+4.  It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles.
 
 2 Background
 
 TODO - something here?
 
-2.1 The RVV vector model
-
-RVV defines thirty-two vector registers, each of an implementation-defined constant width VLEN. These registers can be interpreted as vectors of elements. The program can configure the size of elements, and the implementation defines a maximum width ELEN.
-
-RVV instructions operate on groups of vector registers. The implementation stores two variables, vstart and vl, which define the start and length of the “body” section within the vector. Instructions only operate on body elements, and some allow elements within the body to be masked out and ignored.
-
-2.1.1 Exception handling
-
-If synchronous exceptions (e.g. invalid memory access) or asynchronous interrupts are encountered while executing a vector instruction, RVV defines two ways to trap them. In both cases, the PC of the instruction is saved in a register “*epc”.
-
-If the instruction should be resumed after handling the trap, e.g. in the case of demand paging, the implementation may use a “precise trap”. The implementation must complete all instructions up to “*epc”, and no instructions after that, and save the index of the offending vector element in “vstart”. Within the instruction, all vector elements before “vstart” must have committed their results, and all other elements must either 1) not have committed results, or 2) be idempotent e.g. repeatable without changing the outcome.
-
-In other cases “imprecise traps” may be used, which allow instructions after “*epc” and vector elements after “vstart” to commit their results. “vstart” must still be recorded, however.
-
-2.2 CHERI
+2.1 CHERI
 
 In CHERI, addresses/pointers are replaced with capabilities: unforgeable tokens that provide specific kinds of access to an address within a range of memory. The above statement is enough to understand what capabilities contain²:
 
@@ -44,7 +35,7 @@ In CHERI, addresses/pointers are replaced with capabilities: unforgeable tokens 
 
 -   The bounds, i.e. the range of addresses this capability could point to
 
-A great deal of work has gone into compressing capabilities down into a reasonable size (see [WJXF19]), and using the magic of floating-point all of this data has been reduced to just 2x the architectural register size. For example, on 64-bit RISC-V a standard capability is 128-bits long. The rest of this dissertation assumes capabilities are 128-bits long for simplicity.
+By using floating-point, all of this data has been reduced to just 2x the architectural register size (see [WJXF19]). For example, on 64-bit RISC-V a standard capability is 128-bits long, and we assume capabilities are 128-bits long throughout this write-up.
 
 A CHERI implementation has to enforce three security properties about its capabilities[WNWR20 Section 1.2.1]:
 
@@ -56,43 +47,69 @@ A CHERI implementation has to enforce three security properties about its capabi
 
 Integrity is enforced by tagging registers and memory. Every 128-bit register and aligned 128-bit region of memory has an associated tag bit, which denotes if its data encodes a valid capability³. If any non-capability data is written to any part of the region the tag bit is zeroed out. Instructions that perform memory accesses can only do so if the provided capability has a valid tag bit. As above, significant work has gone into the implementation to reduce the DRAM overhead of this method (see [JWKM17]).
 
-Provenance and Monotonicity are enforced by all instructions that manipulate capabilities. If an implementation detects a violation of either property, it will zero out the tag bit and rely on Integrity enforcement to ensure it is not dereferenced. Some CHERI-enabled architectures, such as CHERI-RISC-V, also raise a synchronous exception when this occurs.
+Provenance and Monotonicity are enforced by all instructions that manipulate capabilities. If an instruction violates either property, it will zero out the tag bit and rely on Integrity enforcement to ensure it is not dereferenced. Some CHERI-enabled architectures, such as CHERI-RISC-V, also raise a synchronous exception when this occurs.
 
-2.2.1 CHERI-RISC-V ISA
+2.1.1 CHERI-RISC-V ISA
 
-[WNWR20] describes the latest version of the CHERI architecture (CHERI ISAv8) and proposes applications to MIPS, x86-64, and RISC-V. CHERI-RISC-V is a mostly straightforward set of additions to basic RISC-V ISAs. It adds thirty-two general-purpose capability registers, thirty-two Special Capability Registers (SCRs), and many new instructions.
-
-The new general-purpose capability registers are each of size CLEN = 2 * XLEN plus a tag bit. While there is always a logical distinction between the integer registers x0-x31 and capability registers cx0-cx31, the architecture may store them in a Split or Merged register file. A Split register file stores the integer registers separately from capability registers, so programs can manipulate them independently. A Merged register file stores thirty-two registers of length CLEN, using the full width for the capability registers and aliasing the integer registers to the bottom XLEN bits. Under a merged register file, writing to an integer register makes the capability counterpart invalid.
-
-Many of the new SCRs are intended to support the privileged ISA extensions for e.g. hypervisors or operating systems. The emulator doesn’t use these, so their SCRs are not listed here, but there are two highly relevant SCRs for all modes: the Program Counter Capability and the Default Data Capability.
+CHERI-RISC-V (described in [WNWR20]) is a straightforward set of additions to basic RISC-V ISAs. It adds thirty-two general-purpose capability registers cx0-cx31, thirty-two Special Capability Registers (SCRs), and many new instructions. Many of the new SCRs are intended to support the privileged ISA extensions for e.g. hypervisors or operating systems and are unused here. The two most relevant SCRs are the Program Counter Capability (PCC) and Default Data Capability (DDC).
 
 The PCC replaces the program counter and adds more metadata, ensuring instruction fetches have the same security properties as normal loads and stores. The DDC is used to sandbox integer addressing modes. CHERI-RISC-V includes new instructions which use integer addressing, and allows legacy (i.e. integer addressed) code to function on CHERI systems without recompiling for CHERI-RISC-V. These instructions all use integer addresses relative to the DDC, and the DDC controls the permissions those instructions have.
 
-2.2.2 Capability and Integer encoding mode
+2.1.2 Capability and Integer encoding mode
 
-CHERI-RISC-V specifies two encoding modes, selected using a flag in the PCC flags field. Capability mode modifies the behaviour of pre-existing instructions (e.g. Load Byte) to take address operands as capabilities.
+CHERI-RISC-V specifies two encoding modes, selected using a flag in the PCC flags field. Capability mode modifies the behaviour of pre-existing instructions (e.g. Load Byte) to use capability addressing, and Integer mode keeps those instructions using integer addresses but dereferences them relative to the DDC. This allows legacy code to run in a sandbox defined by the DDC without recompiling.
 
-Integer mode seeks to emulate a standard CHERI-less RISC-V architecture as much as possible. All pre-existing RISC-V memory access instructions take address operands as integers, which are dereferenced relative to the DDC⁴. New CHERI instructions may still be used to dereference and inspect capability registers, but all other instructions access registers in an integer context i.e. ignoring the upper bits and tag from merged register files.
+2.1.3 Pure-capability and Hybrid compilation modes
+
+CHERI-Clang⁴, the main CHERI-enabled compiler, supports two ways to compile CHERI-RISC-V which map to the different encoding modes.
+
+Pure-capability mode treats all pointers as capabilities, and emits pre-existing RISC-V instructions that expect to be run in capability mode⁵.
+
+Hybrid mode treats pointers as integer addresses, dereferenced relative to the DDC, unless they are annotated with __capability. This mode emits a mix of capability-addressed and integer-addressed memory instructions. All capabilities in hybrid mode are created manually by the program by copying and shrinking the DDC.
+
+Hybrid mode allows programs to be gradually ported to CHERI, making it very easy to adopt on legacy/large codebases. Any extensions to the model (e.g. CHERI-RVV) should try and retain this property.
+
+2.2 The RVV vector model
+
+RVV defines thirty-two vector registers, each of an implementation-defined constant width VLEN. These registers can be interpreted as vectors of elements. The program can configure the size of elements, and the implementation defines a maximum width ELEN.
+
+RVV instructions operate on groups of vector registers. The implementation holds two status registers, vstart and vl, which define the start and length of the “body” section within the vector. Instructions only operate on body elements, and some allow elements within the body to be masked out and ignored.
+
+2.2.1 RVV memory instructions
+
+TODO - different addressing modes, FoF
+
+2.2.2 Exception handling
+
+If synchronous exceptions (e.g. invalid memory access) or asynchronous interrupts are encountered while executing a vector instruction, RVV defines two ways to trap them. In both cases, the PC of the instruction is saved in a register “*epc”.
+
+If the instruction should be resumed after handling the trap, e.g. in the case of demand paging, the implementation may use a “precise trap”. The implementation must complete all instructions up to “*epc”, and no instructions after that, and save the index of the offending vector element in “vstart”. Within the instruction, all vector elements before “vstart” must have committed their results, and all other elements must either 1) not have committed results, or 2) be idempotent e.g. repeatable without changing the outcome.
+
+In other cases “imprecise traps” may be used, which allow instructions after “*epc” and vector elements after “vstart” to commit their results. “vstart” must still be recorded, however.
+
+2.3 The Hypothesis
+
+** It is possible to use CHERI capabilities as memory references in all vector instructions. **
+
+This is entirely true - all RVV memory instructions take the index of a “base address register” in the scalar register file, and it is trivial to index into the capability register file instead. This can be applied to other ISAs wherever memory references are accessed through a scalar register file, e.g. all Arm Morello scalar instructions and most of Arm SVE’s memory instructions. Notably Arm SVE’s u64base addressing mode, which uses a vector directly as a set of 64-bit integer addresses[19], is not as simple to port to CHERI.
 
 3 Hardware emulation investigation
 
 In order to experiment with integrating CHERI and RVV, we implemented a RISC-V emulator in the Rust programming language named riscv-v-lite. The emulator supports the Multiply, CSR, Vector, and CHERI extensions, and was also used as the base for capabilities-in-vectors research.
 
-3.1 Developing the emulator
-
 The emulator is very modular, such that each ISA extension is defined as a separate module which can easily be plugged into different processor implementations. Each ISA module uses a “connector” structure, containing e.g. virtual references to register files and memory, which allows different processors to reuse ISA modules despite using different register file/memory implementations.
 
-Each processor implements a single stage pipeline. Instructions are fetched, decoded with a common decoder function⁵, and executed. The processor asks each ISA module in turn if it wants to handle the instruction, and uses the first module to say yes. If the ISA module returns a new PC value it is immediately applied, otherwise it is automatically incremented. This structure easily represents basic RISC-V architectures, and can scale up to support many different new modules.
+Each processor implements a single stage pipeline. Instructions are fetched, decoded with a common decoder function⁶, and executed. The processor asks each ISA module in turn if it wants to handle the instruction, and uses the first module to say yes. If the ISA module returns a new PC value it is immediately applied, otherwise it is automatically incremented. This structure easily represents basic RISC-V architectures, and can scale up to support many different new modules.
 
-3.1.1 Emulating CHERI
+3.1 Emulating CHERI
 
 Manipulating CHERI capabilities securely and correctly is a must for any CHERI-enabled emulator. Capability encoding logic is not trivial by any means, so the cheri-compressed-cap C library was re-used rather than implementing it from scratch. There were a few issues with implementing Rust/C interoperation, which are addressed in the dissertation.
 
-3.1.1.1 Integrating into the emulator
+Integrating capabilities into the emulator was relatively simple thanks to the modular emulator structure. CHERI-specific memory and register file types were created, which could expose both integer and capability functionality. The CHERI register file exposed integer-mode and capability-mode accesses, and memory was built in three layers:
 
-Integrating capabilities into the emulator was relatively simple thanks to the modular emulator structure.
-
-CHERI-specific memory and register file types were created, which could expose both integer and capability functionality. The CHERI register file exposed integer-mode and capability-mode accesses, and memory was built in three layers: 1) Normal integer-addressed memory 2) Capability-addressed CHERI memory, which checks capability properties before accessing 1) 3) Integer-mode CHERI memory, which adds an integer address to the DDC before accessing 2)
+1.  Normal integer-addressed memory
+2.  Capability-addressed CHERI memory, which checks capability properties before accessing 1)
+3.  Integer-mode CHERI memory, which adds an integer address to the DDC before accessing 2)
 
 This approach meant code for basic RV64I operations did not need to be modified for CHERI at all - simply passing the integer-mode memory and register file would perform all relevant checks.
 
@@ -100,81 +117,46 @@ Integrating capability instructions was also simple. Two new ISA modules were cr
 
 To reduce the chances of accidentally converting integers to capabilities, the emulator defines a SafeTaggedCap type: a sum type which represents either a CcxCap with the tag bit set, or raw data with the tag bit unset. This adds type safety, as the Rust compiler forces every usage of SafeTaggedCap to consider both options, preventing raw data from being interpreted as a capability by accident and enforcing Provenance.
 
-3.1.2 Emulating vectors
+3.2 Emulating vectors
 
-Vector instructions are executed by a Vector ISA module, which stores all registers and other state. VLEN is hardcoded as 128-bits, chosen because it’s the largest integer primitive provided by Rust that’s large enough to hold a capability. ELEN is also 128-bits, which isn’t supported by the specification, but is required for capabilities-in-vectors. Scaling VLEN and ELEN higher would require new numeric types that were more than 128-bits long.
+Vector instructions are executed by a Vector ISA module, which stores all registers and other state. VLEN is hardcoded as 128-bits, chosen because it’s the largest integer primitive provided by Rust that’s large enough to hold a capability. ELEN is also 128-bits, which isn’t supported by the specification, but is required for capabilities-in-vectors ([chap:capinvec]).
 
-To support both CHERI and non-CHERI execution pointers are separated into an address and a provenance⁶. The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory. When using capabilities, provenance is defined in terms of the base register e.g. “the provenance is provided by capability register X”, or defined by the DDC in integer mode⁷. On non-CHERI platforms the vector unit doesn’t check provenance.
+To support both CHERI and non-CHERI execution pointers are separated into an address and a provenance⁷. The vector unit retrieves an address + provenance pair from the base register, generates a stream of addresses to access, then rejoins each address with the provenance to access memory. When using capabilities, provenance is defined in terms of the base register e.g. “the provenance is provided by capability register X”, or defined by the DDC in integer mode⁸. On non-CHERI platforms the vector unit doesn’t check provenance.
 
-3.1.2.1 Fast-path checking phase
+TODO fixup The initial motivation for this project was investigating the impact of capability checks on performance. Rather than check each element’s access individually, we determine a set of “fast-path” checks which count as checks for multiple elements at once. In the emulator, this is done by computing the “tight bounds” for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds. [chap:hardware:sec:fastpath] describes methods for calculating the “tight bounds” for each access type, and ways that architectural complexity can be traded off to calculate wider bounds.
 
-TODO the emulator describes full-access checking, but we removed that part. TODO greatly cut this down
+3.3 Fast-path calculations
 
-The initial motivation for this project was investigating the impact of capability checks on performance. Rather than check each element’s access individually, we determine a set of “fast-path” checks which check multiple elements at once. The emulator computes the “tight bounds” for each access, i.e. the exact range of bytes that will be accessed, and doing a single capability check with that bounds. The full thesis describes calculating “tight bounds” for each access type, and ways that architectural complexity can be traded off to calculate wider bounds.
+A fast-path check can be performed over various sets of elements. The emulator chooses to perform a single fast-path check for each vector access, calculating the tight bounds before starting the actual access, but in hardware this may introduce prohibitive latency. This section describes the general principles surrounding fast-paths for CHERI-RVV, notes the areas where whole-access fast-paths are difficult to calculate, and describes possible approaches for hardware.
 
-If the tight bounds don’t pass the capability check, the emulator raises an imprecise trap and stops immediately. In the case of fault-only-first loads, where synchronous exceptions (e.g. capability checks) are explicitly handled, the access continues regardless and elements are checked individually. This is also the expected behaviour if a capability check for wider bounds fails. The emulator deviates from the spec in that vstart is not set when the tight bounds check fails, as it does not know exactly which element would have triggered the exception. A fully compliant machine must check each access to find vstart in these cases.
-
-3.1.2.2 Integer vs. Capability encoding mode
-
-CHERI-RISC-V defines two execution modes that the program can switch between. In Integer mode “address operands to existing RISC-V load and store opcodes contain integer addresses” which are implicitly dereferenced relative to the default data capability, and in Capability mode those opcodes are modified to use capability operands.
-
-Integer mode was included in the interests of maintaining compatibility with legacy code that hasn’t been adapted to capabilities. As similar vector code may also exist, CHERI-RVV treats vector memory access instructions as “existing RISC-V load and store opcodes” and requires that they respect integer/capability mode.
-
-We do not define new mode-agnostic instructions, which means vector programs cannot mix capability and integer addressing without changing encoding modes. This may make incremental adoption more difficult, and in the future we may examine existing vanilla RVV programs to determine if it’s worth adding those instructions.
-
-3.2 Fast-path calculations
-
-A fast-path check can be performed over various sets of elements. The emulator chooses to perform a single fast-path check for each vector access, calculating the tight bounds before starting the actual access, but in hardware this may introduce prohibitive latency. Here, we explore other possible approaches for hardware.
-
-3.2.1 Possible fast-path outcomes
+3.3.1 Possible fast-path outcomes
 
 In some cases, a failed address range check may not mean the access fails. The obvious case is fault-only-first loads, where capability exceptions may be handled without triggering a trap. Implementations may also choose to calculate wider bounds than accessed for the sake of simplicity, or even forego a fast-path check altogether. Thus, a fast-path check can have four outcomes depending on the circumstances.
 
-A Success means no per-access capability checks are required. Likely-Failure and Unchecked results mean each access must be checked, to see if any of them actually raise an exception. Unfortunately, accesses still need to be checked under Failure, because both precise and imprecise traps need to report the offending element in vstart⁸.
+  Success   All accesses will succeed
+  --------- ---------------------------
+  Failure   At least one access will
+            raise an exception
 
-Because all archetypes may have Failure or Likely-Failure outcomes, hardware must provide a fallback slow-path for each archetype which checks/performs each access in turn. In theory, a CHERI-RVV specification could relax the vstart requirement for imprecise traps, and state that all capability exceptions trigger imprecise traps. In this case, only archetypes that produce Likely-Failure outcomes need the slow-path. However, it is likely that for complexity reasons all masked accesses will use wide ranges, thus producing Likely-Failure outcomes and requiring slow-paths for all archetypes anyway. Because the Likely-Failure and Failure cases require the slow-path anyway, computing the fast-path can only be worthwhile if Success is the common case.
+Likely-Failure At least one access may or Unchecked raise an exception
 
-  Type             Meaning
-  ---------------- ---------------------------
-  Success          All accesses will succeed
-  Failure          At least one access will
-                   raise an exception
-  Likely-Failure   At least one access may
-  or Unchecked     raise an exception
+A Success means no per-access capability checks are required. Likely-Failure and Unchecked results mean each access must be checked, to see if any of them actually raise an exception. Unfortunately, accesses still need to be checked under Failure, because both precise and imprecise traps need to report the offending element in vstart⁹. Because all archetypes may have Failure or Likely-Failure outcomes, and thus require a fallback slow-path which checks elements individually, computing the fast-path can only be worthwhile if Success is the common case.
 
-3.2.2 m-element known-range fast-paths
+3.3.2 m-element known-range fast-paths
 
-A hardware implementation of a vector unit may be able to issue m requests within a set range in parallel. For example, elements in the same cache line may be accessible all at once. In these cases, checking elements individually would either require m parallel bounds checks, m checks’ worth of latency, or something in-between. In this subsection we consider a fast-path check for m elements.
+A hardware implementation of a vector unit may be able to issue m requests within a set range in parallel. For example, elements in the same cache line may be accessible all at once. In these cases, checking elements individually would either require m parallel bounds checks, m checks’ worth of latency, or something in-between. In this subsection we consider a fast-path check for m elements for unit and strided accesses. Indexed addressing has very little opportunity for fast-path checking, which is discussed in the full dissertation.
 
-Capability checks can be split into two steps: address-agnostic (e.g. permissions checks, bounds decoding) and address-dependent (e.g. bounds checks). Address-agnostic steps can be performed before any bounds checking, and should add minimal start-up latency (bounds decoding must complete before the checks anyway, and permission checks can be performed in parallel). Once the bounds are decoded the actual checks consist of minimal logic⁹, so a fast-path must have very minimal logic to compete.
+We consider two approaches for these accesses. First, one could amortize the checking logic cost over multiple sets of m elements by operating in terms of cache lines. Iterating through all accessed cache lines, and then iterating over the elements inside, allows the fast-path to hardcode the bounds width and do one check for multiple cycles of work (if cache lines contain more than m elements). Cache-line-aligned allocations benefit here, as all fast-path checks will be in-bounds i.e. Successful, but misaligned data is guaranteed to create at least one Likely-Failure outcome per access (requiring a slow-path check). Calculating tight bounds for the m accessed elements per cycle could address this.
 
-We first consider unit and strided accesses, and note two approaches. First, one could amortize the checking logic cost over multiple sets of m elements by operating in terms of cache lines. Iterating through all accessed cache lines, and then iterating over the elements inside, allows the fast-path to hardcode the bounds width and do one check for multiple cycles of work (if cache lines contain more than m elements). Cache-line-aligned allocations benefit here, as all fast-path checks will be in-bounds i.e. Successful, but misaligned data is guaranteed to create at least one Likely-Failure outcome per access (requiring a slow-path check). Calculating tight bounds for the m accessed elements per cycle could address this.
+Another approach is to simply calculate the bounds occupied by m elements, which is simple for unit and strided accesses. The minimum and maximum can then be picked easily to generate tight bounds. An m-way multiplexer is still required for taking the minimum and maximum, because evl and vstart may not be m-aligned. If m is small, this also neatly extends to handle masked/inactive elements. This may use less logic overall than m parallel bounds checks, depending on the hardware platform¹⁰, but it definitely uses more logic than the cache-line approach. Clearly, there’s a trade-off to be made.
 
-For unit and strided accesses, the bounds occupied by m elements is straightforward to calculate, as the addresses can be generated in order. The minimum and maximum can then be picked easily to generate tight bounds. An m-way multiplexer is still required for taking the minimum and maximum, because evl and vstart may not be m-aligned. If m is small, this also neatly extends to handle masked/inactive elements. This may use less logic overall than m parallel bounds checks, depending on the hardware platform¹⁰, but it definitely uses more logic than the cache-line approach. Clearly, there’s a trade-off to be made.
+3.4 The Hypothesis
 
-Indexed fast-paths are more complicated, because the addresses are unsorted. The two approaches above have different advantages for indexed accesses. If the offsets/indices are spatially close, just not sorted, cache line checks may efficiently cover all elements. An implementation could potentially cache the results, and refer back for each access, instead of trying to iterate through cache lines in order. Otherwise a m-way parallel reduction could be performed to find the min and max, but that would likely take up more logic than m comparisons. This may be a moot point depending on the cache implementation though - if the m accesses per cycle must be in the same cache line, and the addresses are spread out, you’re limited to one access and therefore one check per cycle regardless.
+The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost.
 
-In summary, there are fast-path checks that consume less logic than m parallel checks in certain circumstances. Even though a slow-path is always necessary, it can be implemented in a slow way (e.g. doing one check per cycle) to save on logic. Particularly if other parts of the system rely on constraining the addresses accessed in each cycle, a fast-path check can take advantage of those constraints.
+This is true for Successful accesses. Because the RVV spec requires that the faulting element is always recorded[Xyz21a Section 17], a Failure due to a capability violation requires elements to be checked individually.
 
-3.3 Testing and evaluation
-
-We tested the emulator using a set of test programs described in later sections, and found that all instructions were implemented correctly.
-
-[hyp:hw_cap_as_vec_mem_ref] - Feasibility
-
-This is true. All vector memory access instructions index the scalar general-purpose register file to read the base address, and CHERI-RVV implementations can simply use this index for the scalar capability register file instead. This can be considered through the lens of adding CHERI to any RISC-V processor, and in particular adding Capability mode to adjust the behaviour of legacy instructions. RVV instructions can have their behaviour adjusted in exactly the same way as the scalar memory access instructions.
-
-That approach then scales to other base architectures that have CHERI variants. For example, Morello’s scalar Arm instructions were modified to use CHERI capabilities as memory references[21 Section 1.3], so one may simply try to apply those modifications to e.g. Arm SVE instructions. This only works where Arm SVE accesses memory references in the same way as scalar Arm instructions did i.e. through a scalar register file.
-
-Arm SVE has some addressing modes like u64base, which uses a vector as a set of 64-bit integer addresses[19]. This has more complications, because simply dereferencing integer addresses without a capability is insecure. Would a CHERI version convert this mode to use capabilities-in-vectors, breaking compatibility with legacy code that expects integer references? Another option would be to only enable this instruction in Integer mode, and dereference relative to the DDC. It’s possible to port this to CHERI, but requires further investigation and thought.
-
-[hyp:hw_cap_bounds_checks_amortized] - Fast-path checks
-
-This is also true, at least for Successful accesses. Because the RVV spec requires that the faulting element is always recorded[Xyz21 Section 17], a Failure due to a capability violation requires elements to be checked individually. CHERI-RVV could change the specification so the faulting element doesn’t need to be calculated, which would make Failures faster, but that still requires Likely-Failures to take the slow-path.
-
-There are many ways to combine the checks for a set of vector elements, which can take advantage of the range constraints. For example, a unit-stride access could a hierarchy of checks: cache-line checks until a Likely-Failure, then tight m-element bounds until a Likely-Failure, then the slow-path. However, the choice of fast-path checks is inherently a trade-off between latency, area, energy usage, and more. Picking the right one for the job is highly dependent on the existing implementation, and indeed an implementation may decide that parallel per-element checks is better than a fast-path.
-
-4 The CHERI-RVV software stack
+There are fast-path checks that consume less logic than m parallel checks for unit and strided accesses. Even though a slow-path is always necessary, it can be implemented in a slow way (e.g. doing one check per cycle) to save on logic. Particularly if other parts of the system rely on constraining the addresses accessed in each cycle, a fast-path check can take advantage of those constraints. # The CHERI-RVV software stack
 
 This chapter, being less relevant to RISE/hardware security, has been greatly condensed.
 
@@ -186,27 +168,39 @@ As part of the project, we considered how adding CHERI to RVV would affect the s
 
 Clang currently supports intrinsics and inline assembly for RVV, but not auto-vectorization yet. This just requires engineering work - Arm SVE, a similar model, has great auto-vectorization.
 
-4.1 Our changes to CHERI-Clang
+3.5 Our changes to CHERI-Clang
 
 The first step was to fix up the pre-existing RVV definition in Clang to use capability registers for the base address. This meant CHERI-RVV assembly code could be compiled, as long as it explicitly referenced capability registers. Unfortunately, non-CHERI inline assembly could not be automatically compiled under this method.
 
-We investigated updating vector intrinsics to support CHERI, but found the code defining the intrinsics was more complicated than for assembly. We believe it is possible to update the intrinsics, but it requires significant engineering work. Other experiments, such as creating C functions to replace the intrinsics, ran into more significant problems. One of these problems involved storing vectors to the stack.
+We investigated updating vector intrinsics to support CHERI, but found the code defining the intrinsics was more complicated than for assembly. We believe it is possible to update the intrinsics, but it requires significant engineering work.
 
-4.1.1 Storing scalable vectors on the stack
+TODO this is really short lol
 
-If a program uses too much data, or calls a function which may overwrite register values, the compiler will save/restore those register values to memory on the stack. This also applies to multiprocessing systems where a process can be paused, have the state saved, and resume later. RVV provides whole-register memory access instructions explicitly to make this process easy[Xyz21 Section 7.9].
+3.6 The Hypothesis
 
-CHERI-Clang contains an LLVM IR pass¹¹ which enforces strict bounds on so-called “stack capabilities” (capabilities pointing to stack-allocated data), which requires knowing the size of the data. This pass requires the size to be known at compile-time, but scalable vectors do not have known sizes until runtime and so cannot currently be stored on the stack. This can be fixed with engineering effort - on non-CHERI platforms Clang simply finds VLEN at runtime.
+** Legacy vector code can be compiled into a pure-capability form with no changes. **
 
-4.2 Testing and evaluation
+This is true for CHERI-RVV, but cannot be done in practice yet. Engineering effort is required to support this in CHERI-Clang. Because this argument concerns source code, all three ways to generate CHERI-RVV instructions must be examined.
 
-TODO summarize testing and evaluation
+3.6.1 Inline assembly
 
-5 Capabilities-in-vectors
+For GCC-style inline assembly, where register types are specified in the source code, this is impossible. Legacy integer-addressed RVV instructions will specify general-purpose registers for the base address, and the new pure-capability versions require capability registers instead. A programmer will have to change the register types by hand before the code compiles in pure-capability form.
 
-Implementing memcpy correctly for CHERI systems requires copying the tag bits as well as the data. As it stands, any vectorized memcpy on the systems described in previous chapters will not copy the tag bits, because the vector registers cannot store the tag bits and indeed cannot store valid capabilities. memcpy is very frequently vectorized, so it’s vital that CHERI-RVV can implement it correctly. Manipulating capabilities-in-vectors could also accelerate CHERI-specific processes, such as revoking capabilities for freed memory[XWAF19].
+3.6.2 Intrinsics
 
-5.1 Extending the emulator
+The current RVV intrinsics use pointer types for all base addresses[Xyz21b]. In pure-capability compilers these pointers should be treated as capabilities instead of integers. All RVV memory intrinsics have equivalent RVV instructions, which all use capabilities in pure-capability mode, so changing the intrinsics to match is valid.
+
+This is not currently the case for CHERI-Clang, as RVV memory access intrinsics are broken, but this can be fixed with engineering effort.
+
+3.6.3 Auto-vectorization
+
+All vanilla RVV instructions have counterparts with identical encodings and behaviour in CHERI-RVV pure-capability mode, assuming the base addresses can be converted to valid capabilities. Any auto-vectorized legacy code which uses valid base addresses can thus be converted to pure-capability CHERI-RVV code with no changes.
+
+This is not currently possible for CHERI-Clang, as RVV auto-vectorization is not implemented yet.# Capabilities-in-vectors
+
+Implementing memcpy correctly for CHERI systems requires copying the tag bits as well as the data, which means the vector registers must store the tag bits and thus store valid capabilities. memcpy is frequently vectorized, so it’s vital that CHERI-RVV can implement it correctly. Manipulating capabilities-in-vectors could also accelerate CHERI-specific processes, such as revoking capabilities for freed memory[XWAF19].
+
+3.7 Extending the emulator
 
 We defined three goals for capabilities-in-vectors:
 
@@ -216,93 +210,61 @@ We defined three goals for capabilities-in-vectors:
 3.  Vector instructions should be able to manipulate capabilities.
     -   Clearing tag bits counts as manipulation.
 
-First, we considered the impact on the theoretical vector model. We decided that any operation with elements smaller than CLEN cannot output valid capabilities under any circumstances¹², meaning a new element width equal to CLEN must be introduced. We set ELEN = VLEN = CLEN = 128¹³ for our vector unit.
+First, we considered the impact on the theoretical vector model. We decided that any operation with elements smaller than CLEN cannot output valid capabilities under any circumstances¹¹, meaning a new element width equal to CLEN must be introduced. We set ELEN = VLEN = CLEN = 128¹² for our vector unit.
 
-Two new memory access instructions were created to take advantage of this new element width, and the vector model was adjusted to support 128-bit elements. Similar to the CHERI-RISC-V LC/SC instructions we implemented 128-bit unit-stride vector loads and stores, which took over officially-reserved encodings¹⁴ we expected official versions to use. We have not tested other types of access, but expect them to be noncontroversial. Indexed accesses require specific scrutiny, as they may be expected to use 128-bit offsets on 64-bit systems.
+Two new memory access instructions were created to take advantage of this new element width. Similar to CHERI-RISC-V’s LC/SC instructions, we implemented 128-bit unit-stride vector loads and stores, which took over officially-reserved encodings¹³ for 128-bit accesses. We have not tested other types of access, but expect them to be noncontroversial.
 
-The next step was to add capability support to the vector register file. Our approach to capabilities-in-vectors is similar in concept to CHERI-RISC-V’s Merged scalar register file, in that the same bits of a register can be accessed in two contexts: an integer context, zeroing the tag, or a capability context which maintains the current tag. The only instructions which can access data in a capability context are 128-bit memory accesses¹⁵. All other instructions read out untagged integer data and clear tags when writing data.
+The next step was to add capability support to the vector register file. Our approach to capabilities-in-vectors is similar in concept to CHERI-RISC-V’s Merged scalar register file, in that the same bits of a register can be accessed in two contexts: an integer context, zeroing the tag, or a capability context which maintains the current tag. The only instructions which can access data in a capability context are 128-bit memory accesses¹⁴. All other instructions read out untagged integer data and clear tags when writing data.
 
 A new CHERI-specific vector register file was created, where each register is a SafeTaggedCap i.e. either zero-tagged integer data or a valid tagged capability. This makes it much harder to accidentally violate Provenance, and reuses the code path (and related security properties) for accessing capabilities in memory. Just like scalar accesses, vectorized capability accesses are atomic and 128-bit aligned.
 
-5.2 Testing and evaluation
+3.8 The Hypothesis
 
-We constructed a second test program to ensure memcpy could be performed correctly with capabilities-in-vectors. It copies an array of Element structures that hold pointers to static Base structures. On CHERI platforms, even in Integer mode, capability pointers are used and copied. The first test simply copies the data, and tests that all the copied pointers still work, which succeeds on all compilers/architectures. The second test is CHERI-exclusive, and invalidates all pointers during the copy process by performing integer arithmetic on the vector registers. The copied pointers are examined to make sure their tag bits are all zeroed, and this test succeeds on both CHERI configurations.
+** It is possible for a vector architecture to load, store, and manipulate capabilities in vector registers without violating CHERI security principles. **
 
-[hyp:cap_in_vec_storage] - Holding capabilities in vectors
+We considered this from three perspectives, checking they each fulfil Provenance, Monotonicity, and Integrity.
 
-It is possible for a single vector register to hold a capability (and differentiate a capability from integer data) as long as VLEN = CLEN. VLEN could also be larger, and a compliant implementation must then have VLEN be an integer multiple of CLEN. In theory, one could also describe a scheme where capabilities must be held by multiple registers together (e.g. VLEN = CLEN/2 with one tag bit for every two registers), but this would complicate matters.
+3.8.1 Holding capabilities in vector registers
 
-If an implementation decides, as we did, that elements of width CLEN are required to produce capabilities, then VLEN ≥ ELEN therefore VLEN ≥ CLEN. If a short VLEN is absolutely essential, one could place precise guarantees on a specific set of instructions to enable it (e.g. SEW=64, LMUL=2 unit-stride unmasked loads could guarantee atomic capability transfers) but the emulator does not consider this. The CHERI security properties also impose some conditions.
+As long as VLEN = CLEN, and a tag bit is stored alongside each one, a single vector register can hold a capability and differentiate it from integer data. One could also hold multiple capabilities in a register if VLEN was an integer multiple of CLEN, but this was not tested. We decided that only CLEN-width operations could produce capabilities, thus we had to ensure ELEN = CLEN. Our implementation sets VLEN = ELEN = CLEN = 128bits.
 
-Provenance & Monotonicity
+To ensure Provenance and Monotonicity were upheld, we decided that the tag bit for a register would only be set when loading a valid capability from memory, and cleared in all other circumstances. Integrity is not affected by how a capability is stored.
 
-The tag bit must be protected such that capabilities cannot be forged from integer data. The emulator’s integer/capability context approach, where the tag bit may only be set on copying a valid capability from memory, and the output tag bit is zeroed on all other accesses, enforces this correctly.
+3.8.2 Moving capabilities between vector registers and memory
 
-Integrity
+Memory access instructions must follow the same rules as scalar capability accesses. To maintain Provenance they must be CLEN-aligned, or at least only load valid capabilities from aligned addresses, because tag bits only apply to CLEN-aligned regions; and they must be atomic[WNWR20 Section 11.3].
 
-Integrity is not affected by how a capability is stored, as long as the other properties are maintained.
+This atomicity requirement applies to the individual element accesses within each vector access too. If multiple elements within a vector access try to write to the same 128-bit region, TODO
 
-[hyp:cap_in_vec_load_store] - Sending capabilities between vectors and memory
+Monotonicity is not affected by simply loading/storing capabilities from memory. Integrity requires that the accesses themselves are checked against a valid base capability, just like normal scalar and vector accesses.
 
-For this to be the case, the instructions which can load/store capabilities must fulfil certain alignment and atomicity requirements. They must require all accesses be CLEN-aligned, or at least only load valid capabilities from aligned addresses, because tag bits only apply to CLEN-aligned regions. TR-951 states that capability memory accesses must be atomic[WNWR20 Section 11.3]. This applies to vectors, even in ways that don’t apply to scalar accesses.
+3.8.3 Manipulating capabilities in vector registers
 
-Individual element accesses for a vector access must be atomic relative to each other. This is relevant for e.g. a strided store using an unaligned stride, such that one element writes a valid capability and another element overwrites part of that address range. If unaligned 128-bit accesses are allowed, then either the unaligned second element should “win” and clear relevant tag bits, or the first element should “win” and write the full capability atomically. The emulator requires all 128-bit accesses to be aligned so meets this requirement easily.
+The emulator limits all manipulation to clearing the tag bit, achieved by writing data to the register in an integer context. This preserves Provenance and Monotonicity, because it’s impossible to create or change capabilities, and doesn’t affect Integrity.
 
-Provenance
+In theory it’s possible to do more complex transformations, but there aren’t many scalar transformations which would benefit from vectorization. If more transformations are added they should be considered carefully, rather than creating vector equivalents for all scalar manipulations. For example, revocation as described in [XWAF19] may benefit from a vector equivalent to CLoadTags. # Conclusion
 
-Provenance requires the accesses be atomic as described above, and require that tag bits are copied correctly: the output tag bit must only be set if the input had a valid tag bit. These conditions also apply to scalar accesses.
+This project demonstrated the viability of integrating CHERI with scalable vector models by producing an example CHERI-RVV implementation. This required both research effort in studying the related specifications and a substantial implementation effort. We produced four software artifacts: a Rust wrapper for the cheri-compressed-cap C library (900 lines of code), a RISC-V emulator supporting multiple architecture extensions (5,300 LoC), a fork of CHERI-Clang supporting CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000 LoC¹⁵). Developing these artifacts provided enough information to make conclusions for the initial hypotheses.
 
-Monotonicity
+Based on the hypotheses examined in this write-up and the original dissertation, scalable vector models can be adapted to CHERI without significant loss of functionality. Most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, but any differences from RVV’s model will require careful examination. Given the importance of vector processing to modern computing, and thus its importance to CHERI, we hope that this research paves the way for future vector-enabled CHERI processors.
 
-These loads/stores do not attempt to manipulate capabilities, so have no relevance to Monotonicity.
+3.9 Testing
 
-Integrity
+TODO mention testing!!
 
-The same conditions for scalar and other vector accesses apply to maintain Integrity: namely that the base capability for each access should be checked to ensure it is valid. The emulator doesn’t allow capabilities-in-vectors to be dereferenced directly, but if an implementation allows it those capabilities would also need to be checked.
-
-[hyp:cap_in_vec_manip] - Manipulating capabilities in vectors
-
-The emulator limits all manipulation to clearing the tag bit, achieved by writing data to the register in an integer context. In theory, it’s possible to do more complex transformations, which can be proven by implementing each vector manipulation on vector elements as sequential scalar manipulations on scalar elements.
-
-With this method, all pre-existing scalar capability manipulations can become vector manipulations, but the utility seems limited. For example, instructions for creating capabilities or manipulating bounds en masse don’t have an obvious use case. If more transformations are added they should be considered carefully, rather than creating vector equivalents for all scalar manipulations. For example, revocation as described in [XWAF19] may benefit from a vector equivalent to CLoadTags.
-
-Provenance & Monotonicity
-
-Because the only possible manipulations clear the tag bit, it’s impossible to create or change capabilities, so Provenance and Monotonicity cannot be violated. Any manipulations that create capabilities, or potentially any manipulations that transfer capabilities from vector registers directly to scalar registers, would require more scrutiny.
-
-Integrity
-
-As stated before, capabilities-in-vectors cannot be dereferenced directly, so there is no impact on Integrity.
-
-6 Conclusion
-
-This project demonstrated the viability of integrating CHERI with scalable vector models by producing an example CHERI-RVV implementation. This required both research effort in studying the related specifications and a substantial implementation effort. We produced four software artifacts: a Rust wrapper for the cheri-compressed-cap C library (900 lines of code), a RISC-V emulator supporting multiple architecture extensions (5,300 LoC), a fork of CHERI-Clang supporting CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000 LoC¹⁶). Developing these artifacts provided enough information to make conclusions for the initial hypotheses.
-
-6.1 Evaluating hypotheses
-
-[hyp:hw_cap_as_vec_mem_ref] showed that all memory references can be replaced with capabilities in all RVV instructions while maintaining functionality. [hyp:hw_cap_bounds_checks_amortized] then alleviated performance concerns by showing it was possible to combine the required capability checks for all vector accesses, amortizing the overall cost of checking, although with varying practical benefit.
-
-On the software side [hyp:sw_vec_legacy,hyp:sw_pure_compat] showed that non-CHERI vectorized code could be run on CHERI systems, and even recompiled for pure-capability platforms with no source code changes, but that CHERI-Clang’s current state adds some practical limitations. We developed the vector_memcpy test program to show that despite those limitations, it’s possible to write correct CHERI-RVV code on current compilers. [hyp:sw_stack_vectors,hyp:sw_multiproc] address the pausing and resuming of vector code, specifically saving and restoring variable-length architectural state, concluding that it is entirely possible but requires software adjustments.
-
-Through a limited investigation of capabilities-in-vectors, [hyp:cap_in_vec_storage,hyp:cap_in_vec_load_store,hyp:cap_in_vec_manip] showed that a highly constrained implementation could enable a fully-functional vectorized memcpy, as demonstrated in the vector_memcpy_pointers test program, without violating CHERI security principles. It should be possible to extend the CHERI-RVV ISA with vector equivalents of existing CHERI scalar instructions, but we did not investigate this further.
-
-Clearly, scalable vector models can be adapted to CHERI without significant loss of functionality. Most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, but any differences from RVV’s model will require careful examination. Given the importance of vector processing to modern computing, and thus its importance to CHERI, we hope that this research paves the way for future vector-enabled CHERI processors.
-
-6.2 Future work
+3.10 Future work
 
 The stated purpose of this project was to enable future implementations of CHERI-RVV and CHERI Arm SVE. We’ve shown this is feasible, and we believe our research is enough to create an initial CHERI-RVV specification, but both could benefit from more research on capabilities-in-vectors.
 
-All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the first version of CHERI-RVV based on this dissertation and only add new instructions as required. Once created, the standard can be implemented in CHERI-Clang¹⁷ and added to existing CHERI-RISC-V processors¹⁸.
+All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the first version of CHERI-RVV based on this dissertation and only add new instructions as required. Once created, the standard can be implemented in CHERI-Clang¹⁶ and added to existing CHERI-RISC-V processors¹⁷.
 
 More theoretically, other vector models could benefit from dereferencing capabilities-in-vectors. Arm SVE has addressing modes that directly use vector elements as memory references, as do its predecessors and contemporaries. A draft specification of CHERI-x86 is in the works[WNWR20 Chapter 6], and existing x86 vector models like AVX have similar features. This may prove impractical, but this could be mitigated by e.g. replacing these addressing modes with variants of RVV’s “indexed” mode. Once this problem is solved, CHERI will be able to match the memory access abilities of any vector ISA it needs to, making it that much easier for industry to adopt CHERI in the long term.
+
+TODO below is 700 words
 
 [19]
 
 ARM LTD: Arm Compiler Scalable Vector Extension User Guide Version 6.12 ( Nr. 0612-00), 2019
-
-[21]
-
-ARM LTD: Arm Architecture Reference Manual Supplement - Morello for A-profile Architecture.
 
 [JWKM17]
 
@@ -340,7 +302,11 @@ WATSON, ROBERT N. M. ; WOODRUFF, JONATHAN ; NEUMANN, PETER G. ; MOORE, SIMON W. 
 
 XIA, HONGYAN ; WOODRUFF, JONATHAN ; AINSWORTH, SAM ; FILARDO, NATHANIEL W ; ROE, MICHAEL ; RICHARDSON, ALEXANDER ; RUGG, PETER ; NEUMANN, PETER G ; u. a.: CHERIvoke: Characterising Pointer Revocation Using CHERI Capabilities for Temporal Memory Safety (2019), S. 14
 
-[Xyz21]
+[Xyz21b]
+
+RISC-V Vector Extension Intrinsics (v1.0) : RISC-V Non-ISA Specifications, 2021
+
+[Xyz21a]
 
 RISC-V "V" Vector Extension.
 
@@ -352,32 +318,30 @@ RISC-V "V" Vector Extension.
 
 3.  This has the side-effect that capabilities must be 128-bit aligned in memory.↩︎
 
-4.  Of course, the DDC must be valid when it is used in this mode, and all bounds checks etc. must still pass.↩︎
+4.  https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-llvm.html↩︎
 
-5.  The decoder, and therefore all emulated processors, doesn’t support RISC-V Compressed instructions.↩︎
+5.  This wasn’t derived from documentation, but instead from manual inspection of emitted code.↩︎
 
-6.  The “original allocation the pointer is derived from”[MGDK19], or in CHERI terms the bounds within which the pointer is valid.↩︎
+6.  The decoder, and therefore all emulated processors, doesn’t support RISC-V Compressed instructions.↩︎
 
-7.  See [chap:emu:rvv_int_mode] for the reasoning behind this decision.↩︎
+7.  The “original allocation the pointer is derived from”[MGDK19], or in CHERI terms the bounds within which the pointer is valid.↩︎
 
-8.  In very particular cases, e.g. unmasked unit-strided accesses where nf = 1, the capability bounds could be used to calculate what the offending element must have been. We believe this is too niche of a use case to investigate further, particularly given the complexity of the resulting hardware.↩︎
+8.  See [chap:emu:rvv_int_mode] for the reasoning behind this decision.↩︎
 
-9.  Likely requires two arithmetic operations per element, for checking against the top and bottom bounds.↩︎
+9.  In very particular cases, e.g. unmasked unit-strided accesses where nf = 1, the capability bounds could be used to calculate what the offending element must have been. We believe this is too niche of a use case to investigate further, particularly given the complexity of the resulting hardware.↩︎
 
 10. e.g. on FPGAs multiplexers can be relatively cheap.↩︎
 
-11. llvm/lib/CodeGen/CheriBoundAllocas.cpp in CTSRD-CHERI/llvm-project on GitHub↩︎
+11. This avoids edge cases with masking, where one part of a capability could be modified while the other parts are left alone.↩︎
 
-12. This avoids edge cases with masking, where one part of a capability could be modified while the other parts are left alone.↩︎
+12. The tag bits are implicitly instead of explicitly included here because VLEN,ELEN must be powers of two.↩︎
 
-13. The tag bits are implicitly instead of explicitly included here because VLEN,ELEN must be powers of two.↩︎
+13. The RVV spec mentions, but does not specify, potential encodings for 128-bit element widths and instructions ([Xyz21a, S.p10, p32], [tab:capinvec:accesswidth]).↩︎
 
-14. The RVV spec mentions, but does not specify, potential encodings for 128-bit element widths and instructions ([Xyz21, S.p10, p32], [tab:capinvec:accesswidth]).↩︎
+14. The encoding mode ([chap:bg:subsec:cheriencodingmode]) does not affect register usage: when using the Integer encoding mode, instructions can still access the vector registers in a capability context. This is just like how scalar capability registers are still accessible in Integer encoding mode.↩︎
 
-15. The encoding mode ([chap:bg:subsec:cheriencodingmode]) does not affect register usage: when using the Integer encoding mode, instructions can still access the vector registers in a capability context. This is just like how scalar capability registers are still accessible in Integer encoding mode.↩︎
+15. This doesn’t include automatically generated code.↩︎
 
-16. This doesn’t include automatically generated code.↩︎
+16. See 4.4 for the other required changes to CHERI-Clang.↩︎
 
-17. See 4.4 for the other required changes to CHERI-Clang.↩︎
-
-18. https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html↩︎
+17. https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html↩︎
