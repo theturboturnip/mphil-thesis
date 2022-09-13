@@ -27,7 +27,7 @@ element width equal to `CLEN` must be introduced. We set
 Two new memory access instructions were created to take advantage of
 this new element width. Similar to CHERI-RISC-V's `LC/SC` instructions, we
 implemented 128-bit unit-stride vector loads and stores, which took over
-officially-reserved encodings[^46] for 128-bit accesses.
+officially-reserved encodings for 128-bit accesses.
 We have not tested other types of access, but expect them to be
 noncontroversial.
 <!-- Indexed accesses require extra scrutiny, as they

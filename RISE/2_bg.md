@@ -8,7 +8,7 @@ TODO - something here?
 In CHERI, addresses/pointers are replaced with capabilities: unforgeable
 tokens that provide *specific kinds of access* to an *address* within a
 *range of memory*. The above statement is enough to understand what
-capabilities contain[^13]:
+capabilities contain:
 
 -   Permission bits, to restrict access
 
@@ -35,7 +35,7 @@ its capabilities[@TR-951 Section 1.2.1]:
 
 Integrity is enforced by tagging registers and memory. Every 128-bit
 register and aligned 128-bit region of memory has an associated tag bit,
-which denotes if its data encodes a valid capability[^14]. If any
+which denotes if its data encodes a valid capability. If any
 non-capability data is written to any part of the region the tag bit is
 zeroed out. Instructions that perform memory accesses can only do so if
 the provided capability has a valid tag bit. As above, significant work
@@ -82,12 +82,12 @@ This allows legacy code to run in a sandbox defined by the DDC without recompili
 
 ### Pure-capability and Hybrid compilation modes {#cheri_purecap_hybrid}
 
-CHERI-Clang[^16], the main CHERI-enabled compiler, supports two ways to
+CHERI-Clang, the main CHERI-enabled compiler, supports two ways to
 compile CHERI-RISC-V which map to the different encoding modes.
 
 *Pure-capability* mode treats all pointers as capabilities, and emits
 pre-existing RISC-V instructions that expect to be run in capability
-mode[^17].
+mode.
 
 *Hybrid* mode treats pointers as integer addresses, dereferenced
 relative to the DDC, unless they are annotated with `__capability`. This

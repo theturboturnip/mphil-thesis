@@ -5,9 +5,12 @@ csl:
 - din-1505-2-alphanumeric.csl
 ---
 
+TODO note url for project?
+TODO note that royal 'we' is used throughout, I was the sole contributor
+
 # Introduction
 
-The CHERI[^1] architecture extension improves computer
+The CHERI architecture project improves computer
 security by checking all memory accesses in
 hardware.
 Under CHERI, memory cannot be accessed with integer addresses, but must pass

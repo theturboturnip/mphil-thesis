@@ -12,7 +12,7 @@ Each ISA module uses a "connector" structure, containing e.g. virtual references
 which allows different processors to reuse ISA modules despite using different register file/memory implementations.
 
 Each processor implements a single stage pipeline. Instructions are
-fetched, decoded with a common decoder function[^19], and executed. The
+fetched, decoded with a common decoder function, and executed. The
 processor asks each ISA module in turn if it wants to handle the
 instruction, and uses the first module to say yes. If the ISA module
 returns a new PC value it is immediately applied, otherwise it is
@@ -71,7 +71,7 @@ address + provenance pair from the base register, generates a stream of
 addresses to access, then rejoins each address with the provenance to
 access memory. When using capabilities, provenance is defined in terms
 of the base register e.g. "the provenance is provided by capability
-register X", or defined by the DDC in integer mode[^29]. On non-CHERI
+register X", or defined by the DDC in integer mode. On non-CHERI
 platforms the vector unit doesn't check provenance.
 
 TODO fixup as an intro to fast-paths
@@ -120,7 +120,7 @@ Likely-Failure and Unchecked results mean each access must be checked,
 to see if any of them actually raise an exception. Unfortunately,
 accesses still need to be checked under Failure, because both precise
 and imprecise traps need to report the offending element in
-`vstart`[^30].
+`vstart`.
 Because all archetypes may have Failure or Likely-Failure outcomes,
 and thus require a fallback slow-path which checks elements individually,
 computing the fast-path can only be worthwhile if Success is the common case.

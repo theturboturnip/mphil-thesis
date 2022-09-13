@@ -7,7 +7,7 @@ csl:
 
 # Introduction
 
-The CHERI[^1] architecture extension improves computer
+The CHERI (Capability Hardware Enhanced RISC Instructions) architecture project improves computer
 security by checking all memory accesses in
 hardware.
 Under CHERI, memory cannot be accessed with integer addresses, but must pass
@@ -75,7 +75,7 @@ TODO - something here?
 In CHERI, addresses/pointers are replaced with capabilities: unforgeable
 tokens that provide *specific kinds of access* to an *address* within a
 *range of memory*. The above statement is enough to understand what
-capabilities contain[^13]:
+capabilities contain:
 
 -   Permission bits, to restrict access
 
@@ -102,7 +102,7 @@ its capabilities[@TR-951 Section 1.2.1]:
 
 Integrity is enforced by tagging registers and memory. Every 128-bit
 register and aligned 128-bit region of memory has an associated tag bit,
-which denotes if its data encodes a valid capability[^14]. If any
+which denotes if its data encodes a valid capability. If any
 non-capability data is written to any part of the region the tag bit is
 zeroed out. Instructions that perform memory accesses can only do so if
 the provided capability has a valid tag bit. As above, significant work
@@ -149,12 +149,12 @@ This allows legacy code to run in a sandbox defined by the DDC without recompili
 
 ### Pure-capability and Hybrid compilation modes {#cheri_purecap_hybrid}
 
-CHERI-Clang[^16], the main CHERI-enabled compiler, supports two ways to
+CHERI-Clang, the main CHERI-enabled compiler, supports two ways to
 compile CHERI-RISC-V which map to the different encoding modes.
 
 *Pure-capability* mode treats all pointers as capabilities, and emits
 pre-existing RISC-V instructions that expect to be run in capability
-mode[^17].
+mode.
 
 *Hybrid* mode treats pointers as integer addresses, dereferenced
 relative to the DDC, unless they are annotated with `__capability`. This
@@ -226,7 +226,7 @@ Each ISA module uses a "connector" structure, containing e.g. virtual references
 which allows different processors to reuse ISA modules despite using different register file/memory implementations.
 
 Each processor implements a single stage pipeline. Instructions are
-fetched, decoded with a common decoder function[^19], and executed. The
+fetched, decoded with a common decoder function, and executed. The
 processor asks each ISA module in turn if it wants to handle the
 instruction, and uses the first module to say yes. If the ISA module
 returns a new PC value it is immediately applied, otherwise it is
@@ -285,7 +285,7 @@ address + provenance pair from the base register, generates a stream of
 addresses to access, then rejoins each address with the provenance to
 access memory. When using capabilities, provenance is defined in terms
 of the base register e.g. "the provenance is provided by capability
-register X", or defined by the DDC in integer mode[^29]. On non-CHERI
+register X", or defined by the DDC in integer mode. On non-CHERI
 platforms the vector unit doesn't check provenance.
 
 TODO fixup as an intro to fast-paths
@@ -334,7 +334,7 @@ Likely-Failure and Unchecked results mean each access must be checked,
 to see if any of them actually raise an exception. Unfortunately,
 accesses still need to be checked under Failure, because both precise
 and imprecise traps need to report the offending element in
-`vstart`[^30].
+`vstart`.
 Because all archetypes may have Failure or Likely-Failure outcomes,
 and thus require a fallback slow-path which checks elements individually,
 computing the fast-path can only be worthwhile if Success is the common case.
@@ -475,7 +475,7 @@ element width equal to `CLEN` must be introduced. We set
 Two new memory access instructions were created to take advantage of
 this new element width. Similar to CHERI-RISC-V's `LC/SC` instructions, we
 implemented 128-bit unit-stride vector loads and stores, which took over
-officially-reserved encodings[^46] for 128-bit accesses.
+officially-reserved encodings for 128-bit accesses.
 We have not tested other types of access, but expect them to be
 noncontroversial.
 <!-- Indexed accesses require extra scrutiny, as they
@@ -574,7 +574,7 @@ All architectures may benefit from more advanced vectorized capability
 manipulation. Because these processes are still evolving, it may be wise
 to standardize the first version of CHERI-RVV based on this dissertation
 and only add new instructions as required. Once created, the standard
-can be implemented in CHERI-Clang[^49] and added to existing
+can be implemented in CHERI-Clang and added to existing
 CHERI-RISC-V processors[^50].
 
 More theoretically, other vector models could benefit from
@@ -588,149 +588,17 @@ RVV's "indexed" mode. Once this problem is solved, CHERI will be able to
 match the memory access abilities of any vector ISA it needs to, making
 it that much easier for industry to adopt CHERI in the long term.
 
-TODO below is 700 words
-
-[^1]: Capability Hardware Enhanced RISC Instructions
-
-[^2]: This is a SIMD (Single Instruction Multiple Data) paradigm.
-
-[^3]: It appears memcpy is implemented as a copy of memmove.
-
-[^4]: [`sysdeps/x86_64/multiarch/ifunc-memmove.h` in `bminor/glibc` on
-    GitHub](https://github.com/bminor/glibc/blob/7b1cfba79ee54221ffa7d7879433b7ee1728cd76/sysdeps/x86_64/multiarch/ifunc-memmove.h)
-
-[^5]: <https://wiki.riscv.org/display/HOME/Recently+Ratified+Extensions>
-
-[^6]: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html>
-
-[^7]: A single vector register will always have enough bits for all
-    elements. The maximum element count is found when SEW is minimized
-    (8 bits) and LMUL is maximized (8 registers), and is equal to
-    `VLEN * LMUL / SEW = VLEN * 8 / 8 = VLEN`.
-
-[^8]: <https://github.com/riscv/riscv-v-spec/issues/799>
-
-[^9]: If the memory region is idempotent, then `vstart` could any value
-    where all preceding elements had completed. It could even be zero,
-    in which case all accesses would be retried on resume, as long as it
-    could guarantee forward progress.
-
-[^10]: [`semidynamics/OpenVectorInterface` on
-    Github](https://github.com/semidynamics/OpenVectorInterface)
-
-[^11]: Segment 0 may be masked out, in which case this is impossible.
-
-[^12]: This allows restarting after raising an exception partway through
-    a structure
-
-[^13]: This is a slight simplification. For the purposes of vector
-    memory accesses the *otype* of a capability can be ignored, as any
-    type other than `UNSEALED` cannot be dereferenced anyway.
-
-[^14]: This has the side-effect that capabilities must be 128-bit
-    aligned in memory.
-
-[^15]: Of course, the DDC must be valid when it is used in this mode,
-    and all bounds checks etc. must still pass.
-
-[^16]: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-llvm.html>
-
-[^17]: This wasn't derived from documentation, but instead from manual
-    inspection of emitted code.
-
-[^18]: i.e. entirely bare-metal without privilege levels for OSs or
-    hypervisors.
-
-[^19]: The decoder, and therefore all emulated processors, doesn't
-    support RISC-V Compressed instructions.
-
-[^20]: See <https://godbolt.org/z/qj43jssr6> for an example.
-
-[^21]: [`clang/docs/UsersManual.rst:3384` in `llvm/llvm-project` on
-    GitHub](https://github.com/llvm/llvm-project/blob/release/13.x/clang/docs/UsersManual.rst#x86)
-
-[^22]: [`clang/lib/CodeGen/TargetInfo.cpp:2811` in `llvm/llvm-project`
-    on
-    GitHub](https://github.com/llvm/llvm-project/blob/75e33f71c2dae584b13a7d1186ae0a038ba98838/clang/lib/CodeGen/TargetInfo.cpp#L2811)
-
-[^23]: [`rems-project/sail` on
-    Github](https://github.com/rems-project/sail)
-
-[^24]: [`CTSRD-CHERI/sail-cheri-riscv` on
-    Github](https://github.com/CTSRD-CHERI/sail-cheri-riscv)
-
-[^25]: [`theturboturnip/cheri-compressed-cap` on
-    Github](https://github.com/theturboturnip/cheri-compressed-cap)
-
-[^26]: <https://theturboturnip.github.io/files/doc/rust_cheri_compressed_cap/>
-
-[^27]: [`src/crt_init_globals.c` in `CTSRD-CHERI/device-model` on
-    GitHub](https://github.com/CTSRD-CHERI/device-model/blob/88e5e8e744d57b88b0dbb8e3456ee0e69afc143b/src/crt_init_globals.c)
-
 [^28]: The "original allocation the pointer is derived
     from"[@memarianExploringSemanticsPointer2019], or in CHERI terms the
     bounds within which the pointer is valid.
 
-[^29]: See
-    [\[chap:emu:rvv_int_mode\]](#chap:emu:rvv_int_mode){reference-type="ref"
-    reference="chap:emu:rvv_int_mode"} for the reasoning behind this
-    decision.
-
-[^30]: In very particular cases, e.g. unmasked unit-strided accesses
-    where `nf = 1`, the capability bounds could be used to calculate
-    what the offending element must have been. We believe this is too
-    niche of a use case to investigate further, particularly given the
-    complexity of the resulting hardware.
-
-[^31]: Likely requires two arithmetic operations per element, for
-    checking against the top and bottom bounds.
-
 [^32]: e.g. on FPGAs multiplexers can be relatively cheap.
-
-[^33]: Behaviour under the Total Store Ordering extension hasn't been
-    defined.
-
-[^34]: e.g. each byte could be written in a separate access.
-
-[^35]: Even instructions that *would* trigger precise traps but are
-    guaranteed not to throw an exception or respond to asynchronous
-    interrupt may execute out of order.
-
-[^36]: It is difficult to verify the actual corresponding version,
-    because there is no readily available specification for v0.1, and
-    the extension supports instructions only present from v0.8 such as
-    whole register accesses.
-
-[^37]: <https://github.com/riscv-collab/riscv-gcc/issues/320>
-
-[^38]: As described later, CHERI-Clang crashes when intrinsics are used,
-    so we use inline assembly instead.
-
-[^39]: RVV slightly differs here, as it allows VLEN smaller than 128.
-
-[^40]: <https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded>
-
-[^41]: We tried using preprocessor macros instead of real functions, but
-    they are difficult to program and do not support returning values
-    like intrinsics do.
-
-[^42]: [`llvm/lib/CodeGen/CheriBoundAllocas.cpp` in
-    `CTSRD-CHERI/llvm-project` on
-    GitHub](https://github.com/CTSRD-CHERI/llvm-project/blob/master/llvm/lib/CodeGen/CheriBoundAllocas.cpp)
-
-[^43]: This ensures all memory accesses use valid capabilities.
 
 [^44]: This avoids edge cases with masking, where one part of a
     capability could be modified while the other parts are left alone.
 
 [^45]: The tag bits are implicitly instead of explicitly included here
     because `VLEN,ELEN` must be powers of two.
-
-[^46]: The RVV spec mentions, but does not specify, potential encodings
-    for 128-bit element widths and instructions
-    ([@specification-RVV-v1.0 p10, p32],
-    [\[tab:capinvec:accesswidth\]](#tab:capinvec:accesswidth){reference-type="ref"
-    reference="tab:capinvec:accesswidth"}).
 
 [^47]: The encoding mode
     ([\[chap:bg:subsec:cheriencodingmode\]](#chap:bg:subsec:cheriencodingmode){reference-type="ref"
@@ -742,9 +610,5 @@ TODO below is 700 words
 
 [^48]: This doesn't include automatically generated code.
 
-[^49]: See
-    [4.4](#chap:software:sec:chericlangchanges){reference-type="ref"
-    reference="chap:software:sec:chericlangchanges"} for the other
-    required changes to CHERI-Clang.
 
 [^50]: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/cheri-risc-v.html>
