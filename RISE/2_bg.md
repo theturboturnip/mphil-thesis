@@ -115,7 +115,7 @@ Instructions only operate on body elements, and some allow elements within the b
 
 ### RVV memory instructions
 
-TODO - something here
+TODO - different addressing modes, FoF
 
 ### Exception handling
 
