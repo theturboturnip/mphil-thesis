@@ -62,6 +62,9 @@ savecount:
     ./texcount.pl -sum -merge chapters.tex > ./output/wordcount.txt
     ./texcount.pl -sum -merge chapters.tex -v -html > ./output/wordcount.html
 
+rcount:
+    wc -w RISE/1_intro.md RISE/2_bg.md RISE/3_hw.md RISE/4_sw.md RISE/5_capinvec.md RISE/6_concl.md
+
 open: build-thesis
     xdg-open ./output/thesis.pdf
 
