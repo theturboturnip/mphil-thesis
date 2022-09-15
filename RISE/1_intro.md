@@ -2,7 +2,7 @@
 bibliography:
 - thesis.bib
 csl:
-- din-1505-2-alphanumeric.csl
+- institute-of-physics-numeric-modified.csl
 ---
 
 TODO note url for project?

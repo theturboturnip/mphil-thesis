@@ -2,12 +2,15 @@
 bibliography:
 - thesis.bib
 csl:
-- din-1505-2-alphanumeric.csl
+- institute-of-physics-numeric-modified.csl
 ---
+
+TODO note url for project?
+TODO note that royal 'we' is used throughout, I was the sole contributor
 
 # Introduction
 
-The CHERI (Capability Hardware Enhanced RISC Instructions) architecture project improves computer
+The CHERI architecture project improves computer
 security by checking all memory accesses in
 hardware.
 Under CHERI, memory cannot be accessed with integer addresses, but must pass
