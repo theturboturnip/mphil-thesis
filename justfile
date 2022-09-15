@@ -64,6 +64,7 @@ savecount:
 
 rcount:
     wc -w RISE/1_intro.md RISE/2_bg.md RISE/3_hw.md RISE/4_sw.md RISE/5_capinvec.md RISE/6_concl.md
+    wc -w RISE/RISE_abstract.md
 
 open: build-thesis
     xdg-open ./output/thesis.pdf
