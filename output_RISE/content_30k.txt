@@ -256,16 +256,12 @@ Based on the hypotheses examined in this summary and the original dissertation, 
 
 3.9 Testing
 
-TODO mention testing!!
+Alongside the theoretical hypotheses, the emulator was tested with a comprehensive set of self-checking test programs. RVV memory access correctness was tested by implementing functions that mimicked memcpy on integer data, under various scenarios for different instructions and addressing modes. These included unit, strided, and indexed addressing modes, “segmented” and “masked” accesses (explained in the dissertation), and fault-only-first loads. Fault-only-first loads were also tested on the boundary of mapped memory, showing they correctly swallowed memory access exceptions.
+
+Capabilities-in-vectors had a dedicated testbench, which would attempt to memcpy an array of structures holding pointers to other structures. This had two variants. The first simply copied the data, which worked on CHERI and non-CHERI. The other would add 0 to the data after loading it from memory, which invalidates any capabilities before copying it to the output. That only worked on CHERI, showing that capability manipulation was possible.
 
 3.10 Future work
 
 The stated purpose of this project was to enable future implementations of CHERI-RVV and CHERI Arm SVE. We’ve shown this is feasible, and we believe our research is enough to create an initial CHERI-RVV specification, but both could benefit from more research on capabilities-in-vectors.
 
-All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the first version of CHERI-RVV based on this dissertation and only add new instructions as required. Once created, the standard can be implemented in CHERI-Clang and added to existing CHERI-RISC-V processors⁷.
-
-More theoretically, other vector models could benefit from dereferencing capabilities-in-vectors. Arm SVE has addressing modes that directly use vector elements as memory references, as do its predecessors and contemporaries. A draft specification of CHERI-x86 is in the works[7], and existing x86 vector models like AVX have similar features. This may prove impractical, but this could be mitigated by e.g. replacing these addressing modes with variants of RVV’s “indexed” mode. Once this problem is solved, CHERI will be able to match the memory access abilities of any vector ISA it needs to, making it that much easier for industry to adopt CHERI in the long term.
-
-[1]
-
-Watson R N M, Moore S W, et al
+All architectures may benefit from more advanced vectorized capabil

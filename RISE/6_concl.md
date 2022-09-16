@@ -21,7 +21,13 @@ CHERI, we hope that this research paves the way for future
 vector-enabled CHERI processors.
 
 ## Testing
-TODO mention testing!!
+Alongside the theoretical hypotheses, the emulator was tested with a comprehensive set of self-checking test programs.
+RVV memory access correctness was tested by implementing functions that mimicked `memcpy` on integer data, under various scenarios for different instructions and addressing modes.
+These included unit, strided, and indexed addressing modes, "segmented" and "masked" accesses (explained in the dissertation), and fault-only-first loads.
+Fault-only-first loads were also tested on the boundary of mapped memory, showing they correctly swallowed memory access exceptions.
+
+Capabilities-in-vectors had a dedicated testbench, which would attempt to `memcpy` an array of structures holding pointers to other structures.
+This had two variants. The first simply copied the data, which worked on CHERI and non-CHERI. The other would add 0 to the data after loading it from memory, which invalidates any capabilities before copying it to the output. That only worked on CHERI, showing that capability manipulation was possible.
 
 ## Future work
 
