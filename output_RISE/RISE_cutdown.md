@@ -61,7 +61,7 @@ implementation and informing the approach for a future CHERI Arm SVE
 implementation.
 
 The full dissertation addresses nine hypotheses, but for the sake of brevity we examine four here.
-Sections 2-5 each cover one hypothesis in order, and Section 6 concludes.
+Chapters 2-5 each cover one hypothesis in order, and Chapter 6 concludes.
 
 1. It is possible to use CHERI capabilities as memory references in all vector instructions.
 2. The capability bounds checks for vector elements within a known range (e.g. a cache line) can be performed in a single check, amortizing the cost.
