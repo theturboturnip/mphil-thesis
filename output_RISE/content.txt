@@ -242,7 +242,7 @@ To ensure Provenance and Monotonicity were upheld, we decided that the tag bit f
 
 Memory access instructions must follow the same rules as scalar capability accesses. To maintain Provenance they must be CLEN-aligned, or at least only load valid capabilities from aligned addresses, because tag bits only apply to CLEN-aligned regions; and they must be atomic[7].
 
-This atomicity requirement applies to the individual element accesses within each vector access too. If multiple elements within a vector access try to write to the same 128-bit region, TODO
+This atomicity requirement applies to the individual element accesses within each vector access too. If multiple elements within a vector access try to write to the same 128-bit region non-atomically, it could result in a corrupted/malformed/forged capability.
 
 Monotonicity is not affected by simply loading/storing capabilities from memory. Integrity requires that the accesses themselves are checked against a valid base capability, just like normal scalar and vector accesses.
 

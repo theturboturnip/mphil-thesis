@@ -534,7 +534,7 @@ valid capabilities from aligned addresses, because tag bits only apply
 to `CLEN`-aligned regions; and they must be atomic[@TR-951 Section 11.3].
 
 This atomicity requirement applies to the individual element accesses within each vector access too.
-If multiple elements within a vector access try to write to the same 128-bit region, TODO
+If multiple elements within a vector access try to write to the same 128-bit region non-atomically, it could result in a corrupted/malformed/forged capability.
 
 Monotonicity is not affected by simply loading/storing capabilities from memory.
 Integrity requires that the accesses themselves are checked against a valid base capability, just like normal scalar and vector accesses.
