@@ -8,7 +8,7 @@ software artifacts: a Rust wrapper for the `cheri-compressed-cap` C
 library (900 lines of code), a RISC-V emulator supporting multiple
 architecture extensions (5,300 LoC), a fork of CHERI-Clang supporting
 CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000
-LoC[^48]). Developing these artifacts provided enough information to
+LoC). Developing these artifacts provided enough information to
 make conclusions for the initial hypotheses.
 
 Based on the hypotheses examined in this summary and the original dissertation,
@@ -42,7 +42,7 @@ manipulation. Because these processes are still evolving, it may be wise
 to standardize the first version of CHERI-RVV based on this dissertation
 and only add new instructions as required. Once created, the standard
 can be implemented in CHERI-Clang and added to existing
-CHERI-RISC-V processors[^50].
+CHERI-RISC-V processors.
 
 More theoretically, other vector models could benefit from
 *dereferencing* capabilities-in-vectors. Arm SVE has addressing modes
