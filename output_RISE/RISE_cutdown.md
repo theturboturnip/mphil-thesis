@@ -185,7 +185,18 @@ Instructions only operate on body elements, and some allow elements within the b
 
 ### RVV memory instructions
 
-TODO - different addressing modes, FoF
+The only RVV instructions that interact with memory are vectorized loads and stores.
+These instructions take a register index to use as the "base address", and calculates offsets from that base for each individual vector element.
+The offsets can be calculated in three ways:
+
+- Unit-stride, where elements are tightly packed together.
+- Strided, where a second register specifies the distance between consecutive elements.
+- Indexed, where a vector register holds the offsets for each vector element.
+
+Additionally, unit-stride accesses support a few alternate modes of operation.
+The most relevant one here is the fault-only-first unit-strided load.
+This loads as much contiguous data as possible from the base address, until one of the elements triggers an exception (such as a capability bounds violation).
+That exception will be silently swallowed, and `vl` will be shrunk to the index of the offending element.
 
 ### Exception handling
 

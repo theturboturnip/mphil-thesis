@@ -79,7 +79,13 @@ RVV instructions operate on groups of vector registers. The implementation holds
 
 2.2.1 RVV memory instructions
 
-TODO - different addressing modes, FoF
+The only RVV instructions that interact with memory are vectorized loads and stores. These instructions take a register index to use as the “base address”, and calculates offsets from that base for each individual vector element. The offsets can be calculated in three ways:
+
+-   Unit-stride, where elements are tightly packed together.
+-   Strided, where a second register specifies the distance between consecutive elements.
+-   Indexed, where a vector register holds the offsets for each vector element.
+
+Additionally, unit-stride accesses support a few alternate modes of operation. The most relevant one here is the fault-only-first unit-strided load. This loads as much contiguous data as possible from the base address, until one of the elements triggers an exception (such as a capability bounds violation). That exception will be silently swallowed, and vl will be shrunk to the index of the offending element.
 
 2.2.2 Exception handling
 
@@ -260,24 +266,4 @@ The stated purpose of this project was to enable future implementations of CHERI
 
 All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the first version of CHERI-RVV based on this dissertation and only add new instructions as required. Once created, the standard can be implemented in CHERI-Clang and added to existing CHERI-RISC-V processors⁷.
 
-More theoretically, other vector models could benefit from dereferencing capabilities-in-vectors. Arm SVE has addressing modes that directly use vector elements as memory references, as do its predecessors and contemporaries. A draft specification of CHERI-x86 is in the works[7], and existing x86 vector models like AVX have similar features. This may prove impractical, but this could be mitigated by e.g. replacing these addressing modes with variants of RVV’s “indexed” mode. Once this problem is solved, CHERI will be able to match the memory access abilities of any vector ISA it needs to, making it that much easier for industry to adopt CHERI in the long term.
-
-[1]
-
-Watson R N M, Moore S W, et al; 2019; "An Introduction to CHERI"
-
-[2]
-
-Szekeres L, Payer M, et al; 2013; "SoK: Eternal War in Memory". 2013 IEEE Symposium on Security and Privacy pp 48–62. https://doi.org/10.1109/SP.2013.13
-
-[3]
-
-Watson R N M, Woodruff J, et al; 2015; "CHERI: A Hybrid Capability-System Architecture for Scalable Software Compartmentalization". 2015 IEEE Symposium on Security and Privacy (SP) (San Jose, CA: IEEE) pp 20–37. https://ieeexplore.ieee.org/document/7163016/
-
-[4]
-
-Stephens N, Biles S, et al; 2017; "The ARM Scalable Vector Extension". IEEE Micro 37 26–39. http://ieeexplore.ieee.org/document/7924233/
-
-[5]
-
-Anon
+More theoretically, other vector models could benefit from dereferencing capabilities-in-vectors. Arm SVE has addressing modes that directly use vector elements as memory references, as do its predecessors and contemporaries. A draft specification of CHERI-x86 is in the works[7], and existing x86 vector models like AVX have similar features. This may prove impractical, but this could be mitigated by e.g. replacing these addressing modes wi
