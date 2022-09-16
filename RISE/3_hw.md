@@ -74,18 +74,10 @@ of the base register e.g. "the provenance is provided by capability
 register X", or defined by the DDC in integer mode. On non-CHERI
 platforms the vector unit doesn't check provenance.
 
-TODO fixup as an intro to fast-paths
 The initial motivation for this project was investigating the impact of
 capability checks on performance. Rather than check each element's
 access individually, we determine a set of "fast-path" checks which
-count as checks for multiple elements at once. In the emulator, this is
-done by computing the "tight bounds" for each access, i.e. the exact
-range of bytes that will be accessed, and doing a single capability
-check with that bounds.
-[\[chap:hardware:sec:fastpath\]](#chap:hardware:sec:fastpath){reference-type="ref"
-reference="chap:hardware:sec:fastpath"} describes methods for
-calculating the "tight bounds" for each access type, and ways that
-architectural complexity can be traded off to calculate *wider* bounds.
+count as checks for multiple elements at once.
 
 ## Fast-path calculations
 A fast-path check can be performed over various sets of elements. The
