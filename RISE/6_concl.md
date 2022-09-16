@@ -11,7 +11,7 @@ CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000
 LoC[^48]). Developing these artifacts provided enough information to
 make conclusions for the initial hypotheses.
 
-Based on the hypotheses examined in this write-up and the original dissertation,
+Based on the hypotheses examined in this summary and the original dissertation,
 scalable vector models can be adapted to CHERI without
 significant loss of functionality. Most of the hypotheses are general
 enough to cover other scalable models, e.g. Arm SVE, but any differences

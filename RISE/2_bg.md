@@ -1,7 +1,7 @@
 # Background
 
-TODO - something here?
-
+This chapter provides background on CHERI and RVV.
+It has been cut down to only include information relevant to the rest of this summary.
 
 ## CHERI {#chap:bg:sec:cheri}
 
@@ -21,7 +21,7 @@ By using floating-point, all of this data has been reduced to just 2x the archit
 size (see [@woodruffCHERIConcentratePractical2019]).
 For example, on 64-bit RISC-V a standard capability is 128-bits
 long, and we assume capabilities are 128-bits
-long throughout this write-up.
+long throughout this summary.
 
 A CHERI implementation has to enforce three security properties about
 its capabilities[@TR-951 Section 1.2.1]:

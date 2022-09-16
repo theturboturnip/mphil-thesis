@@ -70,8 +70,8 @@ Sections 2-5 each cover one hypothesis in order, and Section 6 concludes.
 
 # Background
 
-TODO - something here?
-
+This chapter provides background on CHERI and RVV.
+It has been cut down to only include information relevant to the rest of this summary.
 
 ## CHERI {#chap:bg:sec:cheri}
 
@@ -91,7 +91,7 @@ By using floating-point, all of this data has been reduced to just 2x the archit
 size (see [@woodruffCHERIConcentratePractical2019]).
 For example, on 64-bit RISC-V a standard capability is 128-bits
 long, and we assume capabilities are 128-bits
-long throughout this write-up.
+long throughout this summary.
 
 A CHERI implementation has to enforce three security properties about
 its capabilities[@TR-951 Section 1.2.1]:
@@ -554,7 +554,7 @@ CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000
 LoC[^48]). Developing these artifacts provided enough information to
 make conclusions for the initial hypotheses.
 
-Based on the hypotheses examined in this write-up and the original dissertation,
+Based on the hypotheses examined in this summary and the original dissertation,
 scalable vector models can be adapted to CHERI without
 significant loss of functionality. Most of the hypotheses are general
 enough to cover other scalable models, e.g. Arm SVE, but any differences
