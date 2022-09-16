@@ -67,9 +67,7 @@ it that much easier for industry to adopt CHERI in the long term.
 [^45]: The tag bits are implicitly instead of explicitly included here
     because `VLEN,ELEN` must be powers of two.
 
-[^47]: The encoding mode
-    ([\[chap:bg:subsec:cheriencodingmode\]](#chap:bg:subsec:cheriencodingmode){reference-type="ref"
-    reference="chap:bg:subsec:cheriencodingmode"}) does not affect
+[^47]: The encoding mode does not affect
     register usage: when using the Integer encoding mode, instructions
     can still access the vector registers in a capability context. This
     is just like how scalar capability registers are still accessible in

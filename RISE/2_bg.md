@@ -3,7 +3,7 @@
 This chapter provides background on CHERI and RVV.
 It has been cut down to only include information relevant to the rest of this summary.
 
-## CHERI {#chap:bg:sec:cheri}
+## CHERI
 
 In CHERI, addresses/pointers are replaced with capabilities: unforgeable
 tokens that provide *specific kinds of access* to an *address* within a
@@ -133,18 +133,18 @@ That exception will be silently swallowed, and `vl` will be shrunk to the index 
 If synchronous exceptions (e.g. invalid memory access) or asynchronous interrupts
 are encountered while executing a vector instruction, RVV defines two ways
 to trap them.
-In both cases, the PC of the instruction is saved in a register "*epc".
+In both cases, the PC of the instruction is saved in a register `*epc`.
 
 If the instruction should be resumed after handling the trap, e.g. in the case of demand paging,
 the implementation may use a "precise trap".
-The implementation must complete all instructions up to "*epc", and no instructions after that,
-and save the index of the offending vector element in "vstart".
-Within the instruction, all vector elements before "vstart" must have committed their results, and all other elements must either
+The implementation must complete all instructions up to `*epc`, and no instructions after that,
+and save the index of the offending vector element in `vstart`.
+Within the instruction, all vector elements before `vstart` must have committed their results, and all other elements must either
 1) not have committed results, or
 2) be idempotent e.g. repeatable without changing the outcome.
 
-In other cases "imprecise traps" may be used, which allow instructions after "*epc" and vector elements after "vstart" to commit their results.
-"vstart" must still be recorded, however.
+In other cases "imprecise traps" may be used, which allow instructions after `*epc` and vector elements after `vstart` to commit their results.
+`vstart` must still be recorded, however.
    
 
 

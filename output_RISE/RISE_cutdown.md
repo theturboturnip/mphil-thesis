@@ -73,7 +73,7 @@ Chapters 2-5 each cover one hypothesis in order, and Chapter 6 concludes.
 This chapter provides background on CHERI and RVV.
 It has been cut down to only include information relevant to the rest of this summary.
 
-## CHERI {#chap:bg:sec:cheri}
+## CHERI
 
 In CHERI, addresses/pointers are replaced with capabilities: unforgeable
 tokens that provide *specific kinds of access* to an *address* within a
@@ -203,18 +203,18 @@ That exception will be silently swallowed, and `vl` will be shrunk to the index 
 If synchronous exceptions (e.g. invalid memory access) or asynchronous interrupts
 are encountered while executing a vector instruction, RVV defines two ways
 to trap them.
-In both cases, the PC of the instruction is saved in a register "*epc".
+In both cases, the PC of the instruction is saved in a register `*epc`.
 
 If the instruction should be resumed after handling the trap, e.g. in the case of demand paging,
 the implementation may use a "precise trap".
-The implementation must complete all instructions up to "*epc", and no instructions after that,
-and save the index of the offending vector element in "vstart".
-Within the instruction, all vector elements before "vstart" must have committed their results, and all other elements must either
+The implementation must complete all instructions up to `*epc`, and no instructions after that,
+and save the index of the offending vector element in `vstart`.
+Within the instruction, all vector elements before `vstart` must have committed their results, and all other elements must either
 1) not have committed results, or
 2) be idempotent e.g. repeatable without changing the outcome.
 
-In other cases "imprecise traps" may be used, which allow instructions after "*epc" and vector elements after "vstart" to commit their results.
-"vstart" must still be recorded, however.
+In other cases "imprecise traps" may be used, which allow instructions after `*epc` and vector elements after `vstart` to commit their results.
+`vstart` must still be recorded, however.
    
 
 
@@ -289,9 +289,7 @@ all registers and other state. `VLEN` is hardcoded as 128-bits, chosen
 because it's the largest integer primitive provided by Rust that's large
 enough to hold a capability. `ELEN` is also 128-bits, which isn't
 supported by the specification, but is required for
-capabilities-in-vectors
-([\[chap:capinvec\]](#chap:capinvec){reference-type="ref"
-reference="chap:capinvec"}).
+capabilities-in-vectors.
 
 To support both CHERI and non-CHERI execution pointers are separated
 into an address and a *provenance*[^28]. The vector unit retrieves an
@@ -325,15 +323,9 @@ also choose to calculate wider bounds than accessed for the sake of
 simplicity, or even forego a fast-path check altogether. Thus, a
 fast-path check can have four outcomes depending on the circumstances.
 
-::: subtable
-  Success          All accesses will succeed
-  ---------------- ----------------------------
-  Failure          At least one access *will*
-                   raise an exception
-  ---------------- ----------------------------
-  Likely-Failure   At least one access *may*
-  *or* Unchecked   raise an exception
-:::
+- Success - All accesses will succeed
+- Failure - At least one access *will* raise an exception
+- Likely-Failure *or* Unchecked - At least one access *may* raise an exception
 
 A Success means no per-access capability checks are required.
 Likely-Failure and Unchecked results mean each access must be checked,
@@ -393,6 +385,7 @@ always necessary, it can be implemented in a slow way (e.g. doing one
 check per cycle) to save on logic. Particularly if other parts of the
 system rely on constraining the addresses accessed in each cycle, a
 fast-path check can take advantage of those constraints.
+
 # The CHERI-RVV software stack
 
 This chapter, being less relevant to RISE/hardware security, has been greatly condensed.
@@ -450,7 +443,10 @@ Any auto-vectorized legacy code which uses valid base addresses can thus be
 converted to pure-capability CHERI-RVV code with no changes.
 
 This is not currently possible for CHERI-Clang, as RVV
-auto-vectorization is not implemented yet.# Capabilities-in-vectors
+auto-vectorization is not implemented yet.
+
+
+# Capabilities-in-vectors
 
 Implementing `memcpy` correctly for CHERI systems requires copying the
 tag bits as well as the data, which means the vector registers must store the tag bits and thus store valid capabilities.
@@ -541,6 +537,8 @@ should be considered carefully, rather than creating vector equivalents
 for all scalar manipulations. For example, revocation as described
 in [@xiaCHERIvokeCharacterisingPointer2019] may benefit from a vector
 equivalent to `CLoadTags`.
+
+
 # Conclusion
 
 This project demonstrated the viability of integrating CHERI with
@@ -610,9 +608,7 @@ it that much easier for industry to adopt CHERI in the long term.
 [^45]: The tag bits are implicitly instead of explicitly included here
     because `VLEN,ELEN` must be powers of two.
 
-[^47]: The encoding mode
-    ([\[chap:bg:subsec:cheriencodingmode\]](#chap:bg:subsec:cheriencodingmode){reference-type="ref"
-    reference="chap:bg:subsec:cheriencodingmode"}) does not affect
+[^47]: The encoding mode does not affect
     register usage: when using the Integer encoding mode, instructions
     can still access the vector registers in a capability context. This
     is just like how scalar capability registers are still accessible in

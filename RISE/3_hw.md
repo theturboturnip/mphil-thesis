@@ -61,9 +61,7 @@ all registers and other state. `VLEN` is hardcoded as 128-bits, chosen
 because it's the largest integer primitive provided by Rust that's large
 enough to hold a capability. `ELEN` is also 128-bits, which isn't
 supported by the specification, but is required for
-capabilities-in-vectors
-([\[chap:capinvec\]](#chap:capinvec){reference-type="ref"
-reference="chap:capinvec"}).
+capabilities-in-vectors.
 
 To support both CHERI and non-CHERI execution pointers are separated
 into an address and a *provenance*[^28]. The vector unit retrieves an
@@ -97,15 +95,9 @@ also choose to calculate wider bounds than accessed for the sake of
 simplicity, or even forego a fast-path check altogether. Thus, a
 fast-path check can have four outcomes depending on the circumstances.
 
-::: subtable
-  Success          All accesses will succeed
-  ---------------- ----------------------------
-  Failure          At least one access *will*
-                   raise an exception
-  ---------------- ----------------------------
-  Likely-Failure   At least one access *may*
-  *or* Unchecked   raise an exception
-:::
+- Success - All accesses will succeed
+- Failure - At least one access *will* raise an exception
+- Likely-Failure *or* Unchecked - At least one access *may* raise an exception
 
 A Success means no per-access capability checks are required.
 Likely-Failure and Unchecked results mean each access must be checked,
@@ -165,3 +157,4 @@ always necessary, it can be implemented in a slow way (e.g. doing one
 check per cycle) to save on logic. Particularly if other parts of the
 system rely on constraining the addresses accessed in each cycle, a
 fast-path check can take advantage of those constraints.
+
