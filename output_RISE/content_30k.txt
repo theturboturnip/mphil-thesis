@@ -253,7 +253,7 @@ In theory it’s possible to do more complex transformations, but there aren’t
 
 6 Conclusion
 
-This project demonstrated the viability of integrating CHERI with scalable vector models by producing an example CHERI-RVV implementation. This required both research effort in studying the related specifications and a substantial implementation effort. We produced four software artifacts: a Rust wrapper for the cheri-compressed-cap C library (900 lines of code), a RISC-V emulator supporting multiple architecture extensions (5,300 LoC), a fork of CHERI-Clang supporting CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000 LoC⁶). Developing these artifacts provided enough information to make conclusions for the initial hypotheses.
+This project demonstrated the viability of integrating CHERI with scalable vector models by producing an example CHERI-RVV implementation. This required both research effort in studying the related specifications and a substantial implementation effort. We produced four software artifacts: a Rust wrapper for the cheri-compressed-cap C library (900 lines of code), a RISC-V emulator supporting multiple architecture extensions (5,300 LoC), a fork of CHERI-Clang supporting CHERI-RVV (400 changed LoC), and test programs for the emulator (3,000 LoC). Developing these artifacts provided enough information to make conclusions for the initial hypotheses.
 
 Based on the hypotheses examined in this summary and the original dissertation, scalable vector models can be adapted to CHERI without significant loss of functionality. Most of the hypotheses are general enough to cover other scalable models, e.g. Arm SVE, but any differences from RVV’s model will require careful examination. Given the importance of vector processing to modern computing, and thus its importance to CHERI, we hope that this research paves the way for future vector-enabled CHERI processors.
 
@@ -267,4 +267,4 @@ Capabilities-in-vectors had a dedicated testbench, which would attempt to memcpy
 
 The stated purpose of this project was to enable future implementations of CHERI-RVV and CHERI Arm SVE. We’ve shown this is feasible, and we believe our research is enough to create an initial CHERI-RVV specification, but both could benefit from more research on capabilities-in-vectors.
 
-All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the firs
+All architectures may benefit from more advanced vectorized capability manipulation. Because these processes are still evolving, it may be wise to standardize the first v
