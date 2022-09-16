@@ -174,15 +174,13 @@ As part of the project, we considered how adding CHERI to RVV would affect the s
 2.  Vector intrinsics, where the programmer writes vector code and the compiler handles low-level details e.g. register allocation
 3.  Inline assembly, where the programmer directly describes the assembly instructions to execute.
 
-Clang currently supports intrinsics and inline assembly for RVV, but not auto-vectorization yet. This just requires engineering work - Arm SVE, a similar model, has great auto-vectorization.
-
 3.5 Our changes to CHERI-Clang
 
 The first step was to fix up the pre-existing RVV definition in Clang to use capability registers for the base address. This meant CHERI-RVV assembly code could be compiled, as long as it explicitly referenced capability registers. Unfortunately, non-CHERI inline assembly could not be automatically compiled under this method.
 
 We investigated updating vector intrinsics to support CHERI, but found the code defining the intrinsics was more complicated than for assembly. We believe it is possible to update the intrinsics, but it requires significant engineering work.
 
-TODO this is really short lol
+Clang currently supports intrinsics and inline assembly for RVV, but not auto-vectorization yet. This just requires engineering work - Arm SVE, a similar model, has great auto-vectorization.
 
 3.6 The Hypothesis
 
