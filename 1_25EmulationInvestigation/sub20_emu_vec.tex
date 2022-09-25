@@ -75,6 +75,6 @@ Integer mode was included in the interests of maintaining compatibility with leg
 As similar vector code may also exist, CHERI-RVV treats vector memory access instructions as \enquote{existing RISC-V load and store opcodes} and requires that they respect integer/capability mode.
 
 We do not define new mode-agnostic instructions, like \code{S[BHWD][U].CAP} and \code{S[BHWD].DDC} (\cref{cheri_instructions}), which means vector programs cannot mix capability and integer addressing without changing encoding modes.
-This may make incremental adoption more difficult, and in the future we should examine existing vanilla RVV programs to determine if it's worth adding those instructions.
+This may make incremental adoption more difficult, and in the future we should examine existing programs to evaluate adding those instructions.
 % This could cause complications, but 
 % This should not cause too many complications, as vector accesses appear infrequently enough in code that changing them all at once should be feasible.

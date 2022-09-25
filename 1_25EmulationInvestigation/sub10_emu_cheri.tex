@@ -11,14 +11,14 @@ The latter then defines every relevant structure or function based on those prep
 For example, a function \code{compute_base_top} is generated twice, once as  \code{cc64\_decompress\_mem} returning \code{cc64\_cap\_t} and another time as \code{cc128\_decompress\_mem} returning \code{cc128\_cap\_t}.
 Elegantly capturing both sets was the main challenge for the Rust wrapper.
 
-One of Rust's core language elements is the Trait - a set of functions and \enquote{associated types} that can be \emph{implemented} for any type.
-This gives a simple way to define a consistent interface: define a trait \code{CompressedCapability} with all of the functions from \code{cheri\_compressed\_cap\_common.h}, and implement it for two empty structures \code{Cc64} and \code{Cc128}.
+One of Rust's core language elements is the Trait --- a set of functions and \enquote{associated types} that can be \emph{implemented} for any type.
+This gives a simple way to define a consistent interface: define a trait \code{CompressedCapability} with all of the functions from the common headers, and implement it for two empty structures \code{Cc64} and \code{Cc128}.
 In the future, this would allow the Morello versions of capabilities to be added easily.
 A struct \code{CcxCap<T>} is also defined which uses specific types for addresses and lengths pulled from a \code{CompressedCapability}.
 For example, the 64-bit capability structure holds a 32-bit address, and the 128-bit capability a 64-bit address.
 
 128-bit capabilities can cover a 64-bit address range, and thus can have a length of $2^{64}$.
-Storing this length requires 65-bits, so all math in \code{cheri\_compressed\_cap\_common.h} uses 128-bit length values.
+Storing this length requires 65-bits, so all math in \code{cheri-compressed-cap} uses 128-bit length values.
 C doesn't have any standardized 128-bit types, but GCC and LLVM provide so-called ``extension types'' which are used instead.
 Although the x86-64 ABI does specify how 128-bit values should be stored and passed as arguments\cite{specification-x86-psABI-v1.0}, these rules do not seem consistently applied\footnote{See \url{https://godbolt.org/z/qj43jssr6} for an example.}.
 This causes great pain to anyone who needs to pass them across a language boundary.
@@ -49,6 +49,7 @@ Two new ISA modules were created: \code{XCheri64} for the new CHERI instructions
 The actual Processor structure was left mostly unchanged.
 Integer addresses were changed to capabilities throughout,
 memory and register file types were changed as described above, and the PCC/DDC were added.
+\pagebreak
 
 \begin{figure}
     \centering
