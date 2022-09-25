@@ -34,9 +34,15 @@ build-thesis-anon: savecount
     @mkdir -p ./output_anon/
     latexmk -shell-escape -interaction=nonstopmode -lualatex -pretex="\def\turnipanon{1}" -usepretex ./thesis.tex -outdir=./output_anon/
 
-build-all: build-results build-thesis build-thesis-anon
+build-book:
+    @mkdir -p ./output_book/
+    latexmk -shell-escape -interaction=nonstopmode -lualatex ./thesis_book.tex -outdir=./output_book/
 
-final: build-all
+build-submission: build-results build-thesis build-thesis-anon
+
+build-all: build-submission build-book
+
+final: build-submission
     #!/usr/bin/env sh
     mkdir -p ./submission/
     cp ./output/thesis.pdf ./submission/sws35-project.pdf

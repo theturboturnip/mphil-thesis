@@ -11,6 +11,9 @@ output/*
 output_anon/*
 !output_anon/thesis.pdf
 
+output_book/*
+!output_book/thesis_book.pdf
+
 # thesis-class is cloned as a git repository
 # We only want to include important files - these will be pulled in to Overleaf
 # Ignore all files initially
@@ -26,4 +29,5 @@ thesis-class/*
 !thesis-class/License
 
 _minted-thesis
+_minted-thesis_book
 output_RISE/content.html

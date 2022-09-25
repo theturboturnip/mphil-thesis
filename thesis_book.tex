@@ -1,0 +1,93 @@
+\documentclass[a4paper,mphil]{cam-thesis}
+\usepackage{luacode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Preamble: Contains packages, commands, and meta-info (e.g. title, author,
+%%           college, etc.)
+%%
+\input{0_1Preamble/content}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Thesis meta-information (title, author's name etc.)
+%%
+\input{0_2ThesisInfo/content}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Abstract
+%%
+\input{0_3Abstract/content}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Acknowledgments
+%%
+\input{0_4Acknowledgments/content}
+
+
+\begin{document}
+
+% in one-side mode, get a version of cleardoublepage that works
+% https://tex.stackexchange.com/a/102462
+% \newcommand\cleartooddpage{\clearpage
+%   \ifodd\value{page}\else\null\clearpage\fi}
+\newcommand\cleartooddpage{\cleardoublepage}
+
+\camtitlepage{}
+
+% Don't include word count/declaration for printed version
+% \cleartooddpage
+% \camdeclarationpage{}
+% \wordcountdata{}
+% \vfill\null
+
+\cleartooddpage
+\camacknowledgementspage{}
+
+% Abstract and ToC
+\cleartooddpage
+\camabstractpage{}
+\cleartooddpage
+\camtocpage{}
+
+% Set chapter title format
+\ContentTitleFormat
+
+
+\cleartooddpage
+\input{chapters}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% References
+%%
+% If you include some work not referenced in the main text (e.g. using \nocite{}), consider changing "References" to "Bibliography".
+%
+
+\cleardoublepage
+\phantomsection
+\begingroup
+% Allow references to not fill the whole line
+\raggedright
+% \printbibheading[heading=bibnumbered,title=References]
+\chapter*{References}\addcontentsline{toc}{chapter}{References}
+\printbibliography[heading=none]
+\endgroup%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Appendix
+%%
+\subfile{2_1Appendix/content}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Index
+%%
+% \input{2_2Index/content}
+
+
+
+
+\end{document}
